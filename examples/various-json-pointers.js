@@ -2,11 +2,6 @@ var assert = require('assert'),
 ptr = require('..')
 ;
 
-var elapsed_time = function(mark, note){
-    var precision = 3; // 3 decimal places
-    var elapsed = process.hrtime(mark)[1] / 1000000; // divide by a million to get nano to milli
-    console.log(elapsed.toFixed(precision) + " ms - " + note); // print message + time
-}
 var obj = {
   a: 1,
   b: {
@@ -54,8 +49,6 @@ assert.throws(function() {
 assert.throws(function() { 
   ptr.set(obj, "a", {a: "value"});
 });
-
-elapsed_time(start, 'completed getting and setting '.concat(n - 1, ' values using string pointers.'));
 
 // JSON Pointers (as URI fragments)
 ub = ub * 2;

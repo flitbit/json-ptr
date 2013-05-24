@@ -1,9 +1,10 @@
+'use strict';
 
 function decodePointer (ptr) {
 	if (typeof ptr !== 'string') throw new TypeError('Invalid type: JSON Pointers are represented as strings.');
 	if (ptr.length === 0) return [];
 	if (ptr[0] !== '/') throw new ReferenceError('Invalid JSON Pointer syntax. Non-empty pointer must begin with a solidus `/`.')
-	var path = ptr.substring(1).split('/')
+		var path = ptr.substring(1).split('/')
 	, i = -1
 	, len = path.length;
 	while(++i < len) {
@@ -14,15 +15,14 @@ function decodePointer (ptr) {
 
 function encodePointer (path) {
 	if (path && !Array.isArray(path)) throw new TypeError('Invalid type: path must be an array of segments.');
-	path = path || [];
 	if (path.length === 0) return '';
-	var clone = path.slice(0)
+	var res = []
 	, i = -1
 	, len = path.length
 	while(++i < len) {
-		clone[i] = clone[i].replace('~', '~0').replace('/', '~1');
+		res.push(path[i].replace('~', '~0').replace('/', '~1'));
 	}
-	return "/".concat(clone.join('/'));
+	return "/".concat(res.join('/'));
 }
 
 function decodeUriFragmentIdentifier(ptr) {
@@ -41,15 +41,14 @@ function decodeUriFragmentIdentifier(ptr) {
 
 function encodeUriFragmentIdentifier(path) {
 	if (path && !Array.isArray(path)) throw new TypeError('Invalid type: path must be an array of segments.');
-	path = path || [];
 	if (path.length === 0) return '#';
-	var clone = path.slice(0)
+	var res = []
 	, i = -1
 	, len = path.length
 	while(++i < len) {
-		clone[i] = encodeURIComponent(clone[i].replace('~', '~0').replace('/', '~1'));
+		res.push(encodeURIComponent(path[i].replace('~', '~0').replace('/', '~1')));
 	}
-	return "#/".concat(clone.join('/'));
+	return "#/".concat(res.join('/'));
 }
 
 function toArrayIndexReference(arr, idx) {
@@ -64,72 +63,43 @@ function toArrayIndexReference(arr, idx) {
 	return parseInt(idx);
 }
 
-function JsonPointer(ptr) {
-	Object.defineProperty(this, "encode",
-		this.encode = (ptr.length > 0 && ptr[0] === '#') ? encodeUriFragmentIdentifier : encodePointer
-		);
-	if (Array.isArray(ptr)) {
-		Object.defineProperty(this, "path", { enumerable: true, value: ptr });
-	} else {
-		var decode = (ptr.length > 0 && ptr[0] === '#') ? decodeUriFragmentIdentifier : decodePointer;
-		Object.defineProperty(this, "path", { enumerable: true, value: decode(ptr) });
-	}
-}
-
-Object.defineProperty(JsonPointer.prototype, 'pointer', {
-	enumerable: true,
-	get: function() { return encodePointer(this.path); }
-});
-
-Object.defineProperty(JsonPointer.prototype, 'uriFragmentIdentifier', {
-	enumerable: true,
-	get: function() { return encodeUriFragmentIdentifier(this.path); }
-});
-
-JsonPointer.prototype.get = function (obj) {
+function get(obj, path) {
 	if (typeof obj !== 'undefined') {
-		var path = this.path
-		, it = obj
+		var it = obj
 		, len = path.length
 		, cursor = -1
 		, step, p;
 		// non-recursive object descent...
 		if (len) {
-			while(++cursor < len) {
+			while(++cursor < len && it) {
 				step = path[cursor];
 				if (Array.isArray(it)) {
 					if (isNaN(step)) {
-						break;
+						return;
 					}
 					p = toArrayIndexReference(it, step);
 					if (it.length > p) {
 						it = it[p];
 					} else {
-						break;
+						return;
 					}
 				} else {
 					it = it[step];
-					if (typeof it === 'undefined') {
-						break;
-					}
 				}
 			}
-			if (cursor === len) {
-				return it;
-			}
-		} else {
 			return it;
+		} else {
+			return obj;
 		}
 	}
 	// implicit return undefined, allows us to
 	// differentiate null as a valid value.
 }
 
-JsonPointer.prototype.set = function (obj, val) {
-	if (this.path.length === 0) throw new Error("Cannot set the root object; assign it directly.")
+function set(obj, val, path, enc) {
+	if (path.length === 0) throw new Error("Cannot set the root object; assign it directly.")
 	if (typeof obj !== 'undefined') {
-		var path = this.path
-		, it = obj
+		var it = obj
 		, len = path.length
 		, set = path.length - 1
 		, cursor = -1
@@ -153,7 +123,7 @@ JsonPointer.prototype.set = function (obj, val) {
 						return undefined;
 					} else {
 						throw new ReferenceError("Not found: "
-							.concat(this.encode(path.slice(0, cursor + 1), true), '.'));
+							.concat(encode(path.slice(0, cursor + 1), true), '.'));
 					}
 				} else {
 					if (cursor === set) {
@@ -164,7 +134,7 @@ JsonPointer.prototype.set = function (obj, val) {
 					it = it[step];
 					if (typeof it === 'undefined') {
 						throw new ReferenceError("Not found: "
-							.concat(this.encode(path.slice(0, cursor + 1), true), '.'));
+							.concat(encode(path.slice(0, cursor + 1), true), '.'));
 					}
 				}
 			}
@@ -177,13 +147,51 @@ JsonPointer.prototype.set = function (obj, val) {
 	}
 }
 
+function JsonPointer(ptr) {
+	this.encode = (ptr.length > 0 && ptr[0] === '#') ? encodeUriFragmentIdentifier : encodePointer;
+	if (Array.isArray(ptr)) {
+		this.path = ptr;
+	} else {
+		var decode = (ptr.length > 0 && ptr[0] === '#') ? decodeUriFragmentIdentifier : decodePointer;
+		this.path = decode(ptr);
+	}
+}
+
+Object.defineProperty(JsonPointer.prototype, 'pointer', {
+	enumerable: true,
+	get: function() { return encodePointer(this.path); }
+});
+
+Object.defineProperty(JsonPointer.prototype, 'uriFragmentIdentifier', {
+	enumerable: true,
+	get: function() { return encodeUriFragmentIdentifier(this.path); }
+});
+
+JsonPointer.prototype.get = function (obj) {
+	return get(obj, this.path);
+}
+
+JsonPointer.prototype.set = function(obj, val) {
+	return set(obj, val, this.path, this.encode);
+}
+
 JsonPointer.prototype.toString = function () {
 	return this.pointer;
 }
 
 module.exports.JsonPointer = JsonPointer;
 module.exports.create = function (ptr) { return new JsonPointer(ptr); };
-module.exports.get = function (obj, ptr) { return (new JsonPointer(ptr)).get(obj); };
-module.exports.set = function (obj, ptr, val) { return (new JsonPointer(ptr)).set(obj, val); };
+module.exports.get = function (obj, ptr) {
+	var decode = (ptr.length > 0 && ptr[0] === '#') ? decodeUriFragmentIdentifier : decodePointer;
+	return get(obj, decode(ptr));
+};
+module.exports.set = function (obj, ptr, val) {
+	var encode = (ptr.length > 0 && ptr[0] === '#') ? encodeUriFragmentIdentifier : encodePointer;
+	var decode = (ptr.length > 0 && ptr[0] === '#') ? decodeUriFragmentIdentifier : decodePointer;
+
+	return set(obj, val, decode(ptr), encode);
+};
 module.exports.decodePointer = decodePointer;
 module.exports.encodePointer = encodePointer;
+module.exports.decodeUriFragmentIdentifier = decodeUriFragmentIdentifier;
+module.exports.encodeUriFragmentIdentifier = encodeUriFragmentIdentifier;
