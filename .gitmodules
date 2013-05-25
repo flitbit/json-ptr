@@ -1,0 +1,3 @@
+[submodule "examples/node-jsonpointer"]
+	path = examples/node-jsonpointer
+	url = https://github.com/janl/node-jsonpointer.git
