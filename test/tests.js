@@ -743,12 +743,22 @@ describe('when working with complex data', function() {
 		},
 		d: {
 			e: [{a:3}, {b:4}, {c:5}]
-		}
+		},
+		f: null
 	};
+
+	// confirm that we can distinguish between missing values and values that are set to null...
 
 	it('#get should return `undefined` when the requested element is undefined (#/g/h)', function() {
 		var unk = ptr.get(data, '#/g/h');
 		(typeof unk).should.eql('undefined');
+	});
+
+
+	it('#get should return null when the requested element has a null value (#/f)', function() {
+		var unk = ptr.get(data, '#/f');
+		should.not.exist(unk);
+		(unk === null).should.be.true;
 	});
 });
 
