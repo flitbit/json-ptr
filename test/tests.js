@@ -1,6 +1,8 @@
-var should   = require('should'),
-ptr = require('..')
-;
+if (typeof require === 'function') {
+	var expect = require('expect.js'),
+	JsonPointer = require('..')
+	;
+}
 
 describe('JsonPointer', function() {
 	'use strict';
@@ -20,716 +22,716 @@ describe('JsonPointer', function() {
 		};
 
 		describe('with a JSON pointer to the root ``', function() {
-			var p = ptr.create('');
+			var p = JsonPointer.create('');
 
 			it('#get should resolve to the object itself', function() {
-				p.get(data).should.equal(data);
+				expect(p.get(data)).to.eql(data);
 			});
 
 			it('#set should throw', function() {
-				(function() {
+				expect(function() {
 					p.set(data, { this: "should cause an exception"});
-				}).should.throw();
+				}).to.throwError();
 			});
 
 			it('should have an empty path', function() {
-				p.path.should.have.length(0);
+				expect(p.path).to.have.length(0);
 			});
 
 			it('should have a pointer that is empty', function() {
-				p.pointer.should.eql('');
+				expect(p.pointer).to.eql('');
 			});
 
 			it('should have a URI fragment identfier that is empty', function() {
-				p.uriFragmentIdentifier.should.eql('#');
+				expect(p.uriFragmentIdentifier).to.eql('#');
 			});
 		});
 
 		describe('a URI fragment identfier to the root #', function() {
-			var p = ptr.create('#');
+			var p = JsonPointer.create('#');
 
 			it('#get should resolve to the object itself', function() {
-				p.get(data).should.equal(data);
+				expect(p.get(data)).to.equal(data);
 			});
 
 			it('#set should throw', function() {
-				(function() {
+				expect(function() {
 					p.set(data, { this: "should cause an exception"});
-				}).should.throw();
+				}).to.throwError();
 			});
 
 			it('should have an empty path', function() {
-				p.path.should.have.length(0);
+				expect(p.path).to.have.length(0);
 			});
 
 			it('should have a pointer that is empty', function() {
-				p.pointer.should.eql('');
+				expect(p.pointer).to.eql('');
 			});
 
 			it('should have a URI fragment identfier that is empty', function() {
-				p.uriFragmentIdentifier.should.eql('#');
+				expect(p.uriFragmentIdentifier).to.eql('#');
 			});
 		});
 
 		describe('with a JSON pointer of `/foo`', function() {
-			var p = ptr.create('/foo');
+			var p = JsonPointer.create('/foo');
 
 			it('#get should resolve to data["foo"]', function() {
-				p.get(data).should.equal(data["foo"]);
+				expect(p.get(data)).to.equal(data["foo"]);
 			});
 
 			it('#set should succeed changing the referenced value', function() {
 				var capture = p.get(data);
 				var updated = { this: "should succeed" }; 
 				p.set(data, updated);
-				p.get(data).should.eql(updated);
+				expect(p.get(data)).to.eql(updated);
 				p.set(data, capture);
 			});
 
 			it('should have a path of [ "foo" ]', function() {
-				p.path.should.eql(["foo"]);
+				expect(p.path).to.eql(["foo"]);
 			});
 
 			it('should have the pointer `/foo`', function() {
-				p.pointer.should.eql('/foo');
+				expect(p.pointer).to.eql('/foo');
 			});
 
 			it('should have the URI fragment identfier `#/foo`', function() {
-				p.uriFragmentIdentifier.should.eql('#/foo');
+				expect(p.uriFragmentIdentifier).to.eql('#/foo');
 			});
 		});
 
 		describe('a URI fragment identifier of `#/foo`', function() {
-			var p = ptr.create('#/foo');
+			var p = JsonPointer.create('#/foo');
 
 			it('#get should resolve to data["foo"]', function() {
-				p.get(data).should.equal(data["foo"]);
+				expect(p.get(data)).to.equal(data["foo"]);
 			});
 
 			it('#set should succeed changing the referenced value', function() {
 				var capture = p.get(data);
 				var updated = { this: "should succeed" }; 
 				p.set(data, updated);
-				p.get(data).should.eql(updated);
+				expect(p.get(data)).to.eql(updated);
 				p.set(data, capture);
 			});
 
 			it('should have a path of [ "foo" ]', function() {
-				p.path.should.eql(["foo"]);
+				expect(p.path).to.eql(["foo"]);
 			});
 
 			it('should have the pointer `/foo`', function() {
-				p.pointer.should.eql('/foo');
+				expect(p.pointer).to.eql('/foo');
 			});
 
 			it('should have the URI fragment identfier `#/foo`', function() {
-				p.uriFragmentIdentifier.should.eql('#/foo');
+				expect(p.uriFragmentIdentifier).to.eql('#/foo');
 			});
 		});
 
 		describe('with a JSON pointer of `/foo/0`', function() {
-			var p = ptr.create('/foo/0');
+			var p = JsonPointer.create('/foo/0');
 
 			it('#get should resolve to data.foo[0]', function() {
-				p.get(data).should.equal(data.foo[0]);
+				expect(p.get(data)).to.equal(data.foo[0]);
 			});
 
 			it('#set should succeed changing the referenced value', function() {
 				var capture = p.get(data);
 				var updated = { this: "should succeed" }; 
 				p.set(data, updated);
-				p.get(data).should.eql(updated);
+				expect(p.get(data)).to.eql(updated);
 				p.set(data, capture);
 			});
 
 			it('should have a path of [ "foo", "0" ]', function() {
-				p.path.should.eql(["foo", "0"]);
+				expect(p.path).to.eql(["foo", "0"]);
 			});
 
 			it('should have the pointer `/foo/0`', function() {
-				p.pointer.should.eql('/foo/0');
+				expect(p.pointer).to.eql('/foo/0');
 			});
 
 			it('should have the URI fragment identfier `#/foo/0`', function() {
-				p.uriFragmentIdentifier.should.eql('#/foo/0');
+				expect(p.uriFragmentIdentifier).to.eql('#/foo/0');
 			});
 		});
 
 		describe('a URI fragment identifier of `#/foo/0`', function() {
-			var p = ptr.create('#/foo/0');
+			var p = JsonPointer.create('#/foo/0');
 
 			it('#get should resolve to data.foo[0]', function() {
-				p.get(data).should.equal(data.foo[0]);
+				expect(p.get(data)).to.equal(data.foo[0]);
 			});
 
 			it('#set should succeed changing the referenced value', function() {
 				var capture = p.get(data);
 				var updated = { this: "should succeed" }; 
 				p.set(data, updated);
-				p.get(data).should.eql(updated);
+				expect(p.get(data)).to.eql(updated);
 				p.set(data, capture);
 			});
 
 			it('should have a path of [ "foo", "0" ]', function() {
-				p.path.should.eql(["foo", "0"]);
+				expect(p.path).to.eql(["foo", "0"]);
 			});
 
 			it('should have the pointer `/foo/0`', function() {
-				p.pointer.should.eql('/foo/0');
+				expect(p.pointer).to.eql('/foo/0');
 			});
 
 			it('should have the URI fragment identfier `#/foo/0`', function() {
-				p.uriFragmentIdentifier.should.eql('#/foo/0');
+				expect(p.uriFragmentIdentifier).to.eql('#/foo/0');
 			});
 		});
 
 		describe('with a JSON pointer of `/`', function() {
-			var p = ptr.create('/');
+			var p = JsonPointer.create('/');
 
 			it('#get should resolve to data[""]', function() {
-				p.get(data).should.equal(data[""]);
+				expect(p.get(data)).to.equal(data[""]);
 			});
 
 			it('#set should succeed changing the referenced value', function() {
 				var capture = p.get(data);
 				var updated = { this: "should succeed" }; 
 				p.set(data, updated);
-				p.get(data).should.eql(updated);
+				expect(p.get(data)).to.eql(updated);
 				p.set(data, capture);
 			});
 
 			it('should have a path of [ "" ]', function() {
-				p.path.should.eql([""]);
+				expect(p.path).to.eql([""]);
 			});
 
 			it('should have the pointer `/`', function() {
-				p.pointer.should.eql('/');
+				expect(p.pointer).to.eql('/');
 			});
 
 			it('should have the URI fragment identfier `#/`', function() {
-				p.uriFragmentIdentifier.should.eql('#/');
+				expect(p.uriFragmentIdentifier).to.eql('#/');
 			});
 		});
 
 		describe('a URI fragment identifier of `#/`', function() {
-			var p = ptr.create('#/');
+			var p = JsonPointer.create('#/');
 
 			it('#get should resolve to data[""]', function() {
-				p.get(data).should.equal(data[""]);
+				expect(p.get(data)).to.equal(data[""]);
 			});
 
 			it('#set should succeed changing the referenced value', function() {
 				var capture = p.get(data);
 				var updated = { this: "should succeed" }; 
 				p.set(data, updated);
-				p.get(data).should.eql(updated);
+				expect(p.get(data)).to.eql(updated);
 				p.set(data, capture);
 			});
 
 			it('should have a path of [ "" ]', function() {
-				p.path.should.eql([""]);
+				expect(p.path).to.eql([""]);
 			});
 
 			it('should have the pointer `/`', function() {
-				p.pointer.should.eql('/');
+				expect(p.pointer).to.eql('/');
 			});
 
 			it('should have the URI fragment identfier `#/`', function() {
-				p.uriFragmentIdentifier.should.eql('#/');
+				expect(p.uriFragmentIdentifier).to.eql('#/');
 			});
 		});
 
 		describe('with a JSON pointer of `/a~1b`', function() {
-			var p = ptr.create('/a~1b');
+			var p = JsonPointer.create('/a~1b');
 
 			it('#get should resolve to data["a/b"]', function() {
-				p.get(data).should.equal(data["a/b"]);
+				expect(p.get(data)).to.equal(data["a/b"]);
 			});
 
 			it('#set should succeed changing the referenced value', function() {
 				var capture = p.get(data);
 				var updated = { this: "should succeed" }; 
 				p.set(data, updated);
-				p.get(data).should.eql(updated);
+				expect(p.get(data)).to.eql(updated);
 				p.set(data, capture);
 			});
 
 			it('should have a path of [ "a/b" ]', function() {
-				p.path.should.eql(["a/b"]);
+				expect(p.path).to.eql(["a/b"]);
 			});
 
 			it('should have the pointer `/a~1b`', function() {
-				p.pointer.should.eql('/a~1b');
+				expect(p.pointer).to.eql('/a~1b');
 			});
 
 			it('should have the URI fragment identfier `#/a~1b`', function() {
-				p.uriFragmentIdentifier.should.eql('#/a~1b');
+				expect(p.uriFragmentIdentifier).to.eql('#/a~1b');
 			});
 		});
 
 		describe('a URI fragment identifier of `#/a~1b`', function() {
-			var p = ptr.create('#/a~1b');
+			var p = JsonPointer.create('#/a~1b');
 
 			it('#get should resolve to data["a/b"]', function() {
-				p.get(data).should.equal(data["a/b"]);
+				expect(p.get(data)).to.equal(data["a/b"]);
 			});
 
 			it('#set should succeed changing the referenced value', function() {
 				var capture = p.get(data);
 				var updated = { this: "should succeed" }; 
 				p.set(data, updated);
-				p.get(data).should.eql(updated);
+				expect(p.get(data)).to.eql(updated);
 				p.set(data, capture);
 			});
 
 			it('should have a path of [ "a/b" ]', function() {
-				p.path.should.eql(["a/b"]);
+				expect(p.path).to.eql(["a/b"]);
 			});
 
 			it('should have the pointer `/a~1b`', function() {
-				p.pointer.should.eql('/a~1b');
+				expect(p.pointer).to.eql('/a~1b');
 			});
 
 			it('should have the URI fragment identfier `#/a~1b`', function() {
-				p.uriFragmentIdentifier.should.eql('#/a~1b');
+				expect(p.uriFragmentIdentifier).to.eql('#/a~1b');
 			});
 		});
 
 		describe('with a JSON pointer of `/c%d`', function() {
-			var p = ptr.create('/c%d');
+			var p = JsonPointer.create('/c%d');
 
 			it('#get should resolve to data["c%d"]', function() {
-				p.get(data).should.equal(data["c%d"]);
+				expect(p.get(data)).to.equal(data["c%d"]);
 			});
 
 			it('#set should succeed changing the referenced value', function() {
 				var capture = p.get(data);
 				var updated = { this: "should succeed" }; 
 				p.set(data, updated);
-				p.get(data).should.eql(updated);
+				expect(p.get(data)).to.eql(updated);
 				p.set(data, capture);
 			});
 
 			it('should have a path of [ "c%d" ]', function() {
-				p.path.should.eql(["c%d"]);
+				expect(p.path).to.eql(["c%d"]);
 			});
 
 			it('should have the pointer `/c%d`', function() {
-				p.pointer.should.eql('/c%d');
+				expect(p.pointer).to.eql('/c%d');
 			});
 
 			it('should have the URI fragment identfier `#/c%25d`', function() {
-				p.uriFragmentIdentifier.should.eql('#/c%25d');
+				expect(p.uriFragmentIdentifier).to.eql('#/c%25d');
 			});
 		});
 
 		describe('a URI fragment identifier of `#/c%25d`', function() {
-			var p = ptr.create('#/c%25d');
+			var p = JsonPointer.create('#/c%25d');
 
 			it('#get should resolve to data["c%d"]', function() {
-				p.get(data).should.equal(data["c%d"]);
+				expect(p.get(data)).to.equal(data["c%d"]);
 			});
 
 			it('#set should succeed changing the referenced value', function() {
 				var capture = p.get(data);
 				var updated = { this: "should succeed" }; 
 				p.set(data, updated);
-				p.get(data).should.eql(updated);
+				expect(p.get(data)).to.eql(updated);
 				p.set(data, capture);
 			});
 
 			it('should have a path of [ "c%d" ]', function() {
-				p.path.should.eql(["c%d"]);
+				expect(p.path).to.eql(["c%d"]);
 			});
 
 			it('should have the pointer `/c%d`', function() {
-				p.pointer.should.eql('/c%d');
+				expect(p.pointer).to.eql('/c%d');
 			});
 
 			it('should have the URI fragment identfier `#/c%25d`', function() {
-				p.uriFragmentIdentifier.should.eql('#/c%25d');
+				expect(p.uriFragmentIdentifier).to.eql('#/c%25d');
 			});
 		});
 
 		describe('with a JSON pointer of `/e^f`', function() {
-			var p = ptr.create('/e^f');
+			var p = JsonPointer.create('/e^f');
 
 			it('#get should resolve to data["e^f"]', function() {
-				p.get(data).should.equal(data["e^f"]);
+				expect(p.get(data)).to.equal(data["e^f"]);
 			});
 
 			it('#set should succeed changing the referenced value', function() {
 				var capture = p.get(data);
 				var updated = { this: "should succeed" }; 
 				p.set(data, updated);
-				p.get(data).should.eql(updated);
+				expect(p.get(data)).to.eql(updated);
 				p.set(data, capture);
 			});
 
 			it('should have a path of [ "e^f" ]', function() {
-				p.path.should.eql(["e^f"]);
+				expect(p.path).to.eql(["e^f"]);
 			});
 
 			it('should have the pointer `/e^f`', function() {
-				p.pointer.should.eql('/e^f');
+				expect(p.pointer).to.eql('/e^f');
 			});
 
 			it('should have the URI fragment identfier `#/e%5Ef`', function() {
-				p.uriFragmentIdentifier.should.eql('#/e%5Ef');
+				expect(p.uriFragmentIdentifier).to.eql('#/e%5Ef');
 			});
 		});
 
 		describe('a URI fragment identifier of `#/e%5Ef`', function() {
-			var p = ptr.create('#/e%5Ef');
+			var p = JsonPointer.create('#/e%5Ef');
 
 			it('#get should resolve to data["e^f"]', function() {
-				p.get(data).should.equal(data["e^f"]);
+				expect(p.get(data)).to.equal(data["e^f"]);
 			});
 
 			it('#set should succeed changing the referenced value', function() {
 				var capture = p.get(data);
 				var updated = { this: "should succeed" }; 
 				p.set(data, updated);
-				p.get(data).should.eql(updated);
+				expect(p.get(data)).to.eql(updated);
 				p.set(data, capture);
 			});
 
 			it('should have a path of [ "e^f" ]', function() {
-				p.path.should.eql(["e^f"]);
+				expect(p.path).to.eql(["e^f"]);
 			});
 
 			it('should have the pointer `/e^f`', function() {
-				p.pointer.should.eql('/e^f');
+				expect(p.pointer).to.eql('/e^f');
 			});
 
 			it('should have the URI fragment identfier `#/e%5Ef`', function() {
-				p.uriFragmentIdentifier.should.eql('#/e%5Ef');
+				expect(p.uriFragmentIdentifier).to.eql('#/e%5Ef');
 			});
 		});
 
 		describe('with a JSON pointer of `/g|h`', function() {
-			var p = ptr.create('/g|h');
+			var p = JsonPointer.create('/g|h');
 
 			it('#get should resolve to data["g|h"]', function() {
-				p.get(data).should.equal(data["g|h"]);
+				expect(p.get(data)).to.equal(data["g|h"]);
 			});
 
 			it('#set should succeed changing the referenced value', function() {
 				var capture = p.get(data);
 				var updated = { this: "should succeed" }; 
 				p.set(data, updated);
-				p.get(data).should.eql(updated);
+				expect(p.get(data)).to.eql(updated);
 				p.set(data, capture);
 			});
 
 			it('should have a path of [ "g|h" ]', function() {
-				p.path.should.eql(["g|h"]);
+				expect(p.path).to.eql(["g|h"]);
 			});
 
 			it('should have the pointer `/g|h`', function() {
-				p.pointer.should.eql('/g|h');
+				expect(p.pointer).to.eql('/g|h');
 			});
 
 			it('should have the URI fragment identfier `#/g%7Ch`', function() {
-				p.uriFragmentIdentifier.should.eql('#/g%7Ch');
+				expect(p.uriFragmentIdentifier).to.eql('#/g%7Ch');
 			});
 		});
 
 		describe('a URI fragment identifier of `#/g%7Ch`', function() {
-			var p = ptr.create('#/g%7Ch');
+			var p = JsonPointer.create('#/g%7Ch');
 
 			it('#get should resolve to data["g|h"]', function() {
-				p.get(data).should.equal(data["g|h"]);
+				expect(p.get(data)).to.equal(data["g|h"]);
 			});
 
 			it('#set should succeed changing the referenced value', function() {
 				var capture = p.get(data);
 				var updated = { this: "should succeed" }; 
 				p.set(data, updated);
-				p.get(data).should.eql(updated);
+				expect(p.get(data)).to.eql(updated);
 				p.set(data, capture);
 			});
 
 			it('should have a path of [ "g|h" ]', function() {
-				p.path.should.eql(["g|h"]);
+				expect(p.path).to.eql(["g|h"]);
 			});
 
 			it('should have the pointer `/g|h`', function() {
-				p.pointer.should.eql('/g|h');
+				expect(p.pointer).to.eql('/g|h');
 			});
 
 			it('should have the URI fragment identfier `#/g%7Ch`', function() {
-				p.uriFragmentIdentifier.should.eql('#/g%7Ch');
+				expect(p.uriFragmentIdentifier).to.eql('#/g%7Ch');
 			});
 		});
 
 		describe('with a JSON pointer of `/i\\j`', function() {
-			var p = ptr.create('/i\\j');
+			var p = JsonPointer.create('/i\\j');
 
 			it('#get should resolve to data["i\\j"]', function() {
-				p.get(data).should.equal(data["i\\j"]);
+				expect(p.get(data)).to.equal(data["i\\j"]);
 			});
 
 			it('#set should succeed changing the referenced value', function() {
 				var capture = p.get(data);
 				var updated = { this: "should succeed" }; 
 				p.set(data, updated);
-				p.get(data).should.eql(updated);
+				expect(p.get(data)).to.eql(updated);
 				p.set(data, capture);
 			});
 
 			it('should have a path of [ "i\\j" ]', function() {
-				p.path.should.eql(["i\\j"]);
+				expect(p.path).to.eql(["i\\j"]);
 			});
 
 			it('should have the pointer `/i\\j`', function() {
-				p.pointer.should.eql('/i\\j');
+				expect(p.pointer).to.eql('/i\\j');
 			});
 
 			it('should have the URI fragment identfier `#/i%5Cj`', function() {
-				p.uriFragmentIdentifier.should.eql('#/i%5Cj');
+				expect(p.uriFragmentIdentifier).to.eql('#/i%5Cj');
 			});
 		});
 
 		describe('a URI fragment identifier of `#/i%5Cj`', function() {
-			var p = ptr.create('#/i%5Cj');
+			var p = JsonPointer.create('#/i%5Cj');
 
 			it('#get should resolve to data["i\\j"]', function() {
-				p.get(data).should.equal(data["i\\j"]);
+				expect(p.get(data)).to.equal(data["i\\j"]);
 			});
 
 			it('#set should succeed changing the referenced value', function() {
 				var capture = p.get(data);
 				var updated = { this: "should succeed" }; 
 				p.set(data, updated);
-				p.get(data).should.eql(updated);
+				expect(p.get(data)).to.eql(updated);
 				p.set(data, capture);
 			});
 
 			it('should have a path of [ "i\\j" ]', function() {
-				p.path.should.eql(["i\\j"]);
+				expect(p.path).to.eql(["i\\j"]);
 			});
 
 			it('should have the pointer `/i\\j`', function() {
-				p.pointer.should.eql('/i\\j');
+				expect(p.pointer).to.eql('/i\\j');
 			});
 
 			it('should have the URI fragment identfier `#/i%5Cj`', function() {
-				p.uriFragmentIdentifier.should.eql('#/i%5Cj');
+				expect(p.uriFragmentIdentifier).to.eql('#/i%5Cj');
 			});
 		});
 
 		describe('with a JSON pointer of `/k\"l`', function() {
-			var p = ptr.create('/k\"l');
+			var p = JsonPointer.create('/k\"l');
 
 			it('#get should resolve to data["k\"l"]', function() {
-				p.get(data).should.equal(data["k\"l"]);
+				expect(p.get(data)).to.equal(data["k\"l"]);
 			});
 
 			it('#set should succeed changing the referenced value', function() {
 				var capture = p.get(data);
 				var updated = { this: "should succeed" }; 
 				p.set(data, updated);
-				p.get(data).should.eql(updated);
+				expect(p.get(data)).to.eql(updated);
 				p.set(data, capture);
 			});
 
 			it('should have a path of [ "k\"l" ]', function() {
-				p.path.should.eql(["k\"l"]);
+				expect(p.path).to.eql(["k\"l"]);
 			});
 
 			it('should have the pointer `/k\"l`', function() {
-				p.pointer.should.eql('/k\"l');
+				expect(p.pointer).to.eql('/k\"l');
 			});
 
 			it('should have the URI fragment identfier `#/k%22l`', function() {
-				p.uriFragmentIdentifier.should.eql('#/k%22l');
+				expect(p.uriFragmentIdentifier).to.eql('#/k%22l');
 			});
 		});
 
 		describe('a URI fragment identifier of `#/k%22l`', function() {
-			var p = ptr.create('#/k%22l');
+			var p = JsonPointer.create('#/k%22l');
 
 			it('#get should resolve to data["k\"l"]', function() {
-				p.get(data).should.equal(data["k\"l"]);
+				expect(p.get(data)).to.equal(data["k\"l"]);
 			});
 
 			it('#set should succeed changing the referenced value', function() {
 				var capture = p.get(data);
 				var updated = { this: "should succeed" }; 
 				p.set(data, updated);
-				p.get(data).should.eql(updated);
+				expect(p.get(data)).to.eql(updated);
 				p.set(data, capture);
 			});
 
 			it('should have a path of [ "k\"l" ]', function() {
-				p.path.should.eql(["k\"l"]);
+				expect(p.path).to.eql(["k\"l"]);
 			});
 
 			it('should have the pointer `/k\"l`', function() {
-				p.pointer.should.eql('/k\"l');
+				expect(p.pointer).to.eql('/k\"l');
 			});
 
 			it('should have the URI fragment identfier `#/k%22l`', function() {
-				p.uriFragmentIdentifier.should.eql('#/k%22l');
+				expect(p.uriFragmentIdentifier).to.eql('#/k%22l');
 			});
 		});
 
 		describe('with a JSON pointer of `/ `', function() {
-			var p = ptr.create('/ ');
+			var p = JsonPointer.create('/ ');
 
 			it('#get should resolve to data[" "]', function() {
-				p.get(data).should.equal(data[" "]);
+				expect(p.get(data)).to.equal(data[" "]);
 			});
 
 			it('#set should succeed changing the referenced value', function() {
 				var capture = p.get(data);
 				var updated = { this: "should succeed" }; 
 				p.set(data, updated);
-				p.get(data).should.eql(updated);
+				expect(p.get(data)).to.eql(updated);
 				p.set(data, capture);
 			});
 
 			it('should have a path of [ " " ]', function() {
-				p.path.should.eql([" "]);
+				expect(p.path).to.eql([" "]);
 			});
 
 			it('should have the pointer `/ `', function() {
-				p.pointer.should.eql('/ ');
+				expect(p.pointer).to.eql('/ ');
 			});
 
 			it('should have the URI fragment identfier `#/%20`', function() {
-				p.uriFragmentIdentifier.should.eql('#/%20');
+				expect(p.uriFragmentIdentifier).to.eql('#/%20');
 			});
 		});
 
 		describe('a URI fragment identifier of `#/%20`', function() {
-			var p = ptr.create('#/%20');
+			var p = JsonPointer.create('#/%20');
 
 			it('#get should resolve to data[" "]', function() {
-				p.get(data).should.equal(data[" "]);
+				expect(p.get(data)).to.equal(data[" "]);
 			});
 
 			it('#set should succeed changing the referenced value', function() {
 				var capture = p.get(data);
 				var updated = { this: "should succeed" }; 
 				p.set(data, updated);
-				p.get(data).should.eql(updated);
+				expect(p.get(data)).to.eql(updated);
 				p.set(data, capture);
 			});
 
 			it('should have a path of [ " " ]', function() {
-				p.path.should.eql([" "]);
+				expect(p.path).to.eql([" "]);
 			});
 
 			it('should have the pointer `/ `', function() {
-				p.pointer.should.eql('/ ');
+				expect(p.pointer).to.eql('/ ');
 			});
 
 			it('should have the URI fragment identfier `#/%20`', function() {
-				p.uriFragmentIdentifier.should.eql('#/%20');
+				expect(p.uriFragmentIdentifier).to.eql('#/%20');
 			});
 		});
 
 		describe('with a JSON pointer of `/m~0n`', function() {
-			var p = ptr.create('/m~0n');
+			var p = JsonPointer.create('/m~0n');
 
 			it('#get should resolve to data["m~n"]', function() {
-				p.get(data).should.equal(data["m~n"]);
+				expect(p.get(data)).to.equal(data["m~n"]);
 			});
 
 			it('#set should succeed changing the referenced value', function() {
 				var capture = p.get(data);
 				var updated = { this: "should succeed" }; 
 				p.set(data, updated);
-				p.get(data).should.eql(updated);
+				expect(p.get(data)).to.eql(updated);
 				p.set(data, capture);
 			});
 
 			it('should have a path of [ "m~n" ]', function() {
-				p.path.should.eql(["m~n"]);
+				expect(p.path).to.eql(["m~n"]);
 			});
 
 			it('should have the pointer `/m~0n`', function() {
-				p.pointer.should.eql('/m~0n');
+				expect(p.pointer).to.eql('/m~0n');
 			});
 
 			it('should have the URI fragment identfier `#/m~0n`', function() {
-				p.uriFragmentIdentifier.should.eql('#/m~0n');
+				expect(p.uriFragmentIdentifier).to.eql('#/m~0n');
 			});
 		});
 
 		describe('a URI fragment identifier of `#/m~0n`', function() {
-			var p = ptr.create('#/m~0n');
+			var p = JsonPointer.create('#/m~0n');
 
 			it('#get should resolve to data["m~n"]', function() {
-				p.get(data).should.equal(data["m~n"]);
+				expect(p.get(data)).to.equal(data["m~n"]);
 			});
 
 			it('#set should succeed changing the referenced value', function() {
 				var capture = p.get(data);
 				var updated = { this: "should succeed" }; 
 				p.set(data, updated);
-				p.get(data).should.eql(updated);
+				expect(p.get(data)).to.eql(updated);
 				p.set(data, capture);
 			});
 
 			it('should have a path of [ "m~n" ]', function() {
-				p.path.should.eql(["m~n"]);
+				expect(p.path).to.eql(["m~n"]);
 			});
 
 			it('should have the pointer `/m~0n`', function() {
-				p.pointer.should.eql('/m~0n');
+				expect(p.pointer).to.eql('/m~0n');
 			});
 
 			it('should have the URI fragment identfier `#/m~0n`', function() {
-				p.uriFragmentIdentifier.should.eql('#/m~0n');
+				expect(p.uriFragmentIdentifier).to.eql('#/m~0n');
 			});
 		});
 
 		describe('a special array pointer from draft-ietf-appsawg-json-pointer-08 `/foo/-`', function() {
-			var p = ptr.create('/foo/-');
+			var p = JsonPointer.create('/foo/-');
 
 			it('should not resolve via #get', function() {
-				should.not.exist(p.get(data));
+				expect(p.get(data)).to.not.be.ok();
 			});
 
 			it('should set the next element of the array, repeatedly...', function() {
 				p.set(data, 'qux');
-				data.foo[2].should.eql('qux');
+				expect(data.foo[2]).to.eql('qux');
 			});
 
 			it('...', function() {
 				p.set(data, 'quux');
-				data.foo[3].should.eql('quux');
+				expect(data.foo[3]).to.eql('quux');
 			});
 
 			it('...', function() {
 				p.set(data, 'corge');
-				data.foo[4].should.eql('corge');
-			});
+				expect(data.foo[4]).to.eql('corge');
+		});
 
 			it('...', function() {
 				p.set(data, 'grault');
-				data.foo[5].should.eql('grault');
+				expect(data.foo[5]).to.eql('grault');
 			});
 		});
 
 		describe('an invalid pointer', function() {
 
 			it('should fail to parse', function() {
-				(function() {
-					ptr.create('a/');
-				}).should.throw();
+				expect(function() {
+					JsonPointer.create('a/');
+				}).to.throwError();
 			});
 		});
 
 		describe('an invalid URI fragment identifier', function() {
 
 			it('should fail to parse', function() {
-				(function() {
-					ptr.create('#a');
-				}).should.throw();
+				expect(function() {
+					JsonPointer.create('#a');
+				}).to.throwError();
 			});
 
 		});
@@ -750,15 +752,14 @@ describe('when working with complex data', function() {
 	// confirm that we can distinguish between missing values and values that are set to null...
 
 	it('#get should return `undefined` when the requested element is undefined (#/g/h)', function() {
-		var unk = ptr.get(data, '#/g/h');
-		(typeof unk).should.eql('undefined');
+		var unk = JsonPointer.get(data, '#/g/h');
+		expect(unk).to.be.an('undefined');
 	});
 
 
 	it('#get should return null when the requested element has a null value (#/f)', function() {
-		var unk = ptr.get(data, '#/f');
-		should.not.exist(unk);
-		(unk === null).should.be.true;
+		var unk = JsonPointer.get(data, '#/f');
+		expect(unk).to.be(null);
 	});
 });
 

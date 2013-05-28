@@ -12,9 +12,8 @@
 		"test": "mocha -R spec"
 	},
 	"devDependencies": {
-			"should": "~1.2.x",
-			"mocha": "~1.10.x",
-			"json-pointer": "~0.0.3"
+			"expect.js": "~0.2.x",
+			"mocha": "~1.10.x"
 	},
 	"license": "MIT",
 	"repository": {
