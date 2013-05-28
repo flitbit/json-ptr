@@ -20,11 +20,11 @@ var n = -1
 
 while(++n < ub) {
 
-  assert.equal(ptr.get(obj, "/a"),       n + 1);
-  assert.equal(ptr.get(obj, "/b/c"),     n + 2);
-  assert.equal(ptr.get(obj, "/d/e/0/a"), n + 3);
-  assert.equal(ptr.get(obj, "/d/e/1/b"), n + 4);
-  assert.equal(ptr.get(obj, "/d/e/2/c"), n + 5);
+  assert.equal(ptr.get(obj, "/a"),       1);
+  assert.equal(ptr.get(obj, "/b/c"),     2);
+  assert.equal(ptr.get(obj, "/d/e/0/a"), 3);
+  assert.equal(ptr.get(obj, "/d/e/1/b"), 4);
+  assert.equal(ptr.get(obj, "/d/e/2/c"), 5);
 
 }
 

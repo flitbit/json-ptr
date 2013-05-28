@@ -735,4 +735,21 @@ describe('JsonPointer', function() {
 		});
 	});
 
+describe('when working with complex data', function() {
+	var data = {
+		a: 1,
+		b: {
+			c: 2
+		},
+		d: {
+			e: [{a:3}, {b:4}, {c:5}]
+		}
+	};
+
+	it('#get should return `undefined` when the requested element is undefined (#/g/h)', function() {
+		var unk = ptr.get(data, '#/g/h');
+		(typeof unk).should.eql('undefined');
+	});
+});
+
 });
