@@ -709,7 +709,7 @@ describe('JsonPointer', function() {
 			it('...', function() {
 				p.set(data, 'corge');
 				expect(data.foo[4]).to.eql('corge');
-		});
+			});
 
 			it('...', function() {
 				p.set(data, 'grault');
@@ -737,30 +737,42 @@ describe('JsonPointer', function() {
 		});
 	});
 
-describe('when working with complex data', function() {
-	var data = {
-		a: 1,
-		b: {
-			c: 2
-		},
-		d: {
-			e: [{a:3}, {b:4}, {c:5}]
-		},
-		f: null
-	};
+	describe('when working with complex data', function() {
+		var data = {
+			a: 1,
+			b: {
+				c: 2
+			},
+			d: {
+				e: [{a:3}, {b:4}, {c:5}]
+			},
+			f: null
+		};
 
-	// confirm that we can distinguish between missing values and values that are set to null...
 
-	it('#get should return `undefined` when the requested element is undefined (#/g/h)', function() {
-		var unk = JsonPointer.get(data, '#/g/h');
-		expect(unk).to.be.an('undefined');
+		it('#get should return `undefined` when the requested element is undefined (#/g/h)', function() {
+			var unk = JsonPointer.get(data, '#/g/h');
+			expect(unk).to.be.an('undefined');
+		});
+
+
+		it('#get should return null when the requested element has a null value (#/f)', function() {
+			var unk = JsonPointer.get(data, '#/f');
+			expect(unk).to.be(null);
+		});
 	});
 
+	describe('given an sequence of property names ["d", "e~f", "2"]', function() {
+		var path = ["d", "e~f", "2"];
 
-	it('#get should return null when the requested element has a null value (#/f)', function() {
-		var unk = JsonPointer.get(data, '#/f');
-		expect(unk).to.be(null);
+		it('#encodePointer should produce a pointer (/d/e~0f/2)', function() {
+			expect(JsonPointer.encodePointer(path)).to.be('/d/e~0f/2');
+		});
+
+		it('#encodeUriFragmentIdentifier should produce a pointer (#/d/e~0f/2)', function() {
+			expect(JsonPointer.encodeUriFragmentIdentifier(path)).to.be('#/d/e~0f/2');
+		});
+
 	});
-});
 
 });
