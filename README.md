@@ -49,6 +49,11 @@ And a few useful properties:
 
 ## Example
 
+
+This example queries the live flikr api for recent images with 'surf' and 'pipeline'. It then extracts the author and the referenced media item.
+
+Clone the repo and run it on the command line using `node example/example1.js` and you'll see the output. Of note: `json-ptr` will return `undefined` when any part of a pointer's path cannot be resolved, which makes this type of extraction very convenient and compact.
+
 [flikr example](https://github.com/flitbit/json-ptr/blob/master/examples/example1.js)
 ```javascript
 var ptr = require('json-ptr')
