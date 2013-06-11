@@ -9,6 +9,26 @@ A complete implementation of JSON Pointer (RFC 6901) for nodejs and modern brows
 $ npm install json-ptr
 ```
 
+## Tests
+
+Tests use [mocha](http://visionmedia.github.io/mocha/) and [expect.js](https://github.com/LearnBoost/expect.js/), so if you clone the [github repository](https://github.com/flitbit/minioc) you'll need to run:
+
+```bash
+npm install
+```
+
+... followed by ...
+
+```bash
+npm test
+```
+
+... or ...
+
+```bash
+mocha -R spec
+```
+
 ## Basics
 
 !! This document is a work in progress even though the module is considered *complete*. See the [examples of its use for more](https://github.com/flitbit/json-ptr/tree/master/examples).
