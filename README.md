@@ -9,9 +9,9 @@ A complete implementation of JSON Pointer (RFC 6901) for nodejs and modern brows
 $ npm install json-ptr
 ```
 
-See the [examples for more info](https://github.com/flitbit/json-ptr/tree/master/examples).
-
 ## Basics
+
+!! This document is a work in progress even though the module is considered *complete*. See the [examples of its use for more](https://github.com/flitbit/json-ptr/tree/master/examples).
 
 JSON Pointer provides a standardized syntax for reliably referencing data within an object's structure.
 
