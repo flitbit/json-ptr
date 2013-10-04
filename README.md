@@ -67,6 +67,20 @@ And a few useful properties:
 * `#uriFragmentIdentifier` - an RFC 6901 formatted URI fragment identifier
 * `#path` - an array of property names used to descend the object graph from the origin to the referenced item
 
+#### #noConflict
+
+When used in an environment that has a global namespace the only variable used is `JsonPointer`. If you utilize other libraries that already occupy that name you can use the `noConflict` function to restore the obstructing value and assign `json-ptr` to another variable.
+
+```html
+	<!-- ur codez -->
+	<script src="/json-ptr-0.1.1.min.js"></script>
+	<script>
+		// At this point, JsonPointer is assigned to json-ptr's capability.
+		var ptr = JsonPointer.noConflict();
+		// and now it is restored to whatever it was before the json-ptr import.
+	</script>
+```
+
 ## Example
 
 
