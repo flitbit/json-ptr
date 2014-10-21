@@ -9,6 +9,12 @@ A complete implementation of JSON Pointer (RFC 6901) for nodejs and modern brows
 $ npm install json-ptr
 ```
 
+## Releases
+
+```
+2014-10-21 - 0.2.0  Added #list function to enumerate all properties in a graph, producing fragmentId/value pairs.
+```
+
 ## Tests
 
 Tests use [mocha](http://visionmedia.github.io/mocha/) and [expect.js](https://github.com/LearnBoost/expect.js/), so if you clone the [github repository](https://github.com/flitbit/json-ptr) you'll need to run:
@@ -44,7 +50,7 @@ var JsonPointer = require('json-ptr')
 
 **browser**
 ```html
-<script src="json-ptr-0.1.0.min.js"></script>
+<script src="json-ptr-0.2.0.min.js"></script>
 ```
 
 ### Working with Pointers
@@ -66,6 +72,8 @@ And a few useful properties:
 * `#pointer` - an RFC 6901 formatted JSON pointer
 * `#uriFragmentIdentifier` - an RFC 6901 formatted URI fragment identifier
 * `#path` - an array of property names used to descend the object graph from the origin to the referenced item
+* `#list` - lists every property in the object graph, starting from specified object &ndash; and returns each fragmentId/value pair
+
 
 #### #noConflict
 
@@ -73,7 +81,7 @@ When used in an environment that has a global namespace the only variable used i
 
 ```html
 	<!-- ur codez -->
-	<script src="/json-ptr-0.1.1.min.js"></script>
+	<script src="/json-ptr-0.2.0.min.js"></script>
 	<script>
 		// At this point, JsonPointer is assigned to json-ptr's capability.
 		var ptr = JsonPointer.noConflict();
@@ -82,7 +90,6 @@ When used in an environment that has a global namespace the only variable used i
 ```
 
 ## Example
-
 
 This example queries the live flikr api for recent images with 'surf' and 'pipeline'. It then extracts the author and the referenced media item.
 

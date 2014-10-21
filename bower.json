@@ -1,0 +1,25 @@
+{
+  "name": "json-ptr",
+  "main": "index.js",
+  "version": "0.2.0",
+  "homepage": "https://github.com/flitbit/json-ptr",
+  "authors": [
+    "Phillip Clark <phillip@flitbit.com>"
+  ],
+  "description": "A complete implementation of JSON Pointer (RFC 6901) for nodejs and modern browsers.",
+  "keywords": [
+    "6901",
+    "json",
+    "pointers",
+    "fragmentid"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "app/bower_components",
+    "test",
+    "tests"
+  ]
+}

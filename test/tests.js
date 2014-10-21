@@ -795,4 +795,50 @@ describe('JsonPointer', function () {
 
 	});
 
+	describe('when inpsecting objects', function () {
+		var data = {
+			a: 1,
+			b: {
+				c: 2
+			},
+			d: {
+				e: [{ a:3 }, { b:4 }, { c:5 }]
+			},
+			f: null
+		};
+
+		it('#list should return all fragment-value combinations', function () {
+			var items = ptr.list(data);
+
+			expect(items[0]).to.have.keys('fragmentId', 'value');
+			expect(items[0].fragmentId).to.be('#');
+			expect(items[0].value).to.be(data);
+
+			expect(items[1]).to.have.keys('fragmentId', 'value');
+			expect(items[1].fragmentId).to.be('#/a');
+			expect(items[1].value).to.be(data.a);
+
+			expect(items[2]).to.have.keys('fragmentId', 'value');
+			expect(items[2].fragmentId).to.be('#/b');
+			expect(items[2].value).to.be(data.b);
+
+			expect(items[3]).to.have.keys('fragmentId', 'value');
+			expect(items[3].fragmentId).to.be('#/b/c');
+			expect(items[3].value).to.be(data.b.c);
+
+			// ...
+
+			expect(items[9]).to.have.keys('fragmentId', 'value');
+			expect(items[9].fragmentId).to.be('#/d/e/1/b');
+			expect(items[9].value).to.be(data.d.e[1].b);
+
+			// ...
+
+			expect(items[12]).to.have.keys('fragmentId', 'value');
+			expect(items[12].fragmentId).to.be('#/f');
+			expect(items[12].value).to.be(data.f);
+		});
+
+	});
+
 });

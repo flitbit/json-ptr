@@ -47,7 +47,11 @@
 		, len = path.length
 		;
 		while (++i < len) {
-			res.push(path[i].replace('~', '~0').replace('/', '~1'));
+			if (typeof path[i] === 'string') {
+				res.push(path[i].replace('~', '~0').replace('/', '~1'));
+			} else {
+				res.push(path[i]);
+			}
 		}
 		return "/".concat(res.join('/'));
 	}
@@ -75,7 +79,8 @@
 		, len = path.length
 		;
 		while (++i < len) {
-			res.push(encodeURIComponent(path[i].replace('~', '~0').replace('/', '~1')));
+			var segment = '' + path[i];
+			res.push(encodeURIComponent(segment.replace('~', '~0').replace('/', '~1')));
 		}
 		return "#/".concat(res.join('/'));
 	}
@@ -91,6 +96,61 @@
 			if (idx[cursor] < '0' || idx[cursor] > '9') { return -1; }
 		}
 		return parseInt(idx, 10);
+	}
+
+	function list(obj, observe, path, key, stack, ptrs) {
+		var i, len;
+		path = path || [];
+		var currentPath = path.slice(0);
+		if (typeof key !== 'undefined') {
+			currentPath.push(key);
+		}
+		var type = typeof obj;
+		if (type === 'undefined') {
+			return; // should only happen at the top level.
+		} else {
+			var ptr = encodeUriFragmentIdentifier(currentPath);
+			if (type === 'object' && obj !== null) {
+				stack = stack || [];
+				ptrs = ptrs || [];
+				var circ = stack.indexOf(obj);
+				if (circ < 0) {
+					stack.push(obj);
+					ptrs.push(ptr);
+					observe({
+						fragmentId: ptr,
+						value: obj
+					});
+					if (Array.isArray(obj)) {
+						i = -1;
+						len = obj.length;
+						while (++i < len) {
+							list(obj[i], observe, currentPath, i, stack, ptrs);
+						}
+					} else {
+						var props = Object.getOwnPropertyNames(obj);
+						i = -1;
+						len = props.length;
+						while (++i < len) {
+							list(obj[props[i]], observe, currentPath, props[i], stack, ptrs);
+						}
+					}
+					stack.length = stack.length - 1;
+					ptrs.length = ptrs.length - 1;
+				} else {
+					observe({
+						fragmentId: ptr,
+						value: { '$ref': ptrs[circ] },
+						circular: true
+					});
+				}
+			} else {
+				observe({
+					fragmentId: ptr,
+					value: obj
+				});
+			}
+		}
 	}
 
 	function get(obj, path) {
@@ -214,6 +274,16 @@
 		var decode = (ptr.length > 0 && ptr[0] === '#') ? decodeUriFragmentIdentifier : decodePointer;
 
 		return set(obj, val, decode(ptr), encode);
+	};
+	JsonPointer.list = function (obj, observe) {
+		var res = [];
+		observe = observe || function (observation) {
+			res.push(observation);
+		};
+		list(obj, observe);
+		if (res.length) {
+			return res;
+		}
 	};
 	JsonPointer.decodePointer = decodePointer;
 	JsonPointer.encodePointer = encodePointer;
