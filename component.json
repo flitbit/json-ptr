@@ -3,7 +3,12 @@
   "repo": "flitbit/json-ptr",
   "description": "A complete implementation of JSON Pointer (RFC 6901) for nodejs and modern browsers.",
   "version": "0.2.0",
-  "keywords": ["6901", "pointer", "json"],
+	"keywords": [
+		"6901",
+		"json",
+		"pointers",
+		"fragmentid"
+	],
   "dependencies": {
   },
   "scripts": ["index.js"],
