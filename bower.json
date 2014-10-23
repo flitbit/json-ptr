@@ -1,7 +1,7 @@
 {
   "name": "json-ptr",
   "main": "index.js",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "homepage": "https://github.com/flitbit/json-ptr",
   "authors": [
     "Phillip Clark <phillip@flitbit.com>"

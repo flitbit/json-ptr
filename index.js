@@ -282,6 +282,12 @@
 		};
 		list(obj, observe);
 		if (res.length) {
+			// fragments in predictable order
+			res.sort(function (lhs, rhs) {
+				var a = lhs.fragmentId;
+				var b = rhs.fragmentId;
+				return (a < b) ? -1 : (a > b) ? 1 : 0;
+			});
 			return res;
 		}
 	};
