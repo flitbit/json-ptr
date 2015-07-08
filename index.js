@@ -34,7 +34,7 @@
 		, len = path.length
 		;
 		while (++i < len) {
-			path[i] = path[i].replace('~1', '/').replace('~0', '~');
+			path[i] = path[i].replace( /~1/g, '/').replace( /~0/g, '~');
 		}
 		return path;
 	}
@@ -66,7 +66,7 @@
 		, len = path.length
 		;
 		while (++i < len) {
-			path[i] = decodeURIComponent(path[i]).replace('~1', '/').replace('~0', '~');
+			path[i] = decodeURIComponent(path[i]).replace( /~1/g, '/').replace('~0', '~');
 		}
 		return path;
 	}

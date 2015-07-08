@@ -766,7 +766,8 @@ describe('JsonPointer', function () {
 			d: {
 				e: [{a:3}, {b:4}, {c:5}]
 			},
-			f: null
+			f: null,
+			"http://schema.org/name": 'Phillip'
 		};
 
 
@@ -780,6 +781,29 @@ describe('JsonPointer', function () {
 			var unk = ptr.get(data, '#/f');
 			expect(unk).to.be(null);
 		});
+
+		it('#get should return the value of a prop named with multiple slahes (#/http:~1~1schema.org~1name)', function() {
+			var unk = ptr.get(data, '#/http:~1~1schema.org~1name');
+			expect(unk).to.be('Phillip');
+		});
+
+		it('get should return the value of a prop named with multiple slahes (/http:~1~1schema.org~1name)', function() {
+			var unk = ptr.get(data, '/http:~1~1schema.org~1name');
+			expect(unk).to.be('Phillip');
+		});
+
+		it('#set should set the value of a prop named with multiple slahes (#/http:~1~1schema.org~1name)', function() {
+			ptr.set(data, '#/http:~1~1schema.org~1name', 'Phil');
+			var unk = ptr.get(data, '/http:~1~1schema.org~1name');
+			expect(unk).to.be('Phil');
+		});
+
+		it('set should set the value of a prop named with multiple slahes (/http:~1~1schema.org~1name)', function() {
+			ptr.set(data, '/http:~1~1schema.org~1name', 'Phil');
+			var unk = ptr.get(data, '/http:~1~1schema.org~1name');
+			expect(unk).to.be('Phil');
+		});
+
 	});
 
 	describe('given an sequence of property names ["d", "e~f", "2"]', function () {
