@@ -276,7 +276,6 @@
   let $orig = Symbol();
   let $pointer = Symbol();
   let $fragmentId = Symbol();
-  let $dereference = Symbol();
 
   class JsonPointer {
 
