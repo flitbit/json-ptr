@@ -43,7 +43,14 @@ var ptr = require('flitbit/json-ptr')
 **Functions:**
 
 * [`.create(pointer)`](#user-content-createpointer)
-* [`.has(target,pointer)`](#user-content-hastargetroot)
+
+* [`.has(target,pointer)`](#user-content-hastargetpointer)
+* [`.get(target,pointer)`](#user-content-gettargetpointer)
+* [`.set(target,pointer)`](#user-content-settarget-pointer-force)
+
+* [`.flatten(target,fragmentId)`](#user-content-flattentarget-fragmentid)
+* [`.list(target,fragmentId)`](#user-content-listtarget-fragmentid)
+* [`.map(target,fragmentId)`](#user-content-maptarget-fragmentid)
 
 All example code assumes data has this structure:
 ```javascript
