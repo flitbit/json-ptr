@@ -45,7 +45,7 @@ var ptr = require('flitbit/json-ptr')
 * [`.create(pointer)`](#user-content-createpointer)
 * [`.has(target,pointer)`](#user-content-hastargetpointer)
 * [`.get(target,pointer)`](#user-content-gettargetpointer)
-* [`.set(target,pointer)`](#user-content-settarget-pointer-value-force)
+* [`.set(target,pointer,value,force)`](#user-content-settarget-pointer-value-force)
 * [`.flatten(target,fragmentId)`](#user-content-flattentarget-fragmentid)
 * [`.list(target,fragmentId)`](#user-content-listtarget-fragmentid)
 * [`.map(target,fragmentId)`](#user-content-maptarget-fragmentid)
@@ -542,9 +542,15 @@ mocha
 
 ## Releases
 
-* 2016-01-02 &mdash; _0.3.0_  Retooled, nodejs 4+ required. Better compiled pointers. Unrolled recursion in `.list(obj)` function. Added `.map(obj)`. Fully linted. Lots more tests and examples. Documented many previously undocumented features.
+* 2016-01-02 &mdash; __0.3.0__  Retooled, nodejs 4+ required.
+  * Better compiled pointers
+  * Unrolled recursive `.list` function
+  * Added `.map` function
+  * Fully linted
+  * Lots more tests and examples.
+  * Documented many previously undocumented features.
 
-* 2014-10-21 &mdash; _0.2.0_  Added #list function to enumerate all properties in a graph, producing fragmentId/value pairs.
+* 2014-10-21 &mdash; __0.2.0__  Added #list function to enumerate all properties in a graph, producing fragmentId/value pairs.
 
 ## License
 
