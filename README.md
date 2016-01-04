@@ -42,8 +42,8 @@ var ptr = require('flitbit/json-ptr')
 
 **Functions:**
 
-*[`.create(pointer)`](#user-content-createpointer)
-*[`.has(target,pointer)`](#user-content-hastargetroot)
+* [`.create(pointer)`](#user-content-createpointer)
+* [`.has(target,pointer)`](#user-content-hastargetroot)
 
 All example code assumes data has this structure:
 ```javascript
