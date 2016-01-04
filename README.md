@@ -542,7 +542,8 @@ mocha
 
 ## Releases
 
-* 2016-01-02 &mdash; __0.3.0__  Retooled, nodejs 4+ required.
+* 2016-01-02 &mdash; __0.3.0__
+  * Retooled for node 4+
   * Better compiled pointers
   * Unrolled recursive `.list` function
   * Added `.map` function
