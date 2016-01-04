@@ -6,7 +6,7 @@ A complete implementation of JSON Pointer ([RFC 6901](https://tools.ietf.org/htm
 
 I wrote this module a couple of years ago when I was unable to find what I considered a _complete implementation_ of [RFC 6901](https://tools.ietf.org/html/rfc6901). It turns out that I now use the hell out of it.
 
-Since there are a few npm modules for you to choose from, see [the section on performance later in this _readme_](#user-content-performance-and-features); you can use your own judgement as to which package you should employ.
+Since there are a few npm modules for you to choose from, see [the section on performance later in this _readme_](#user-content-performance); you can use your own judgement as to which package you should employ.
 
 ## Install
 
@@ -42,7 +42,7 @@ var ptr = require('flitbit/json-ptr')
 
 **Functions:**
 
-*
+*[`.create(pointer)`](#user-content-create-pointer)
 
 All example code assumes data has this structure:
 ```javascript
@@ -536,7 +536,7 @@ mocha
 
 ## Releases
 
-* 1016-01-02 &mdash; 0.3.0  Retooled, nodejs 4+ required. Better compiled pointers. Unrolled recursion in `.list(obj)` function. Added `.map(obj)`. Fully linted. Lots more tests and examples. Documented many previously undocumented features.
+* 2016-01-02 &mdash; _0.3.0_  Retooled, nodejs 4+ required. Better compiled pointers. Unrolled recursion in `.list(obj)` function. Added `.map(obj)`. Fully linted. Lots more tests and examples. Documented many previously undocumented features.
 
 * 2014-10-21 &mdash; _0.2.0_  Added #list function to enumerate all properties in a graph, producing fragmentId/value pairs.
 
