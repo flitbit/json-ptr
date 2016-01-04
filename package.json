@@ -1,29 +1,47 @@
 {
-	"name": "json-ptr",
-	"version": "0.2.1",
-	"author": "Phillip Clark <phillip@flitbit.com>",
-	"description": "A complete implementation of JSON Pointer (RFC 6901) for nodejs and modern browsers.",
-	"keywords": [
-		"6901",
-		"json",
-		"pointers",
-		"fragmentid"
-	],
-	"main": "index.js",
-	"directories": {
-		"example": "examples",
-		"test": "test"
-	},
-	"scripts": {
-		"test": "mocha -R spec"
-	},
-	"devDependencies": {
-		"expect.js": "~0.3.1",
-    "mocha": "~1.17.1"
-	},
-	"license": "MIT",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/flitbit/json-ptr"
-	}
+  "name": "json-ptr",
+  "version": "0.2.1",
+  "author": "Phillip Clark <phillip@flitbit.com>",
+  "description": "A complete implementation of JSON Pointer (RFC 6901) for nodejs and modern browsers.",
+  "keywords": [
+    "6901",
+    "json",
+    "pointers",
+    "fragmentid"
+  ],
+  "main": "index.js",
+  "directories": {
+    "example": "examples",
+    "test": "test"
+  },
+  "scripts": {
+    "uglify": "uglifyjs index.js -o releases/json-ptr-$npm_package_version.min.js  -r '$,require,exports,module,window,global' -m  --comments '/^!/'",
+    "cover": "istanbul cover ./node_modules/mocha/bin/_mocha --report html -- -R spec",
+    "pretest": "eslint .",
+    "test": "mocha -R spec"
+  },
+  "devDependencies": {
+    "blanket": "^1.2.1",
+    "expect.js": "~0.3.1",
+    "mocha": "~2.3.4"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/flitbit/json-ptr"
+  },
+  "engines": {
+    "node": ">=4.0"
+  },
+  "config": {
+    "blanket": {
+      "pattern": [
+        "index.js"
+      ],
+      "data-cover-never": [
+        "node_modules",
+        "tests"
+      ]
+    }
+  }
 }
