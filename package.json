@@ -15,12 +15,13 @@
     "test": "test"
   },
   "scripts": {
-    "uglify": "uglifyjs index.js -o releases/json-ptr-$npm_package_version.min.js  -r '$,require,exports,module,window,global' -m  --comments '/^!/'",
+    "release": "babel --minified --no-comments index.js --out-file releases/json-ptr-$npm_package_version.min.js",
     "cover": "istanbul cover ./node_modules/mocha/bin/_mocha --report html -- -R spec",
     "pretest": "eslint .",
     "test": "mocha -R spec"
   },
   "devDependencies": {
+    "babel-cli": "^6.3.17",
     "blanket": "^1.2.1",
     "eslint": "^1.10.3",
     "expect.js": "~0.3.1",

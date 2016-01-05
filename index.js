@@ -120,8 +120,8 @@
   }
 
   function toArrayIndexReference(arr, idx) {
-    var len = idx.length,
-      cursor = 0;
+    var len = idx.length;
+    var cursor = 0;
     if (len === 0 || len > 1 && idx[0] === '0') {
       return -1;
     }
@@ -138,7 +138,11 @@
   }
 
   function hasValueAtPath(target, path) {
-    var it, len, cursor, step, p;
+    var it;
+    var len;
+    var cursor;
+    var step;
+    var p;
     if (typeof target !== 'undefined') {
       it = target;
       len = path.length;
@@ -167,7 +171,12 @@
   }
 
   function getValueAtPath(target, path) {
-    var it, len, cursor, step, p, nonexistent = undefined;
+    var it;
+    var len;
+    var cursor;
+    var step;
+    var p;
+    var nonexistent = undefined;
     if (typeof target !== 'undefined') {
       it = target;
       len = path.length;
@@ -213,7 +222,14 @@
   }
 
   function setValueAtPath(target, val, path, force) {
-    var it, len, end, cursor, step, p, rem, nonexistent = undefined;
+    var it;
+    var len;
+    var end;
+    var cursor;
+    var step;
+    var p;
+    var rem;
+    var nonexistent = undefined;
     if (path.length === 0) {
       throw new Error('Cannot set the root object; assign it directly.');
     }
