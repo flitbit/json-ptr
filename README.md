@@ -2,6 +2,8 @@
 
 A complete implementation of JSON Pointer ([RFC 6901](https://tools.ietf.org/html/rfc6901)) for nodejs and modern browsers.
 
+> As pointed out by @twindagger __`v0.3+` breaks backward compatability for the `list` function__. The interface was previously `.list(obj)` and returned _fragmentId pairs_; in v0.3+ the interface is `.list(obj, fragmentId)` and returns _pointer pairs_ when `fragmentId` is not specified (truthy). It essentially is the opposite of what you would expect if you were using the module prior to v0.3.x... my appologies.
+
 ## Background
 
 I wrote this module a couple of years ago when I was unable to find what I considered a _complete implementation_ of [RFC 6901](https://tools.ietf.org/html/rfc6901). It turns out that I now use the hell out of it.
@@ -541,6 +543,9 @@ mocha
 ```
 
 ## Releases
+
+* 2016-01-12 &mdash; __1.0.0__
+  * Rolled major version to 1 to reflect breaking change in `.list(obj, fragmentId)`.
 
 * 2016-01-02 &mdash; __0.3.0__
   * Retooled for node 4+
