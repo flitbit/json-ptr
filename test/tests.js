@@ -818,20 +818,50 @@
               c: 5
             }]
           },
-          f: null
+          f: null,
+          'http://schema.org/name': 'Phillip'
         };
 
 
-        it('#get should return `undefined` when the requested element is undefined (#/g/h)', function() {
-          var unk = ptr.get(data, '#/g/h');
-          expect(unk).to.be.an('undefined');
-        });
+        it('#get should return `undefined` when the requested element is undefined (#/g/h)',
+          function() {
+            var unk = ptr.get(data, '#/g/h');
+            expect(unk).to.be.an('undefined');
+          });
 
 
-        it('#get should return null when the requested element has a null value (#/f)', function() {
-          var unk = ptr.get(data, '#/f');
-          expect(unk).to.be(null);
-        });
+        it('#get should return null when the requested element has a null value (#/f)',
+          function() {
+            var unk = ptr.get(data, '#/f');
+            expect(unk).to.be(null);
+          });
+
+        it('#get should return the value of a prop named with multiple slahes (#/http:~1~1schema.org~1name)',
+          function() {
+            var unk = ptr.get(data, '#/http:~1~1schema.org~1name');
+            expect(unk).to.be('Phillip');
+          });
+
+        it('#get should return the value of a prop named with multiple slahes (/http:~1~1schema.org~1name)',
+          function() {
+            var unk = ptr.get(data, '/http:~1~1schema.org~1name');
+            expect(unk).to.be('Phillip');
+          });
+
+        it('#set should set the value of a prop named with multiple slahes (#/http:~1~1schema.org~1name)',
+          function() {
+            ptr.set(data, '#/http:~1~1schema.org~1name', 'Phil');
+            let unk = ptr.get(data, '/http:~1~1schema.org~1name');
+            expect(unk).to.be('Phil');
+          });
+
+        it('#set should set the value of a prop named with multiple slahes (/http:~1~1schema.org~1name)',
+          function() {
+            ptr.set(data, '/http:~1~1schema.org~1name', 'Phil');
+            let unk = ptr.get(data, '/http:~1~1schema.org~1name');
+            expect(unk).to.be('Phil');
+          });
+
       });
 
       describe('given an sequence of property names ["d", "e~f", "2"]', function() {
@@ -865,40 +895,36 @@
           f: null
         };
         var tests = [
-          ['#list(data)', [data, undefined], 'pointer',
-            [
-              ['', data],
-              ['/a', data.a],
-              ['/b', data.b],
-              ['/d', data.d],
-              ['/f', data.f],
-              ['/b/c', data.b.c],
-              ['/d/e', data.d.e],
-              ['/d/e/0', data.d.e[0]],
-              ['/d/e/1', data.d.e[1]],
-              ['/d/e/2', data.d.e[2]],
-              ['/d/e/0/a', data.d.e[0].a],
-              ['/d/e/1/b', data.d.e[1].b],
-              ['/d/e/2/c', data.d.e[2].c]
-            ]
-          ],
-          ['#list(data, true)', [data, true], 'fragmentId',
-            [
-              ['#', data],
-              ['#/a', data.a],
-              ['#/b', data.b],
-              ['#/d', data.d],
-              ['#/f', data.f],
-              ['#/b/c', data.b.c],
-              ['#/d/e', data.d.e],
-              ['#/d/e/0', data.d.e[0]],
-              ['#/d/e/1', data.d.e[1]],
-              ['#/d/e/2', data.d.e[2]],
-              ['#/d/e/0/a', data.d.e[0].a],
-              ['#/d/e/1/b', data.d.e[1].b],
-              ['#/d/e/2/c', data.d.e[2].c]
-            ]
-          ]
+          ['#list(data)', [data, undefined], 'pointer', [
+            ['', data],
+            ['/a', data.a],
+            ['/b', data.b],
+            ['/d', data.d],
+            ['/f', data.f],
+            ['/b/c', data.b.c],
+            ['/d/e', data.d.e],
+            ['/d/e/0', data.d.e[0]],
+            ['/d/e/1', data.d.e[1]],
+            ['/d/e/2', data.d.e[2]],
+            ['/d/e/0/a', data.d.e[0].a],
+            ['/d/e/1/b', data.d.e[1].b],
+            ['/d/e/2/c', data.d.e[2].c]
+          ]],
+          ['#list(data, true)', [data, true], 'fragmentId', [
+            ['#', data],
+            ['#/a', data.a],
+            ['#/b', data.b],
+            ['#/d', data.d],
+            ['#/f', data.f],
+            ['#/b/c', data.b.c],
+            ['#/d/e', data.d.e],
+            ['#/d/e/0', data.d.e[0]],
+            ['#/d/e/1', data.d.e[1]],
+            ['#/d/e/2', data.d.e[2]],
+            ['#/d/e/0/a', data.d.e[0].a],
+            ['#/d/e/1/b', data.d.e[1].b],
+            ['#/d/e/2/c', data.d.e[2].c]
+          ]]
         ];
         tests.forEach(function(test) {
           describe(test[0], function() {
