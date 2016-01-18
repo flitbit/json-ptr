@@ -1,4 +1,4 @@
-# json-ptr [![Build Status](https://travis-ci.org/flitbit/json-ptr.png)](http://travis-ci.org/flitbit/json-ptr)
+# json-ptr [![Build Status](https://travis-ci.org/flitbit/json-ptr.png)](http://travis-ci.org/flitbit/json-ptr)&nbsp;[![bitHound Overall Score](https://www.bithound.io/github/flitbit/json-ptr/badges/score.svg)](https://www.bithound.io/github/flitbit/json-ptr)
 
 A complete implementation of JSON Pointer ([RFC 6901](https://tools.ietf.org/html/rfc6901)) for nodejs and modern browsers.
 
