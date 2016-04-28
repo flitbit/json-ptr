@@ -46,5 +46,9 @@
         "tests"
       ]
     }
+  },
+  "jspm": {
+    "directories": {"lib": "releases"},
+    "main": "json-ptr-1.0.0.min.js"
   }
 }
