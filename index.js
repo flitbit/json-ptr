@@ -512,4 +512,4 @@
   } else {
     root.JsonPointer = JsonPointer;
   }
-}).call(this); // eslint-disable-line no-invalid-this
+}).call(Function('return this')()); // eslint-disable-line no-new-func
