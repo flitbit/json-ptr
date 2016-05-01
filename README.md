@@ -427,7 +427,7 @@ _result:_
 
 ## Performance
 
-This repository has a [companion repository that makes some performance comparisons](https://github.com/flitbit/json-pointer-performance) between `json-ptr`, [`jsonpointer`](https://www.npmjs.com/package/jsonpointer) and [`json-pointer`](https://www.npmjs.com/package/json-pointer).
+This repository has a [companion repository that makes some performance comparisons](https://github.com/flitbit/json-pointer-comparison) between `json-ptr`, [`jsonpointer`](https://www.npmjs.com/package/jsonpointer) and [`json-pointer`](https://www.npmjs.com/package/json-pointer).
 
 **All timings are expressed as nanoseconds:**
 ```text
