@@ -544,6 +544,9 @@ mocha
 
 ## Releases
 
+* 2016-07-26 &mdash; __1.0.1__
+  * Fixed a problem with the Babel configuration
+
 * 2016-01-12 &mdash; __1.0.0__
   * Rolled major version to 1 to reflect breaking change in `.list(obj, fragmentId)`.
 
