@@ -3,6 +3,10 @@
 (function() {
   var root = this; // either the module or the window (in a browser)
   var savedJsonPointer = root.JsonPointer;
+  var $path = Symbol();
+  var $orig = Symbol();
+  var $pointer = Symbol();
+  var $fragmentId = Symbol();
 
   function replace(str, find, repl) {
     // modified from http://jsperf.com/javascript-replace-all/10
@@ -287,11 +291,6 @@
   function pickDecoder(ptr) {
     return (looksLikeFragment(ptr)) ? decodeUriFragmentIdentifier : decodePointer;
   }
-
-  var $path = Symbol();
-  var $orig = Symbol();
-  var $pointer = Symbol();
-  var $fragmentId = Symbol();
 
   class JsonPointer {
 
