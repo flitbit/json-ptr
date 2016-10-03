@@ -205,13 +205,13 @@
   }
 
   function compilePointerDereference(path) {
-    let body = `if (typeof(obj) !== 'undefined'`;
+    var body = `if (typeof(obj) !== 'undefined'`;
     if (path.length === 0) {
       return function(root) {
         return root;
       };
     }
-    body = path.reduce((body, p, i) => {
+    body = path.reduce(function(body, p, i) {
       return `${body} &&
     typeof((obj = obj['${replace(path[i], '\\', '\\\\')}'])) !== 'undefined'`;
     }, `if (typeof(obj) !== 'undefined'`);
@@ -288,10 +288,10 @@
     return (looksLikeFragment(ptr)) ? decodeUriFragmentIdentifier : decodePointer;
   }
 
-  let $path = Symbol();
-  let $orig = Symbol();
-  let $pointer = Symbol();
-  let $fragmentId = Symbol();
+  var $path = Symbol();
+  var $orig = Symbol();
+  var $pointer = Symbol();
+  var $fragmentId = Symbol();
 
   class JsonPointer {
 
