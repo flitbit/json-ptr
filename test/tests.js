@@ -200,6 +200,37 @@
           });
         });
 
+        describe('a URI fragment identifier of `#/newArray/0`', function() {
+          var p = ptr.create('#/newArray/0');
+
+          it('#get should resolve to undefined', function() {
+            expect(p.get(data)).to.equal(undefined);
+          });
+
+          it('#set with force should succeed creating an array and setting the referenced value', function() {
+            var capture = p.get(data);
+            var updated = {
+              this: 'should succeed'
+            };
+            p.set(data, updated, true);
+            expect(data.newArray).to.be.an('array');
+            expect(p.get(data)).to.eql(updated);
+            p.set(data, capture);
+          });
+
+          it('should have a path of [ "newArray", "0" ]', function() {
+            expect(p.path).to.eql(['newArray', '0']);
+          });
+
+          it('should have the pointer `/newArray/0`', function() {
+            expect(p.pointer).to.eql('/newArray/0');
+          });
+
+          it('should have the URI fragment identfier `#/newArray/0`', function() {
+            expect(p.uriFragmentIdentifier).to.eql('#/newArray/0');
+          });
+        });
+
         describe('with a JSON pointer of `/`', function() {
           var p = ptr.create('/');
 

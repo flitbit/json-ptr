@@ -122,10 +122,13 @@
   function toArrayIndexReference(arr, idx) {
     var len = idx.length;
     var cursor = 0;
-    if (len === 0 || len > 1 && idx[0] === '0') {
+    if (len === 0 || len > 1 && idx[0] === '0' || !isFinite(idx)) {
       return -1;
     }
     if (len === 1 && idx[0] === '-') {
+      if (!Array.isArray(arr)) {
+        return 0;
+      }
       return arr.length;
     }
 
@@ -262,6 +265,11 @@
               if (cursor === end) {
                 it[step] = val;
                 return nonexistent;
+              }
+              // if the next step is an array index, this step should be an array.
+              if (toArrayIndexReference(it[step], path[cursor + 1]) !== -1) {
+                it = it[step] = [];
+                continue;
               }
               it = it[step] = {};
               continue;
