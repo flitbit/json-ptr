@@ -1,8 +1,15 @@
-'use strict';
-
-(function() {
-  var root = this; // either the module or the window (in a browser)
-  var savedJsonPointer = root.JsonPointer;
+(function (root, factory) {
+  if (typeof define === 'function' && define.amd) { // eslint-disable-line no-undef
+    define([], factory);// eslint-disable-line no-undef
+  } else if (typeof module === 'object' && module.exports) {
+    module.exports = factory();
+  } else {
+    root.returnExports = factory();
+  }
+  // eslint-disable-next-line no-undef
+}(typeof self !== 'undefined' ? self : this, function () {
+  var root = this;
+  var $savedJsonPointer = this.JsonPointer;
 
   function replace(str, find, repl) {
     // modified from http://jsperf.com/javascript-replace-all/10
@@ -179,7 +186,7 @@
     var cursor;
     var step;
     var p;
-    var nonexistent = undefined;
+    var nonexistent;
     if (typeof target !== 'undefined') {
       it = target;
       len = path.length;
@@ -208,20 +215,22 @@
   }
 
   function compilePointerDereference(path) {
-    let body = `if (typeof(obj) !== 'undefined'`;
+    let body = 'if (typeof(obj) !== \'undefined\'';
     if (path.length === 0) {
-      return function(root) {
-        return root;
+      return function (it) {
+        return it;
       };
     }
+    // eslint-disable-next-line
     body = path.reduce((body, p, i) => {
       return `${body} &&
     typeof((obj = obj['${replace(path[i], '\\', '\\\\')}'])) !== 'undefined'`;
-    }, `if (typeof(obj) !== 'undefined'`);
+    }, 'if (typeof(obj) !== \'undefined\'');
     body = `${body}) {
   return obj;
 }`;
-    return new Function(['obj'], body); // eslint-disable-line no-new-func
+    // eslint-disable-next-line no-new-func
+    return new Function(['obj'], body);
   }
 
   function setValueAtPath(target, val, path, force) {
@@ -232,12 +241,12 @@
     var step;
     var p;
     var rem;
-    var nonexistent = undefined;
+    var nonexistent;
     if (path.length === 0) {
       throw new Error('Cannot set the root object; assign it directly.');
     }
     if (typeof target === 'undefined') {
-      throw TypeError('Cannot set values on undefined');
+      throw new TypeError('Cannot set values on undefined');
     }
     it = target;
     len = path.length;
@@ -256,8 +265,12 @@
             }
             it = it[p];
           } else if (it.length === p) {
-            it.push(val);
-            return nonexistent;
+            if (cursor === end) {
+              it.push(val);
+              return nonexistent;
+            } else if (force) {
+               it = it[p] = {};
+            }
           }
         } else {
           if (typeof it[step] === 'undefined') {
@@ -296,67 +309,95 @@
     return (looksLikeFragment(ptr)) ? decodeUriFragmentIdentifier : decodePointer;
   }
 
-  let $path = Symbol();
-  let $orig = Symbol();
-  let $pointer = Symbol();
-  let $fragmentId = Symbol();
-
-  class JsonPointer {
-
-    constructor(ptr) {
-      this[$orig] = ptr;
-      this[$path] = (Array.isArray(ptr)) ? ptr : pickDecoder(ptr)(ptr);
-      Object.defineProperty(this, 'get', {
+  function JsonPointer(ptr) {
+    // decode if necessary, make immutable.
+    var localPath = (Array.isArray(ptr)) ?
+      ptr.slice(0) :
+      ptr = pickDecoder(ptr)(ptr);
+    var $original = (Array.isArray(ptr)) ? encodePointer(localPath) : ptr;
+    var $pointer;
+    var $fragmentId;
+    var $compiledGetter = compilePointerDereference(localPath);
+    Object.defineProperties(this, {
+      get: {
         enumerable: true,
-        value: compilePointerDereference(this.path)
-      });
-    }
-
-    get path() {
-      return this[$path];
-    }
-
-    get pointer() {
-      if (!this[$pointer]) {
-        this[$pointer] = encodePointer(this.path);
+        value: $compiledGetter
+      },
+      set: {
+        enumerable: true,
+        value: function (target, value, force) {
+          return setValueAtPath(target, value, localPath, force);
+        }
+      },
+      has: {
+        enumerable: true,
+        value: function (target) {
+          return typeof ($compiledGetter(target)) !== 'undefined';
+        }
+      },
+      path: {
+        enumerable: true,
+        get: function () {
+          return localPath.slice(0);
+        }
+      },
+      pointer: {
+        enumerable: true,
+        get: function () {
+          if (!$pointer) {
+            $pointer = encodePointer(localPath);
+          }
+          return $pointer;
+        }
+      },
+      uriFragmentIdentifier: {
+        enumerable: true,
+        get: function () {
+          if (!$fragmentId) {
+            $fragmentId = encodeUriFragmentIdentifier(localPath);
+          }
+          return $fragmentId;
+        }
+      },
+      toString: {
+        enumerable: true,
+        configurable: true,
+        writable: true,
+        value: function () {
+          return $original;
+        }
       }
-      return this[$pointer];
-    }
-
-    get uriFragmentIdentifier() {
-      if (!this[$fragmentId]) {
-        this[$fragmentId] = encodeUriFragmentIdentifier(this.path);
-      }
-      return this[$fragmentId];
-    }
-
-    has(target) {
-      return typeof(this.get(target)) != 'undefined';
-    }
-
+    });
   }
 
-  class JsonReference {
+  function JsonReference(pointer) {
+    var localPtr = (typeof (pointer) === 'string' || Array.isArray(pointer)) ?
+      new JsonPointer(pointer) :
+      pointer;
 
-    constructor(pointer) {
-      this[$pointer] = pointer;
-    }
-
-    get $ref() {
-      return this[$pointer].uriFragmentIdentifier;
-    }
-
-    resolve(target) {
-      return this[$pointer].get(target);
-    }
-
-    toString() {
-      return this.$ref;
-    }
-
+    Object.defineProperties(this, {
+      $ref: {
+        enumerable: true,
+        value: localPtr.uriFragmentIdentifier
+      },
+      resolve: {
+        enumerable: true,
+        value: function (target) {
+          return localPtr.get(target);
+        }
+      },
+      toString: {
+        enumerable: true,
+        writable: true,
+        configurable: true,
+        value: function () {
+          return localPtr.uriFragmentIdentifier;
+        }
+      }
+    });
   }
 
-  JsonReference.isReference = function(obj) {
+  JsonReference.isReference = function (obj) {
     return obj && obj instanceof JsonReference ||
       (typeof obj.$ref === 'string' &&
         typeof obj.resolve === 'function');
@@ -365,14 +406,14 @@
   function visit(target, visitor, cycle) {
     var items, i, ilen, j, jlen, it, path, cursor, typeT;
     var distinctObjects;
-    var q = new Array();
+    var q = [];
     var qcursor = 0;
     q.push({
       obj: target,
       path: []
     });
     if (cycle) {
-      distinctObjects = new Map();
+      distinctObjects = Object.create(null);
     }
     visitor(encodePointer([]), target);
     while (qcursor < q.length) {
@@ -386,8 +427,8 @@
             it = cursor.obj[j];
             path = cursor.path.concat(j);
             if (typeof it === 'object' && it !== null) {
-              if (cycle && distinctObjects.has(it)) {
-                visitor(encodePointer(path), new JsonReference(distinctObjects.get(it)));
+              if (cycle && distinctObjects[it]) {
+                visitor(encodePointer(path), new JsonReference(distinctObjects[it]));
                 continue;
               }
               q.push({
@@ -395,7 +436,7 @@
                 path: path
               });
               if (cycle) {
-                distinctObjects.set(it, new JsonPointer(encodeUriFragmentIdentifier(path)));
+                distinctObjects[it] = new JsonPointer(encodeUriFragmentIdentifier(path));
               }
             }
             visitor(encodePointer(path), it);
@@ -408,8 +449,8 @@
             it = cursor.obj[items[i]];
             path = cursor.path.concat(items[i]);
             if (typeof it === 'object' && it !== null) {
-              if (cycle && distinctObjects.has(it)) {
-                visitor(encodePointer(path), new JsonReference(distinctObjects.get(it)));
+              if (cycle && distinctObjects[it]) {
+                visitor(encodePointer(path), new JsonReference(distinctObjects[it]));
                 continue;
               }
               q.push({
@@ -417,7 +458,7 @@
                 path: path
               });
               if (cycle) {
-                distinctObjects.set(it, new JsonPointer(encodeUriFragmentIdentifier(path)));
+                distinctObjects[it] = new JsonPointer(encodeUriFragmentIdentifier(path));
               }
             }
             visitor(encodePointer(path), it);
@@ -427,40 +468,32 @@
     }
   }
 
-  JsonPointer.prototype.set = function(target, value, force) {
-    return setValueAtPath(target, value, this.path, force);
-  };
-
-  JsonPointer.prototype.toString = function() {
-    return this.original;
-  };
-
-  JsonPointer.create = function(ptr) {
+  JsonPointer.create = function (ptr) {
     return new JsonPointer(ptr);
   };
 
-  JsonPointer.has = function(target, ptr) {
+  JsonPointer.has = function (target, ptr) {
     return hasValueAtPath(target, pickDecoder(ptr)(ptr));
   };
 
-  JsonPointer.get = function(target, ptr) {
+  JsonPointer.get = function (target, ptr) {
     return getValueAtPath(target, pickDecoder(ptr)(ptr));
   };
 
-  JsonPointer.set = function(target, ptr, val, force) {
+  JsonPointer.set = function (target, ptr, val, force) {
     return setValueAtPath(target, val, pickDecoder(ptr)(ptr), force);
   };
 
-  JsonPointer.list = function(target, fragmentId) {
+  JsonPointer.list = function (target, fragmentId) {
     var res = [];
     var visitor = (fragmentId) ?
-      function(ptr, val) {
+      function (ptr, val) {
         res.push({
           fragmentId: encodeUriFragmentIdentifier(decodePointer(ptr)),
           value: val
         });
       } :
-      function(ptr, val) {
+      function (ptr, val) {
         res.push({
           pointer: ptr,
           value: val
@@ -470,24 +503,24 @@
     return res;
   };
 
-  JsonPointer.flatten = function(target, fragmentId) {
+  JsonPointer.flatten = function (target, fragmentId) {
     var res = {};
     var visitor = (fragmentId) ?
-      function(ptr, val) {
+      function (ptr, val) {
         res[encodeUriFragmentIdentifier(decodePointer(ptr))] = val;
       } :
-      function(ptr, val) {
+      function (ptr, val) {
         res[ptr] = val;
       };
     visit(target, visitor);
     return res;
   };
 
-  JsonPointer.map = function(target, fragmentId) {
-    var res = new Map();
+  JsonPointer.map = function (target, fragmentId) {
+    var res = [];
     var visitor = (fragmentId) ?
-      function(ptr, val) {
-        res.set(encodeUriFragmentIdentifier(decodePointer(ptr)), val);
+      function (ptr, val) {
+        res.push({ key: encodeUriFragmentIdentifier(decodePointer(ptr)), value: val });
       } : res.set.bind(res);
     visit(target, visitor);
     return res;
@@ -495,7 +528,7 @@
 
   JsonPointer.visit = visit;
 
-  JsonPointer.decode = function(ptr) {
+  JsonPointer.decode = function (ptr) {
     return pickDecoder(ptr)(ptr);
   };
 
@@ -504,20 +537,16 @@
   JsonPointer.decodeUriFragmentIdentifier = decodeUriFragmentIdentifier;
   JsonPointer.encodeUriFragmentIdentifier = encodeUriFragmentIdentifier;
 
+  // support ES6 style destructuring...
+  JsonPointer.JsonPointer = JsonPointer;
   JsonPointer.JsonReference = JsonReference;
   JsonPointer.isReference = JsonReference.isReference;
 
-  JsonPointer.noConflict = function() {
-    root.JsonPointer = savedJsonPointer;
+  JsonPointer.noConflict = function () {
+    root.JsonPointer = $savedJsonPointer;
     return JsonPointer;
   };
 
-  if (typeof exports !== 'undefined') {
-    if (typeof module !== 'undefined' && module.exports) {
-      exports = module.exports = JsonPointer;
-    }
-    exports.JsonPointer = JsonPointer;
-  } else {
-    root.JsonPointer = JsonPointer;
-  }
-}).call(Function('return this')()); // eslint-disable-line no-new-func
+  root.JsonPointer = JsonPointer;
+  return JsonPointer;
+}));
