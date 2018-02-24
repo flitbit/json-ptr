@@ -100,7 +100,7 @@ assert.throws(function() {
   ptr.get(obj, 'a/');
 });
 
-let complexKeys = {
+var complexKeys = {
   'a/b': {
     c: 1
   },
@@ -119,7 +119,7 @@ assert.equal(ptr.get(complexKeys, '/a/b/c'), null);
 assert.equal(ptr.get(complexKeys, '/~1'), null);
 
 // draft-ietf-appsawg-json-pointer-08 has special array rules
-let ary = ['zero', 'one', 'two'];
+var ary = ['zero', 'one', 'two'];
 assert.equal(ptr.get(ary, '/01'), null);
 
 // we should be able to push the end of an array with the special pointer '-'
@@ -129,7 +129,7 @@ assert.equal(ptr.set(ary, '/-', 'four'), null);
 assert.equal(ary[4], 'four');
 
 // Examples from the draft:
-let example = {
+var example = {
   'foo': ['bar', 'baz'],
   '': 0,
   'a/b': 1,
@@ -137,13 +137,13 @@ let example = {
   'e^f': 3,
   'g|h': 4,
   'i\\j': 5,
-  'k\"l': 6,
+  'k"l': 6,
   ' ': 7,
   'm~n': 8
 };
 
 assert.equal(ptr.get(example, ''), example);
-let ans = ptr.get(example, '/foo');
+var ans = ptr.get(example, '/foo');
 assert.equal(ans.length, 2);
 assert.equal(ans[0], 'bar');
 assert.equal(ans[1], 'baz');
@@ -154,7 +154,7 @@ assert.equal(ptr.get(example, '/c%d'), 2);
 assert.equal(ptr.get(example, '/e^f'), 3);
 assert.equal(ptr.get(example, '/g|h'), 4);
 assert.equal(ptr.get(example, '/i\\j'), 5);
-assert.equal(ptr.get(example, '/k\"l'), 6);
+assert.equal(ptr.get(example, '/k"l'), 6);
 assert.equal(ptr.get(example, '/ '), 7);
 assert.equal(ptr.get(example, '/m~0n'), 8);
 

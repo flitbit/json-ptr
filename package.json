@@ -16,17 +16,16 @@
     "url": "https://github.com/flitbit/json-ptr"
   },
   "scripts": {
-    "prebuild": "npm run clean && npm run lint",
-    "build": "echo no build",
-    "clean": "rimraf dist",
-    "preversion": "npm run test",
+    "prerelease": "npm run clean && npm run test",
+    "release": "uglifyjs -c -m -o dist/json-ptr.min.js -r '$,require,exports,self,module,define' index.js",
+    "clean": "rimraf dist && mkdir dist",
+    "preversion": "npm run release",
     "postversion": "git push && git push --tags",
-    "prestart": "npm run build",
-    "start": "node index.js",
-    "pretest": "npm run build",
+    "pretest": "npm run lint",
     "test": "mocha test/**/*.js",
-    "test:watch": "nodemon --ext js,json --ignore dist/ --exec \"npm test\"",
-    "ci": "npm run test",
+    "test:watch": "nodemon --ext js,json --ignore dist/ --exec 'npm test'",
+    "preci": "npm run lint",
+    "ci": "mocha --reporter mocha-junit-reporter test/**/*.js",
     "lint": "eslint src test"
   },
   "devDependencies": {
@@ -36,6 +35,7 @@
     "expect.js": "^0.3.1",
     "json": "^9.0.6",
     "mocha": "^5.0.1",
+    "mocha-junit-reporter": "^1.17.0",
     "nodemon": "^1.15.1",
     "rimraf": "^2.6.2",
     "uglify-js": "^3.3.12"

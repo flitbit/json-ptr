@@ -1,4 +1,3 @@
-'use strict';
 
 var ptr = require('..'),
   http = require('http'),
@@ -16,7 +15,7 @@ function processResponse(json) {
   var data = items.get(json);
 
   if (data && Array.isArray(data)) {
-    let images = data.reduce((acc, it) => {
+    var images = data.reduce((acc, it) => {
       // Using the prepared pointers to select parts...
       acc.push({
         author: author.get(it),

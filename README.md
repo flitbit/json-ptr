@@ -2,8 +2,6 @@
 
 A complete implementation of JSON Pointer ([RFC 6901](https://tools.ietf.org/html/rfc6901)) for nodejs and modern browsers.
 
-> As pointed out by @twindagger __`v0.3+` breaks backward compatability for the `list` function__. The interface was previously `.list(obj)` and returned _fragmentId pairs_; in v0.3+ the interface is `.list(obj, fragmentId)` and returns _pointer pairs_ when `fragmentId` is not specified (truthy). It essentially is the opposite of what you would expect if you were using the module prior to v0.3.x... my appologies.
-
 ## Background
 
 I wrote this module a couple of years ago when I was unable to find what I considered a _complete implementation_ of [RFC 6901](https://tools.ietf.org/html/rfc6901). It turns out that I now use the hell out of it.
@@ -18,31 +16,28 @@ npm install json-ptr
 
 ## Use/Import
 
-[nodejs](https://nodejs.org/en/)
+### [nodejs](https://nodejs.org/en/)
+
 ```javascript
 var ptr = require('json-ptr')
 ```
 
-**browser**
+### browser
+
 ```html
 <script src="json-ptr-0.3.0.min.js"></script>
 <!-- exports an object named JsonPointer -->
 <script>var ptr = JsonPointer.noConflict()</script>
 ```
 
-[duo](https://github.com/duojs/duo)
-```javascript
-var ptr = require('flitbit/json-ptr')
-```
-
 ### Module API
 
-**Classes:**
+#### Classes
 
 * [`JsonPointer`](#user-content-jsonpointer-class) : _class_ &ndash; a convenience class for working with JSON pointers.
 * [`JsonReference`](#user-content-jsonreference-class) : _class_ &ndash; a convenience class for working with JSON references.
 
-**Functions:**
+#### Functions
 
 * [`.create(pointer)`](#user-content-createpointer)
 * [`.has(target,pointer)`](#user-content-hastargetpointer)
@@ -53,6 +48,7 @@ var ptr = require('flitbit/json-ptr')
 * [`.map(target,fragmentId)`](#user-content-maptarget-fragmentid)
 
 All example code assumes data has this structure:
+
 ```javascript
 var data = {
   legumes: [{
@@ -80,12 +76,15 @@ var data = {
 Creates an instance of the `JsonPointer` class.
 
 _arguments:_
+
 * `pointer` : _string, required_ &ndash; a JSON pointer in [JSON string representation](https://tools.ietf.org/html/rfc6901#section-5) or [URI fragment identifier representation](https://tools.ietf.org/html/rfc6901#section-6)
 
 _returns:_
+
 * a new [`JsonPointer` instance](#user-content-jsonpointer-class)
 
 _example:_
+
 ```javascript
 var pointer = ptr.create('/legumes/0');
 // fragmentId: #/legumes/0
@@ -96,10 +95,12 @@ var pointer = ptr.create('/legumes/0');
 Determins whether the specified `target` has a value at the `pointer`'s path.
 
 _arguments:_
+
 * `target` : _object, required_ &ndash; the target object
 * `pointer` : _string, required_ &ndash; a JSON pointer in [JSON string representation](https://tools.ietf.org/html/rfc6901#section-5) or [URI fragment identifier representation](https://tools.ietf.org/html/rfc6901#section-6)
 
 _returns:_
+
 * the dereferenced value or _undefined_ if nonexistent
 
 #### .get(target,pointer)
@@ -107,13 +108,16 @@ _returns:_
 Gets a value from the specified `target` object at the `pointer`'s path
 
 _arguments:_
+
 * `target` : _object, required_ &ndash; the target object
 * `pointer` : _string, required_ &ndash; a JSON pointer in [JSON string representation](https://tools.ietf.org/html/rfc6901#section-5) or [URI fragment identifier representation](https://tools.ietf.org/html/rfc6901#section-6)
 
 _returns:_
+
 * the dereferenced value or _undefined_ if nonexistent
 
 _example:_
+
 ```javascript
 var value = ptr.get(data, '/legumes/1');
 // fragmentId: #/legumes/1
@@ -124,21 +128,24 @@ var value = ptr.get(data, '/legumes/1');
 Sets the `value` at the specified `pointer` on the `target`. The default behavior is to do nothing if `pointer` is nonexistent.
 
 _arguments:_
+
 * `target` : _object, required_ &ndash; the target object
 * `pointer` : _string, required_ &ndash; a JSON pointer in [JSON string representation](https://tools.ietf.org/html/rfc6901#section-5) or [URI fragment identifier representation](https://tools.ietf.org/html/rfc6901#section-6)
 * `value` : _any_ &ndash; the value to be set at the specified `pointer`'s path
 * `force` : _boolean, optional_ &ndash; indicates [whether nonexistent paths are created during the call](https://tools.ietf.org/html/rfc6901#section-7)
 
 _returns:_
+
 * The prior value at the pointer's path &mdash; therefore, _undefined_ means the pointer's path was nonexistent.
 
-
 _example:_
+
 ```javascript
 var prior = ptr.set(data, '#/legumes/1/instock', 50);
 ```
 
 example force:
+
 ```javascript
 var data = {};
 
@@ -148,6 +155,7 @@ ptr.set(data, '#/peter/pickle', 'dunno', true);
 
 console.log(JSON.stringify(data, null, '  '));
 ```
+
 ```json
 {
   "peter": {
@@ -165,16 +173,20 @@ Lists all of the pointers available on the specified `target`.
 > See [a discussion about cycles in the object graph later in this document](#user-content-object-graph-cycles-and-recursion) if you have interest in how such is dealt with.
 
 _arguments:_
+
 * `target` : _object, required_ &ndash; the target object
 * `fragmentId` : _boolean, optional_ &ndash; indicates whether fragment identifiers should be listed instead of pointers
 
 _returns:_
+
 * an array of `pointer-value` pairs
 
 _example:_
+
 ```javascript
 var list = ptr.list(data);
 ```
+
 ```json
 [ ...
   {
@@ -201,9 +213,11 @@ var list = ptr.list(data);
 ```
 
 _`fragmentId` example:_
+
 ```javascript
 var list = ptr.list(data, true);
 ```
+
 ```json
 [ ...
   {
@@ -234,16 +248,20 @@ var list = ptr.list(data, true);
 Flattens an object graph (the `target`) into a single-level object of `pointer-value` pairs.
 
 _arguments:_
+
 * `target` : _object, required_ &ndash; the target object
 * `fragmentId` : _boolean, optional_ &ndash; indicates whether fragment identifiers should be listed instead of pointers
 
 _returns:_
+
 * a flattened object of `property-value` pairs as properties.
 
 _example:_
+
 ```javascript
 var obj = ptr.flatten(data, true);
 ```
+
 ```json
 { ...
   "#/legumes/1/name": "lima beans",
@@ -263,13 +281,16 @@ var obj = ptr.flatten(data, true);
 Flattens an object graph (the `target`) into a [Map object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map).
 
 _arguments:_
+
 * `target` : _object, required_ &ndash; the target object
 * `fragmentId` : _boolean, optional_ &ndash; indicates whether fragment identifiers should be listed instead of pointers
 
 _returns:_
+
 * a Map object containing key-value pairs where keys are pointers.
 
 _example:_
+
 ```javascript
 var map = ptr.map(data, true);
 
@@ -277,6 +298,7 @@ for (let it of map) {
   console.log(JSON.stringify(it, null, '  '));
 }
 ```
+
 ```json
 ...
 ["#/legumes/0/name", "pinto beans"]
@@ -298,15 +320,19 @@ for (let it of map) {
 Decodes the specified `pointer`.
 
 _arguments:_
+
 * `pointer` : _string, required_ &ndash; a JSON pointer in [JSON string representation](https://tools.ietf.org/html/rfc6901#section-5) or [URI fragment identifier representation](https://tools.ietf.org/html/rfc6901#section-6).
 
 _returns:_
+
 * An array of path segments used as indexers to descend from a root/`target` object to a referenced value.
 
 _example:_
+
 ```javascript
 var path = ptr.decode('#/legumes/1/instock');
 ```
+
 ```json
 [ "legumes", "1", "instock" ]
 ```
@@ -316,15 +342,19 @@ var path = ptr.decode('#/legumes/1/instock');
 Decodes the specified `pointer`.
 
 _arguments:_
+
 * `pointer` : _string, required_ &ndash; a JSON pointer in [JSON string representation](https://tools.ietf.org/html/rfc6901#section-5).
 
 _returns:_
+
 * An array of path segments used as indexers to descend from a root/`target` object to a referenced value.
 
 _example:_
+
 ```javascript
 var path = ptr.decodePointer('/people/wilbur dongleworth/age');
 ```
+
 ```json
 [ "people", "wilbur dongleworth", "age" ]
 ```
@@ -334,15 +364,19 @@ var path = ptr.decodePointer('/people/wilbur dongleworth/age');
 Encodes the specified `path` as a JSON pointer in [JSON string representation](https://tools.ietf.org/html/rfc6901#section-5).
 
 _arguments:_
+
 * `path` : _Array, required_ &ndash; an array of path segments
 
 _returns:_
+
 * A JSON pointer in [JSON string representation](https://tools.ietf.org/html/rfc6901#section-5).
 
 _example:_
+
 ```javascript
 var path = ptr.encodePointer(['people', 'wilbur dongleworth', 'age']);
 ```
+
 ```json
 "/people/wilbur dongleworth/age"
 ```
@@ -352,15 +386,19 @@ var path = ptr.encodePointer(['people', 'wilbur dongleworth', 'age']);
 Decodes the specified `pointer`.
 
 _arguments:_
+
 * `pointer` : _string, required_ &ndash; a JSON pointer in [URI fragment identifier representation](https://tools.ietf.org/html/rfc6901#section-6).
 
 _returns:_
+
 * An array of path segments used as indexers to descend from a root/`target` object to a referenced value.
 
 _example:_
+
 ```javascript
 var path = ptr.decodePointer('#/people/wilbur%20dongleworth/age');
 ```
+
 ```json
 [ "people", "wilbur dongleworth", "age" ]
 ```
@@ -370,15 +408,19 @@ var path = ptr.decodePointer('#/people/wilbur%20dongleworth/age');
 Encodes the specified `path` as a JSON pointer in [URI fragment identifier representation](https://tools.ietf.org/html/rfc6901#section-6).
 
 _arguments:_
+
 * `path` : _Array, required_ - an array of path segments
 
 _returns:_
+
 * A JSON pointer in [URI fragment identifier representation](https://tools.ietf.org/html/rfc6901#section-6).
 
 _example:_
+
 ```javascript
 var path = ptr.encodePointer(['people', 'wilbur dongleworth', 'age']);
 ```
+
 ```json
 "#/people/wilbur%20dongleworth/age"
 ```
@@ -388,14 +430,15 @@ var path = ptr.encodePointer(['people', 'wilbur dongleworth', 'age']);
 Restores a conflicting `JsonPointer` variable in the global/root namespace (not necessary in node, but useful in browsers).
 
 _example:_
+
 ```html
-	<!-- ur codez -->
-	<script src="/json-ptr-0.3.0.min.js"></script>
-	<script>
-		// At this point, JsonPointer is the json-ptr module
-		var ptr = JsonPointer.noConflict();
-		// and now it is restored to whatever it was before the json-ptr import.
-	</script>
+  <!-- ur codez -->
+  <script src="/json-ptr-0.3.0.min.js"></script>
+  <script>
+  // At this point, JsonPointer is the json-ptr module
+  var ptr = JsonPointer.noConflict();
+  // and now it is restored to whatever it was before the json-ptr import.
+  </script>
 ```
 
 ### `JsonPointer` Class
@@ -403,26 +446,33 @@ _example:_
 Encapsulates pointer related operations for a specified `pointer`.
 
 _properties:_
+
 * `.path` : _array_ &ndash; contains the pointer's path segements.
 * `.pointer` : _string_ &ndash; the pointer's [JSON string representation](https://tools.ietf.org/html/rfc6901#section-5)
 * `.uriFragmentIdentifier` : _string_ &ndash; the pointer's [URI fragment identifier representation](https://tools.ietf.org/html/rfc6901#section-6)
 
 _methods:_
+
 #### .has(target)
+
 Determins whether the specified `target` has a value at the pointer's path.
 
 #### .get(target)
+
 Looks up the specified `target`'s value at the pointer's path if such exists; otherwise _undefined_.
 
 #### .set(target, value, force)
+
 Sets the specified `target`'s value at the pointer's path, if such exists.If `force` is specified (_truthy_), missing path segments are created and the value is always set at the pointer's path.
 
 _arguments:_
+
 * `target` : _object, required_ &ndash; the target object
 * `value` : _any_ &ndash; the value to be set at the specified `pointer`'s path
 * `force` : _boolean, optional_ &ndash; indicates [whether nonexistent paths are created during the call](https://tools.ietf.org/html/rfc6901#section-7)
 
 _result:_
+
 * The prior value at the pointer's path &mdash; therefore, _undefined_ means the pointer's path was nonexistent.
 
 ## Performance
@@ -430,6 +480,7 @@ _result:_
 This repository has a [companion repository that makes some performance comparisons](https://github.com/flitbit/json-pointer-comparison) between `json-ptr`, [`jsonpointer`](https://www.npmjs.com/package/jsonpointer) and [`json-pointer`](https://www.npmjs.com/package/json-pointer).
 
 **All timings are expressed as nanoseconds:**
+
 ```text
 .flatten(obj)
 ...
@@ -479,6 +530,7 @@ json-pointer | get    |          | 1000000 | 2619 | 346.17%
 It is important to recognize in the performance results that _compiled_ options are faster. As a general rule, you should _compile_ any pointers you'll be using repeatedly.
 
 _Consider this example code that queries the flickr API and prints results to the console:_
+
 ```javascript
 'use strict';
 
@@ -526,11 +578,12 @@ http.get(feed, function(res) {
   console.log('Got error: ' + e.message);
 });
 ```
+
 > \[[example/real-world.js](https://github.com/flitbit/json-ptr/blob/master/examples/real-world.js)]
 
 ## Tests
 
-Tests are written using [mocha](http://visionmedia.github.io/mocha/) and [expect.js](https://github.com/Automattic/expect.js).
+Tests are written using [mocha](https://mochajs.org/) and [expect.js](https://github.com/Automattic/expect.js).
 
 ```bash
 npm test

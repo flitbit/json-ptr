@@ -897,14 +897,14 @@
       it('#set should set the value of a prop named with multiple slahes (#/http:~1~1schema.org~1name)',
         function () {
           ptr.set(data, '#/http:~1~1schema.org~1name', 'Phil');
-          let unk = ptr.get(data, '/http:~1~1schema.org~1name');
+          var unk = ptr.get(data, '/http:~1~1schema.org~1name');
           expect(unk).to.be('Phil');
         });
 
       it('#set should set the value of a prop named with multiple slahes (/http:~1~1schema.org~1name)',
         function () {
           ptr.set(data, '/http:~1~1schema.org~1name', 'Phil');
-          let unk = ptr.get(data, '/http:~1~1schema.org~1name');
+          var unk = ptr.get(data, '/http:~1~1schema.org~1name');
           expect(unk).to.be('Phil');
         });
 

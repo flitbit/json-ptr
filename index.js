@@ -215,20 +215,18 @@
   }
 
   function compilePointerDereference(path) {
-    let body = 'if (typeof(obj) !== \'undefined\'';
+    var body = 'if (typeof(obj) !== \'undefined\'';
     if (path.length === 0) {
       return function (it) {
         return it;
       };
     }
     // eslint-disable-next-line
-    body = path.reduce((body, p, i) => {
-      return `${body} &&
-    typeof((obj = obj['${replace(path[i], '\\', '\\\\')}'])) !== 'undefined'`;
+    body = path.reduce(function (body, p, i) {
+      return body + ' && \n\ttypeof((obj = obj[\'' +
+        replace(path[i], '\\', '\\\\') + '\'])) !== \'undefined\'';
     }, 'if (typeof(obj) !== \'undefined\'');
-    body = `${body}) {
-  return obj;
-}`;
+    body = body + ') {\n\treturn obj;\n }';
     // eslint-disable-next-line no-new-func
     return new Function(['obj'], body);
   }
@@ -269,7 +267,7 @@
               it.push(val);
               return nonexistent;
             } else if (force) {
-               it = it[p] = {};
+              it = it[p] = {};
             }
           }
         } else {
