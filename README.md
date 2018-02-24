@@ -1,4 +1,8 @@
-# json-ptr [![Build Status](https://travis-ci.org/flitbit/json-ptr.png)](http://travis-ci.org/flitbit/json-ptr)&nbsp;[![bitHound Overall Score](https://www.bithound.io/github/flitbit/json-ptr/badges/score.svg)](https://www.bithound.io/github/flitbit/json-ptr)
+# json-ptr
+
+[![CircleCI](https://circleci.com/gh/flitbit/json-ptr/tree/master.svg?style=svg)](https://circleci.com/gh/flitbit/json-ptr/tree/master)
+
+[![bitHound Overall Score](https://www.bithound.io/github/flitbit/json-ptr/badges/score.svg)](https://www.bithound.io/github/flitbit/json-ptr)
 
 A complete implementation of JSON Pointer ([RFC 6901](https://tools.ietf.org/html/rfc6901)) for nodejs and modern browsers.
 
@@ -19,13 +23,14 @@ npm install json-ptr
 ### [nodejs](https://nodejs.org/en/)
 
 ```javascript
+// npm install json-ptr
 var ptr = require('json-ptr')
 ```
 
 ### browser
 
 ```html
-<script src="json-ptr-0.3.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/flitbit/json-ptr@1/dist/json-ptr.min.js"></script>
 <!-- exports an object named JsonPointer -->
 <script>var ptr = JsonPointer.noConflict()</script>
 ```
