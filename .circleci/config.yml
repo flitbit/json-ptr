@@ -65,7 +65,10 @@ workflows:
   version: 2
   build_deploy:
     jobs:
+      - build:
+          context: secrets
       - build_deploy_npm:
+          context: secrets
           filters:
             tags:
               only: /.*/
