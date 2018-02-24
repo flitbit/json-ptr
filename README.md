@@ -30,7 +30,7 @@ var ptr = require('json-ptr')
 ### browser
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/flitbit/json-ptr@1/dist/json-ptr.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/json-ptr@1/dist/json-ptr.min.js"></script>
 <!-- exports an object named JsonPointer -->
 <script>var ptr = JsonPointer.noConflict()</script>
 ```
