@@ -5,6 +5,12 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch Program",
+      "program": "${workspaceFolder}/examples/issues/issue-13.js"
+    },
+    {
       "name": "Run mocha",
       "type": "node",
       "request": "launch",

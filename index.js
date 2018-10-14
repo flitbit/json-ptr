@@ -162,7 +162,8 @@
           step = path[cursor];
           if (Array.isArray(it)) {
             if (isNaN(step) || !isFinite(step)) {
-              break;
+              it = it[step];
+              continue;
             }
             p = toArrayIndexReference(it, step);
             if (it.length > p) {
@@ -196,7 +197,8 @@
           step = path[cursor];
           if (Array.isArray(it)) {
             if (isNaN(step) || !isFinite(step)) {
-              return nonexistent;
+              it = it[step];
+              continue;
             }
             p = toArrayIndexReference(it, step);
             if (it.length > p) {
