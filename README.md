@@ -602,6 +602,9 @@ mocha
 
 ## Releases
 
+* 2019-03-10 &mdash; __1.1.2__
+  * Updated packages to remove critical security concern among dev dependencies'
+
 * 2016-07-26 &mdash; __1.0.1__
   * Fixed a problem with the Babel configuration
 
