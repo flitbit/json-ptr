@@ -309,12 +309,15 @@
     return (looksLikeFragment(ptr)) ? decodeUriFragmentIdentifier : decodePointer;
   }
 
+  function decodePtrInit(ptr) {
+    return (Array.isArray(ptr)) ?
+      ptr.slice(0) :
+      pickDecoder(ptr)(ptr);
+  }
+
   function JsonPointer(ptr) {
     // decode if necessary, make immutable.
-    var localPath = (Array.isArray(ptr)) ?
-      ptr.slice(0) :
-      ptr = pickDecoder(ptr)(ptr);
-    var $original = (Array.isArray(ptr)) ? encodePointer(localPath) : ptr;
+    var localPath = decodePtrInit(ptr);
     var $pointer;
     var $fragmentId;
     var $compiledGetter = compilePointerDereference(localPath);
@@ -333,6 +336,12 @@
         enumerable: true,
         value: function (target) {
           return typeof ($compiledGetter(target)) !== 'undefined';
+        }
+      },
+      concat: {
+        enumerable: true,
+        value: function (target) {
+          return new JsonPointer(localPath.concat(target instanceof JsonPointer ? target.path : decodePtrInit(target)));
         }
       },
       path: {
@@ -364,7 +373,7 @@
         configurable: true,
         writable: true,
         value: function () {
-          return $original;
+          return this.pointer;
         }
       }
     });

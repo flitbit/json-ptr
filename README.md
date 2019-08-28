@@ -478,6 +478,14 @@ _result:_
 
 * The prior value at the pointer's path &mdash; therefore, _undefined_ means the pointer's path was nonexistent.
 
+#### .concat(target)
+
+Creates new pointer appending target to the current pointer's path
+
+_arguments:_
+
+* `target` : _JsonPointer, array or string, required_ &ndash; the path to be appended to the current path
+
 ## Performance
 
 This repository has a [companion repository that makes some performance comparisons](https://github.com/flitbit/json-pointer-comparison) between `json-ptr`, [`jsonpointer`](https://www.npmjs.com/package/jsonpointer) and [`json-pointer`](https://www.npmjs.com/package/json-pointer).
