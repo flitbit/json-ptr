@@ -1005,4 +1005,26 @@
       });
   });
 
+  describe('concat pointers', function () {
+    var ptr1 = ptr.create('/a/b');
+    var ptr2 = ptr.create('/c/d');
+    var result = '/a/b/c/d';
+
+    it('#concat JsonPointer("/a/b") with array ["a", "b"] should produce ' + result, function () {
+      expect(ptr1.concat(Array.from(ptr2.path)).pointer).to.be(result);
+    });
+
+    it('#concat JsonPointer("/a/b") with JsonPointer("/b/c") should produce ' + result, function () {
+      expect(ptr1.concat(ptr2).pointer).to.be(result);
+    });
+
+    it('#concat JsonPointer("/a/b") with string "/b/c" should produce ' + result, function () {
+      expect(ptr1.concat(ptr2.pointer).pointer).to.be(result);
+    });
+
+    it('#concat JsonPointer("/a/b") with string "#/b/c" should produce ' + result, function () {
+      expect(ptr1.concat(ptr2.uriFragmentIdentifier).toString()).to.be(result);
+    });
+  });
+
 }));

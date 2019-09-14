@@ -1,6 +1,6 @@
 {
   "name": "json-ptr",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "author": "Phillip Clark <phillip@flitbit.com>",
   "description": "A complete implementation of JSON Pointer (RFC 6901) for nodejs and modern browsers.",
   "keywords": [
@@ -22,7 +22,7 @@
     "preversion": "npm run release",
     "postversion": "git push && git push --tags",
     "pretest": "npm run lint",
-    "test": "mocha test/**/*.js",
+    "test": "mocha test/**/*.js --reporter tap",
     "test:watch": "nodemon --ext js,json --ignore dist/ --exec 'npm test'",
     "preci": "npm run lint",
     "ci": "mocha --reporter mocha-junit-reporter test/**/*.js",
