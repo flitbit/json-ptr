@@ -608,6 +608,9 @@ mocha
 
 ## Releases
 
+* 2019-09-14 &mdash; __1.2.0__
+  * Merged new `.concat` function contributed by @vuwuv, updated dependencies.
+
 * 2019-03-10 &mdash; __1.1.2__
   * Updated packages to remove critical security concern among dev dependencies'
 
