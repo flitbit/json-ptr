@@ -1,0 +1,9 @@
+{
+  "require": [
+    "ts-node/register",
+    "source-map-support/register"
+  ],
+  "bail": true,
+  "full-trace": true,
+  "reporter": "tap"
+}
