@@ -32,7 +32,7 @@
       "./src/__test__"
     ],
     "mode": "modules",
-    "out": "doc",
+    "out": "docs",
     "includeDeclarations": true,
     "excludeExternals": true,
     "excludePrivate": true,

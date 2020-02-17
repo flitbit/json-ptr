@@ -138,8 +138,8 @@
 				<p><em>example:</em></p>
 				<pre><code class="language-ts"><span class="hljs-keyword">const</span> pointer = JsonPointer.create(<span class="hljs-string">'/legumes/0'</span>);
 <span class="hljs-comment">// fragmentId: #/legumes/0</span></code></pre>
-				<a href="#hastargetpointer" id="hastargetpointer" style="color: inherit; text-decoration: none;">
-					<h4>.has(target,pointer)</h4>
+				<a href="#haslttgttarget-t-pointer-string--string--jsonpointer-boolean" id="haslttgttarget-t-pointer-string--string--jsonpointer-boolean" style="color: inherit; text-decoration: none;">
+					<h4>.has&lt;T&gt;(target: T, pointer: string | string[] | JsonPointer): boolean</h4>
 				</a>
 				<p>Determins whether the specified <code>target</code> has a value at the <code>pointer</code>&#39;s path.</p>
 				<p><em>arguments:</em></p>
@@ -165,7 +165,7 @@
 					<li>the dereferenced value or <em>undefined</em> if nonexistent</li>
 				</ul>
 				<p><em>example:</em></p>
-				<pre><code class="language-javascript"><span class="hljs-keyword">let</span> value = ptr.get(data, <span class="hljs-string">'/legumes/1'</span>);
+				<pre><code class="language-javascript"><span class="hljs-keyword">let</span> value = JsonPointer.get(data, <span class="hljs-string">'/legumes/1'</span>);
 <span class="hljs-comment">// fragmentId: #/legumes/1</span></code></pre>
 				<a href="#settarget-pointer-value-force" id="settarget-pointer-value-force" style="color: inherit; text-decoration: none;">
 					<h4>.set(target, pointer, value, force)</h4>
@@ -183,13 +183,13 @@
 					<li>The prior value at the pointer&#39;s path &mdash; therefore, <em>undefined</em> means the pointer&#39;s path was nonexistent.</li>
 				</ul>
 				<p><em>example:</em></p>
-				<pre><code class="language-javascript"><span class="hljs-keyword">let</span> prior = ptr.set(data, <span class="hljs-string">'#/legumes/1/instock'</span>, <span class="hljs-number">50</span>);</code></pre>
+				<pre><code class="language-javascript"><span class="hljs-keyword">let</span> prior = JsonPointer.set(data, <span class="hljs-string">'#/legumes/1/instock'</span>, <span class="hljs-number">50</span>);</code></pre>
 				<p>example force:</p>
 				<pre><code class="language-javascript"><span class="hljs-keyword">let</span> data = {};
 
-ptr.set(data, <span class="hljs-string">'#/peter/piper'</span>, <span class="hljs-string">'man'</span>, <span class="hljs-literal">true</span>);
-ptr.set(data, <span class="hljs-string">'#/peter/pan'</span>, <span class="hljs-string">'boy'</span>, <span class="hljs-literal">true</span>);
-ptr.set(data, <span class="hljs-string">'#/peter/pickle'</span>, <span class="hljs-string">'dunno'</span>, <span class="hljs-literal">true</span>);
+JsonPointer.set(data, <span class="hljs-string">'#/peter/piper'</span>, <span class="hljs-string">'man'</span>, <span class="hljs-literal">true</span>);
+JsonPointer.set(data, <span class="hljs-string">'#/peter/pan'</span>, <span class="hljs-string">'boy'</span>, <span class="hljs-literal">true</span>);
+JsonPointer.set(data, <span class="hljs-string">'#/peter/pickle'</span>, <span class="hljs-string">'dunno'</span>, <span class="hljs-literal">true</span>);
 
 <span class="hljs-built_in">console</span>.log(<span class="hljs-built_in">JSON</span>.stringify(data, <span class="hljs-literal">null</span>, <span class="hljs-string">'  '</span>));</code></pre>
 				<pre><code class="language-json">{
@@ -216,7 +216,7 @@ ptr.set(data, <span class="hljs-string">'#/peter/pickle'</span>, <span class="hl
 					<li>an array of <code>pointer-value</code> pairs</li>
 				</ul>
 				<p><em>example:</em></p>
-				<pre><code class="language-javascript"><span class="hljs-keyword">let</span> list = ptr.list(data);</code></pre>
+				<pre><code class="language-javascript"><span class="hljs-keyword">let</span> list = JsonPointer.list(data);</code></pre>
 				<pre><code class="language-json">[ ...
   {
     <span class="hljs-attr">"pointer"</span>: <span class="hljs-string">"/legumes/2/unit"</span>,
@@ -240,7 +240,7 @@ ptr.set(data, <span class="hljs-string">'#/peter/pickle'</span>, <span class="hl
   }
 ]</code></pre>
 				<p><em><code>fragmentId</code> example:</em></p>
-				<pre><code class="language-javascript"><span class="hljs-keyword">let</span> list = ptr.list(data, <span class="hljs-literal">true</span>);</code></pre>
+				<pre><code class="language-javascript"><span class="hljs-keyword">let</span> list = JsonPointer.list(data, <span class="hljs-literal">true</span>);</code></pre>
 				<pre><code class="language-json">[ ...
   {
     <span class="hljs-attr">"fragmentId"</span>: <span class="hljs-string">"#/legumes/2/unit"</span>,
@@ -277,7 +277,7 @@ ptr.set(data, <span class="hljs-string">'#/peter/pickle'</span>, <span class="hl
 					<li>a flattened object of <code>property-value</code> pairs as properties.</li>
 				</ul>
 				<p><em>example:</em></p>
-				<pre><code class="language-javascript"><span class="hljs-keyword">let</span> obj = ptr.flatten(data, <span class="hljs-literal">true</span>);</code></pre>
+				<pre><code class="language-javascript"><span class="hljs-keyword">let</span> obj = JsonPointer.flatten(data, <span class="hljs-literal">true</span>);</code></pre>
 				<pre><code class="language-json">{ ...
   &quot;#/legumes/1/name&quot;: &quot;lima beans&quot;,
   &quot;#/legumes/1/unit&quot;: &quot;lbs&quot;,
@@ -303,7 +303,7 @@ ptr.set(data, <span class="hljs-string">'#/peter/pickle'</span>, <span class="hl
 					<li>a Map object containing key-value pairs where keys are pointers.</li>
 				</ul>
 				<p><em>example:</em></p>
-				<pre><code class="language-javascript"><span class="hljs-keyword">let</span> map = ptr.map(data, <span class="hljs-literal">true</span>);
+				<pre><code class="language-javascript"><span class="hljs-keyword">let</span> map = JsonPointer.map(data, <span class="hljs-literal">true</span>);
 
 <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> it <span class="hljs-keyword">of</span> map) {
   <span class="hljs-built_in">console</span>.log(<span class="hljs-built_in">JSON</span>.stringify(it, <span class="hljs-literal">null</span>, <span class="hljs-string">'  '</span>));
@@ -334,10 +334,10 @@ ptr.set(data, <span class="hljs-string">'#/peter/pickle'</span>, <span class="hl
 					<li>An array of path segments used as indexers to descend from a root/<code>target</code> object to a referenced value.</li>
 				</ul>
 				<p><em>example:</em></p>
-				<pre><code class="language-javascript"><span class="hljs-keyword">let</span> path = ptr.decode(<span class="hljs-string">'#/legumes/1/instock'</span>);</code></pre>
+				<pre><code class="language-javascript"><span class="hljs-keyword">let</span> path = JsonPointer.decode(<span class="hljs-string">'#/legumes/1/instock'</span>);</code></pre>
 				<pre><code class="language-json">[ <span class="hljs-string">"legumes"</span>, <span class="hljs-string">"1"</span>, <span class="hljs-string">"instock"</span> ]</code></pre>
 				<a href="#decodepointerpointer" id="decodepointerpointer" style="color: inherit; text-decoration: none;">
-					<h4>.decodePointer(pointer)</h4>
+					<h4>decodePointer(pointer)</h4>
 				</a>
 				<p>Decodes the specified <code>pointer</code>.</p>
 				<p><em>arguments:</em></p>
@@ -349,10 +349,10 @@ ptr.set(data, <span class="hljs-string">'#/peter/pickle'</span>, <span class="hl
 					<li>An array of path segments used as indexers to descend from a root/<code>target</code> object to a referenced value.</li>
 				</ul>
 				<p><em>example:</em></p>
-				<pre><code class="language-javascript"><span class="hljs-keyword">let</span> path = ptr.decodePointer(<span class="hljs-string">'/people/wilbur dongleworth/age'</span>);</code></pre>
+				<pre><code class="language-javascript"><span class="hljs-keyword">let</span> path = decodePointer(<span class="hljs-string">'/people/wilbur dongleworth/age'</span>);</code></pre>
 				<pre><code class="language-json">[ <span class="hljs-string">"people"</span>, <span class="hljs-string">"wilbur dongleworth"</span>, <span class="hljs-string">"age"</span> ]</code></pre>
 				<a href="#encodepointerpath" id="encodepointerpath" style="color: inherit; text-decoration: none;">
-					<h4>.encodePointer(path)</h4>
+					<h4>encodePointer(path)</h4>
 				</a>
 				<p>Encodes the specified <code>path</code> as a JSON pointer in <a href="https://tools.ietf.org/html/rfc6901#section-5">JSON string representation</a>.</p>
 				<p><em>arguments:</em></p>
@@ -364,10 +364,10 @@ ptr.set(data, <span class="hljs-string">'#/peter/pickle'</span>, <span class="hl
 					<li>A JSON pointer in <a href="https://tools.ietf.org/html/rfc6901#section-5">JSON string representation</a>.</li>
 				</ul>
 				<p><em>example:</em></p>
-				<pre><code class="language-javascript"><span class="hljs-keyword">let</span> path = ptr.encodePointer([<span class="hljs-string">'people'</span>, <span class="hljs-string">'wilbur dongleworth'</span>, <span class="hljs-string">'age'</span>]);</code></pre>
+				<pre><code class="language-javascript"><span class="hljs-keyword">let</span> path = encodePointer([<span class="hljs-string">'people'</span>, <span class="hljs-string">'wilbur dongleworth'</span>, <span class="hljs-string">'age'</span>]);</code></pre>
 				<pre><code class="language-json"><span class="hljs-string">"/people/wilbur dongleworth/age"</span></code></pre>
 				<a href="#decodeurifragmentidentifierpointer" id="decodeurifragmentidentifierpointer" style="color: inherit; text-decoration: none;">
-					<h4>.decodeUriFragmentIdentifier(pointer)</h4>
+					<h4>decodeUriFragmentIdentifier(pointer)</h4>
 				</a>
 				<p>Decodes the specified <code>pointer</code>.</p>
 				<p><em>arguments:</em></p>
@@ -379,10 +379,10 @@ ptr.set(data, <span class="hljs-string">'#/peter/pickle'</span>, <span class="hl
 					<li>An array of path segments used as indexers to descend from a root/<code>target</code> object to a referenced value.</li>
 				</ul>
 				<p><em>example:</em></p>
-				<pre><code class="language-javascript"><span class="hljs-keyword">let</span> path = ptr.decodePointer(<span class="hljs-string">'#/people/wilbur%20dongleworth/age'</span>);</code></pre>
+				<pre><code class="language-javascript"><span class="hljs-keyword">let</span> path = decodePointer(<span class="hljs-string">'#/people/wilbur%20dongleworth/age'</span>);</code></pre>
 				<pre><code class="language-json">[ <span class="hljs-string">"people"</span>, <span class="hljs-string">"wilbur dongleworth"</span>, <span class="hljs-string">"age"</span> ]</code></pre>
 				<a href="#encodeurifragmentidentifierpath" id="encodeurifragmentidentifierpath" style="color: inherit; text-decoration: none;">
-					<h4>.encodeUriFragmentIdentifier(path)</h4>
+					<h4>encodeUriFragmentIdentifier(path)</h4>
 				</a>
 				<p>Encodes the specified <code>path</code> as a JSON pointer in <a href="https://tools.ietf.org/html/rfc6901#section-6">URI fragment identifier representation</a>.</p>
 				<p><em>arguments:</em></p>
@@ -396,18 +396,6 @@ ptr.set(data, <span class="hljs-string">'#/peter/pickle'</span>, <span class="hl
 				<p><em>example:</em></p>
 				<pre><code class="language-javascript"><span class="hljs-keyword">let</span> path = ptr.encodePointer([<span class="hljs-string">'people'</span>, <span class="hljs-string">'wilbur dongleworth'</span>, <span class="hljs-string">'age'</span>]);</code></pre>
 				<pre><code class="language-json"><span class="hljs-string">"#/people/wilbur%20dongleworth/age"</span></code></pre>
-				<a href="#noconflict" id="noconflict" style="color: inherit; text-decoration: none;">
-					<h4>.noConflict()</h4>
-				</a>
-				<p>Restores a conflicting <code>JsonPointer</code> variable in the global/root namespace (not necessary in node, but useful in browsers).</p>
-				<p><em>example:</em></p>
-				<pre><code class="language-html">  <span class="hljs-comment">&lt;!-- ur codez --&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"/json-ptr-0.3.0.min.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="javascript">
-  <span class="hljs-comment">// At this point, JsonPointer is the json-ptr module</span>
-  <span class="hljs-keyword">let</span> ptr = JsonPointer.noConflict();
-  <span class="hljs-comment">// and now it is restored to whatever it was before the json-ptr import.</span>
-  </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre>
 				<a href="#codejsonpointercode-class" id="codejsonpointercode-class" style="color: inherit; text-decoration: none;">
 					<h3><code>JsonPointer</code> Class</h3>
 				</a>
