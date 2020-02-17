@@ -23,5 +23,19 @@
   ],
   "exclude": [
     "node_modules"
-  ]
+  ],
+  "typedocOptions": {
+    "inputFiles": [
+      "./src"
+    ],
+    "exclude": [
+      "./src/__test__"
+    ],
+    "mode": "modules",
+    "out": "doc",
+    "includeDeclarations": true,
+    "excludeExternals": true,
+    "excludePrivate": true,
+    "excludeNotExported": true,
+  }
 }

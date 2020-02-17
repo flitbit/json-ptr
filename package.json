@@ -23,14 +23,17 @@
     "preversion": "npm run build",
     "prebuild": "npm run lint",
     "pretest": "npm run build",
-    "test": "nyc mocha src/**/*.spec.ts"
+    "test": "nyc mocha src/**/*.spec.ts",
+    "docs": "typedoc"
   },
   "devDependencies": {
     "@types/assert-plus": "^1.0.4",
+    "@types/bent": "^7.0.1",
     "@types/chai": "^4.2.9",
     "@types/mocha": "^7.0.1",
     "@typescript-eslint/eslint-plugin": "^2.19.2",
     "@typescript-eslint/parser": "^2.19.2",
+    "bent": "^7.0.6",
     "chai": "^4.2.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.10.0",
@@ -38,12 +41,14 @@
     "eslint-plugin-json": "^2.0.1",
     "eslint-plugin-mocha": "^6.2.2",
     "eslint-plugin-prettier": "^3.1.2",
+    "lodash": "^4.17.15",
     "mocha": "^7.0.1",
     "nyc": "^15.0.0",
     "prettier": "^1.19.1",
     "rimraf": "^3.0.2",
     "source-map-support": "^0.5.16",
     "ts-node": "^8.6.2",
+    "typedoc": "^0.16.10",
     "typescript": "^3.7.5"
   },
   "nyc": {

@@ -16,21 +16,12 @@ Since there are a few npm modules for you to choose from, see [the section on pe
 npm install json-ptr
 ```
 
-## Use/Import
+## Use
 
 ### [nodejs](https://nodejs.org/en/)
 
 ```javascript
-// npm install json-ptr
-var ptr = require('json-ptr')
-```
-
-### browser
-
-```html
-<script src="https://cdn.jsdelivr.net/npm/json-ptr@1/dist/json-ptr.min.js"></script>
-<!-- exports an object named JsonPointer -->
-<script>var ptr = JsonPointer.noConflict()</script>
+import { JsonPointer, create } from 'json-ptr';
 ```
 
 ### Module API
@@ -53,7 +44,7 @@ var ptr = require('json-ptr')
 All example code assumes data has this structure:
 
 ```javascript
-var data = {
+const data = {
   legumes: [{
     name: 'pinto beans',
     unit: 'lbs',
@@ -74,7 +65,7 @@ var data = {
 }
 ```
 
-#### .create(pointer)
+#### .create(pointer: string | string[]): JsonPointer
 
 Creates an instance of the `JsonPointer` class.
 
@@ -88,12 +79,12 @@ _returns:_
 
 _example:_
 
-```javascript
-var pointer = ptr.create('/legumes/0');
+```ts
+const pointer = JsonPointer.create('/legumes/0');
 // fragmentId: #/legumes/0
 ```
 
-#### .has(target,pointer)
+#### .has&lt;T>(target: T, pointer: string | string[] | JsonPointer): boolean
 
 Determins whether the specified `target` has a value at the `pointer`'s path.
 
@@ -122,7 +113,7 @@ _returns:_
 _example:_
 
 ```javascript
-var value = ptr.get(data, '/legumes/1');
+let value = JsonPointer.get(data, '/legumes/1');
 // fragmentId: #/legumes/1
 ```
 
@@ -144,17 +135,17 @@ _returns:_
 _example:_
 
 ```javascript
-var prior = ptr.set(data, '#/legumes/1/instock', 50);
+let prior = JsonPointer.set(data, '#/legumes/1/instock', 50);
 ```
 
 example force:
 
 ```javascript
-var data = {};
+let data = {};
 
-ptr.set(data, '#/peter/piper', 'man', true);
-ptr.set(data, '#/peter/pan', 'boy', true);
-ptr.set(data, '#/peter/pickle', 'dunno', true);
+JsonPointer.set(data, '#/peter/piper', 'man', true);
+JsonPointer.set(data, '#/peter/pan', 'boy', true);
+JsonPointer.set(data, '#/peter/pickle', 'dunno', true);
 
 console.log(JSON.stringify(data, null, '  '));
 ```
@@ -187,7 +178,7 @@ _returns:_
 _example:_
 
 ```javascript
-var list = ptr.list(data);
+let list = JsonPointer.list(data);
 ```
 
 ```json
@@ -218,7 +209,7 @@ var list = ptr.list(data);
 _`fragmentId` example:_
 
 ```javascript
-var list = ptr.list(data, true);
+let list = JsonPointer.list(data, true);
 ```
 
 ```json
@@ -262,7 +253,7 @@ _returns:_
 _example:_
 
 ```javascript
-var obj = ptr.flatten(data, true);
+let obj = JsonPointer.flatten(data, true);
 ```
 
 ```json
@@ -295,7 +286,7 @@ _returns:_
 _example:_
 
 ```javascript
-var map = ptr.map(data, true);
+let map = JsonPointer.map(data, true);
 
 for (let it of map) {
   console.log(JSON.stringify(it, null, '  '));
@@ -333,14 +324,14 @@ _returns:_
 _example:_
 
 ```javascript
-var path = ptr.decode('#/legumes/1/instock');
+let path = JsonPointer.decode('#/legumes/1/instock');
 ```
 
 ```json
 [ "legumes", "1", "instock" ]
 ```
 
-#### .decodePointer(pointer)
+#### decodePointer(pointer)
 
 Decodes the specified `pointer`.
 
@@ -355,14 +346,14 @@ _returns:_
 _example:_
 
 ```javascript
-var path = ptr.decodePointer('/people/wilbur dongleworth/age');
+let path = decodePointer('/people/wilbur dongleworth/age');
 ```
 
 ```json
 [ "people", "wilbur dongleworth", "age" ]
 ```
 
-#### .encodePointer(path)
+#### encodePointer(path)
 
 Encodes the specified `path` as a JSON pointer in [JSON string representation](https://tools.ietf.org/html/rfc6901#section-5).
 
@@ -377,14 +368,14 @@ _returns:_
 _example:_
 
 ```javascript
-var path = ptr.encodePointer(['people', 'wilbur dongleworth', 'age']);
+let path = encodePointer(['people', 'wilbur dongleworth', 'age']);
 ```
 
 ```json
 "/people/wilbur dongleworth/age"
 ```
 
-#### .decodeUriFragmentIdentifier(pointer)
+#### decodeUriFragmentIdentifier(pointer)
 
 Decodes the specified `pointer`.
 
@@ -399,14 +390,14 @@ _returns:_
 _example:_
 
 ```javascript
-var path = ptr.decodePointer('#/people/wilbur%20dongleworth/age');
+let path = decodePointer('#/people/wilbur%20dongleworth/age');
 ```
 
 ```json
 [ "people", "wilbur dongleworth", "age" ]
 ```
 
-#### .encodeUriFragmentIdentifier(path)
+#### encodeUriFragmentIdentifier(path)
 
 Encodes the specified `path` as a JSON pointer in [URI fragment identifier representation](https://tools.ietf.org/html/rfc6901#section-6).
 
@@ -421,27 +412,11 @@ _returns:_
 _example:_
 
 ```javascript
-var path = ptr.encodePointer(['people', 'wilbur dongleworth', 'age']);
+let path = ptr.encodePointer(['people', 'wilbur dongleworth', 'age']);
 ```
 
 ```json
 "#/people/wilbur%20dongleworth/age"
-```
-
-#### .noConflict()
-
-Restores a conflicting `JsonPointer` variable in the global/root namespace (not necessary in node, but useful in browsers).
-
-_example:_
-
-```html
-  <!-- ur codez -->
-  <script src="/json-ptr-0.3.0.min.js"></script>
-  <script>
-  // At this point, JsonPointer is the json-ptr module
-  var ptr = JsonPointer.noConflict();
-  // and now it is restored to whatever it was before the json-ptr import.
-  </script>
 ```
 
 ### `JsonPointer` Class
@@ -545,20 +520,20 @@ _Consider this example code that queries the flickr API and prints results to th
 ```javascript
 'use strict';
 
-var ptr = require('..'),
+let ptr = require('..'),
   http = require('http'),
   util = require('util');
 
 // A flickr feed, tags surf,pipeline
-var feed = 'http://api.flickr.com/services/feeds/photos_public.gne?tags=surf,pipeline&tagmode=all&format=json&jsoncallback=processResponse';
+let feed = 'http://api.flickr.com/services/feeds/photos_public.gne?tags=surf,pipeline&tagmode=all&format=json&jsoncallback=processResponse';
 
 // Compile/prepare the pointers...
-var items = ptr.create('#/items');
-var author = ptr.create('#/author');
-var media = ptr.create('#/media/m');
+let items = ptr.create('#/items');
+let author = ptr.create('#/author');
+let media = ptr.create('#/media/m');
 
 function processResponse(json) {
-  var data = items.get(json);
+  let data = items.get(json);
 
   if (data && Array.isArray(data)) {
     let images = data.reduce((acc, it) => {
@@ -574,7 +549,7 @@ function processResponse(json) {
 }
 
 http.get(feed, function(res) {
-  var data = '';
+  let data = '';
 
   res.on('data', function(chunk) {
     data += chunk;

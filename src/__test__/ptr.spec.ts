@@ -1,5 +1,7 @@
-import { JsonPointer, create, encodePointer, encodeUriFragmentIdentifier, PointerItem } from '..';
+import { JsonPointer, encodePointer, encodeUriFragmentIdentifier, PointerPair } from '..';
 import { expect } from 'chai';
+
+const create = JsonPointer.create;
 
 describe('JsonPointer', function() {
   describe('when working with the example data from the rfc', function() {
@@ -959,7 +961,7 @@ describe('JsonPointer', function() {
     ];
     tests.forEach(function(test) {
       describe(test.name, function() {
-        let items: PointerItem[];
+        let items: PointerPair[];
         before(function() {
           items = JsonPointer.list(test.args[0], test.args[1] as boolean);
         });

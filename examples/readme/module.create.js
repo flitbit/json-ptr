@@ -1,14 +1,10 @@
-'use strict';
+import { JsonPointer } from '../../src';
+import { data } from './data';
 
-var ptr = require('../../'); // json-ptr
-var data = require('./data');
-var format = require('util').format;
-
-var pointer = ptr.create('/legumes/2');
+const pointer = JsonPointer.create('/legumes/2');
+// const pointer = new JsonPointer('/legumes/2');
 // fragmentId: #/legumes/2
 
-var value = pointer.get(data);
+const value = pointer.get(data);
 
-console.log(
-  format('There are %d %s of %s in stock.',
-    value.instock, value.unit, value.name));
+console.log(`There are ${value.instock} ${value.unit} of ${value.name} in stock.`);
