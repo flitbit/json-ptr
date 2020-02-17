@@ -9,7 +9,6 @@ commands:
     description: "standard npm-based ci workflow"
     steps:
       - checkout
-      - setup_remote_docker
       - run:
           name: authorize npm
           command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
