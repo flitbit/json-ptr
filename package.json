@@ -24,6 +24,7 @@
     "prebuild": "npm run lint",
     "pretest": "npm run build",
     "test": "nyc mocha src/**/*.spec.ts",
+    "ci": "npm run test",
     "docs": "typedoc"
   },
   "devDependencies": {
