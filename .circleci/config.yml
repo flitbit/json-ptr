@@ -35,10 +35,11 @@ jobs:
       - run:
           name: write pre-release npm package
           command: |
-            sudo npm i -g json
+            sudo npm i -g json semver
             PACKAGE_VERSION="$(cat package.json | json version)"
             BRANCH_NAME="${CIRCLE_BRANCH//[^a-z0-9\-]/-}"
-            npm --no-git-tag-version version ${PACKAGE_VERSION}-${BRANCH_NAME}.$(git rev-parse --short HEAD)
+            VERSION_PRE="$(semver -i prepatch --preid ${BRANCH_NAME}.$(git rev-parse --short HEAD) ${PACKAGE_VERSION}"
+            npm --no-git-tag-version version ${VERSION_PRE}
             npm publish --tag=${BRANCH_NAME}
 
   build-release:
