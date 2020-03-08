@@ -1,3 +1,5 @@
+import { JsonStringPointer, UriFragmentIdentifierPointer, Pointer, PathSegments, Decoder } from './types';
+
 export function replace(source: string, find: string, repl: string): string {
   let res = '';
   let rem = source;
@@ -14,10 +16,7 @@ export function replace(source: string, find: string, repl: string): string {
   return res;
 }
 
-export type Decoder = (ptr: string) => string[];
-export type Encoder = (ptr: string[]) => string;
-
-export function decodeFragmentSegments(segments: string[]): string[] {
+export function decodeFragmentSegments(segments: PathSegments): PathSegments {
   let i = -1;
   const len = segments.length;
   const res = new Array(len);
@@ -27,7 +26,7 @@ export function decodeFragmentSegments(segments: string[]): string[] {
   return res;
 }
 
-export function encodeFragmentSegments(segments: string[]): string[] {
+export function encodeFragmentSegments(segments: PathSegments): PathSegments {
   let i = -1;
   const len = segments.length;
   const res = new Array(len);
@@ -41,7 +40,7 @@ export function encodeFragmentSegments(segments: string[]): string[] {
   return res;
 }
 
-export function decodePointerSegments(segments: string[]): string[] {
+export function decodePointerSegments(segments: PathSegments): PathSegments {
   let i = -1;
   const len = segments.length;
   const res = new Array(len);
@@ -51,7 +50,7 @@ export function decodePointerSegments(segments: string[]): string[] {
   return res;
 }
 
-export function encodePointerSegments(segments: string[]): string[] {
+export function encodePointerSegments(segments: PathSegments): PathSegments {
   let i = -1;
   const len = segments.length;
   const res = new Array(len);
@@ -65,7 +64,7 @@ export function encodePointerSegments(segments: string[]): string[] {
   return res;
 }
 
-export function decodePointer(ptr: string): string[] {
+export function decodePointer(ptr: Pointer): PathSegments {
   if (typeof ptr !== 'string') {
     throw new TypeError('Invalid type: JSON Pointers are represented as strings.');
   }
@@ -78,7 +77,7 @@ export function decodePointer(ptr: string): string[] {
   return decodePointerSegments(ptr.substring(1).split('/'));
 }
 
-export function encodePointer(path: string[]): string {
+export function encodePointer(path: PathSegments): JsonStringPointer {
   if (path && !Array.isArray(path)) {
     throw new TypeError('Invalid type: path must be an array of segments.');
   }
@@ -88,7 +87,7 @@ export function encodePointer(path: string[]): string {
   return '/'.concat(encodePointerSegments(path).join('/'));
 }
 
-export function decodeUriFragmentIdentifier(ptr: string): string[] {
+export function decodeUriFragmentIdentifier(ptr: UriFragmentIdentifierPointer): PathSegments {
   if (typeof ptr !== 'string') {
     throw new TypeError('Invalid type: JSON Pointers are represented as strings.');
   }
@@ -104,7 +103,7 @@ export function decodeUriFragmentIdentifier(ptr: string): string[] {
   return decodeFragmentSegments(ptr.substring(2).split('/'));
 }
 
-export function encodeUriFragmentIdentifier(path: string[]): string {
+export function encodeUriFragmentIdentifier(path: PathSegments): UriFragmentIdentifierPointer {
   if (path && !Array.isArray(path)) {
     throw new TypeError('Invalid type: path must be an array of segments.');
   }
@@ -134,7 +133,7 @@ export function toArrayIndexReference(arr: string[], idx: string): number {
   return parseInt(idx, 10);
 }
 
-export function hasValueAtPath<T>(target: T, path: string[]): boolean {
+export function hasValueAtPath<T>(target: T, path: PathSegments): boolean {
   let it;
   let len;
   let cursor;
@@ -171,7 +170,7 @@ export function hasValueAtPath<T>(target: T, path: string[]): boolean {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function getValueAtPath<T>(target: T, path: string[]): any {
+export function getValueAtPath<T>(target: T, path: PathSegments): any {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let it: any;
   let len;
@@ -208,16 +207,14 @@ export function getValueAtPath<T>(target: T, path: string[]): any {
   return undefined;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Dereference = <T, V>(it: T) => V;
+export type Dereference = <T>(it: T) => unknown;
 
-export function compilePointerDereference(path: string[]): Dereference {
+export function compilePointerDereference(path: PathSegments): Dereference {
   let body = "if (typeof(it) !== 'undefined'";
   if (path.length === 0) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (it: any): any => it;
+    return (it): unknown => it;
   }
-  body = path.reduce((body, p, i) => {
+  body = path.reduce((body, _, i) => {
     return body + " && \n\ttypeof((it = it['" + replace(path[i], '\\', '\\\\') + "'])) !== 'undefined'";
   }, "if (typeof(it) !== 'undefined'");
   body = body + ') {\n\treturn it;\n }';
@@ -226,7 +223,7 @@ export function compilePointerDereference(path: string[]): Dereference {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function setValueAtPath<V>(target: any, val: V, path: string[], force: boolean): any {
+export function setValueAtPath<V>(target: any, val: V, path: PathSegments, force: boolean): any {
   if (path.length === 0) {
     throw new Error('Cannot set the root object; assign it directly.');
   }
@@ -293,10 +290,10 @@ export function looksLikeFragment(ptr: string): boolean {
   return ptr && ptr.length && ptr[0] === '#';
 }
 
-export function pickDecoder(ptr: string): Decoder {
+export function pickDecoder(ptr: Pointer): Decoder {
   return looksLikeFragment(ptr) ? decodeUriFragmentIdentifier : decodePointer;
 }
 
-export function decodePtrInit(ptr: string | string[]): string[] {
-  return Array.isArray(ptr) ? ptr.slice(0) : pickDecoder(ptr)(ptr);
+export function decodePtrInit(ptr: Pointer | PathSegments): PathSegments {
+  return Array.isArray(ptr) ? ptr.slice(0) : pickDecoder(ptr as Pointer)(ptr as Pointer);
 }

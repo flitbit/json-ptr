@@ -1,4 +1,10 @@
-import { JsonPointer, encodePointer, encodeUriFragmentIdentifier, PointerPair } from '..';
+import {
+  JsonPointer,
+  encodePointer,
+  encodeUriFragmentIdentifier,
+  JsonStringPointerListItem,
+  UriFragmentIdentifierPointerListItem,
+} from '..';
 import { expect } from 'chai';
 
 const create = JsonPointer.create;
@@ -896,86 +902,62 @@ describe('JsonPointer', function() {
     });
   });
 
-  describe('#list', function() {
+  describe('#list...', function() {
     const data = {
       a: 1,
-      b: {
-        c: 2,
-      },
-      d: {
-        e: [
-          {
-            a: 3,
-          },
-          {
-            b: 4,
-          },
-          {
-            c: 5,
-          },
-        ],
-      },
+      b: { c: 2 },
+      d: { e: [{ a: 3 }, { b: 4 }, { c: 5 }] },
       f: null as object,
     };
-    const tests = [
-      {
-        name: '#list(data)',
-        args: [data, undefined as boolean],
-        ptr: 'pointer',
-        res: [
-          ['', data],
-          ['/a', data.a],
-          ['/b', data.b],
-          ['/d', data.d],
-          ['/f', data.f],
-          ['/b/c', data.b.c],
-          ['/d/e', data.d.e],
-          ['/d/e/0', data.d.e[0]],
-          ['/d/e/1', data.d.e[1]],
-          ['/d/e/2', data.d.e[2]],
-          ['/d/e/0/a', data.d.e[0].a],
-          ['/d/e/1/b', data.d.e[1].b],
-          ['/d/e/2/c', data.d.e[2].c],
-        ],
-      },
-      {
-        name: '#list(data, true)',
-        args: [data, true],
-        ptr: 'fragmentId',
-        res: [
-          ['#', data],
-          ['#/a', data.a],
-          ['#/b', data.b],
-          ['#/d', data.d],
-          ['#/f', data.f],
-          ['#/b/c', data.b.c],
-          ['#/d/e', data.d.e],
-          ['#/d/e/0', data.d.e[0]],
-          ['#/d/e/1', data.d.e[1]],
-          ['#/d/e/2', data.d.e[2]],
-          ['#/d/e/0/a', data.d.e[0].a],
-          ['#/d/e/1/b', data.d.e[1].b],
-          ['#/d/e/2/c', data.d.e[2].c],
-        ],
-      },
+    const pointerList = [
+      ['', data],
+      ['/a', data.a],
+      ['/b', data.b],
+      ['/d', data.d],
+      ['/f', data.f],
+      ['/b/c', data.b.c],
+      ['/d/e', data.d.e],
+      ['/d/e/0', data.d.e[0]],
+      ['/d/e/1', data.d.e[1]],
+      ['/d/e/2', data.d.e[2]],
+      ['/d/e/0/a', data.d.e[0].a],
+      ['/d/e/1/b', data.d.e[1].b],
+      ['/d/e/2/c', data.d.e[2].c],
     ];
-    tests.forEach(function(test) {
-      describe(test.name, function() {
-        let items: PointerPair[];
-        before(function() {
-          items = JsonPointer.list(test.args[0], test.args[1] as boolean);
+    const fragmentList = [
+      ['#', data],
+      ['#/a', data.a],
+      ['#/b', data.b],
+      ['#/d', data.d],
+      ['#/f', data.f],
+      ['#/b/c', data.b.c],
+      ['#/d/e', data.d.e],
+      ['#/d/e/0', data.d.e[0]],
+      ['#/d/e/1', data.d.e[1]],
+      ['#/d/e/2', data.d.e[2]],
+      ['#/d/e/0/a', data.d.e[0].a],
+      ['#/d/e/1/b', data.d.e[1].b],
+      ['#/d/e/2/c', data.d.e[2].c],
+    ];
+    describe('listPointers(target)', function() {
+      const items: JsonStringPointerListItem[] = JsonPointer.listPointers(data);
+      pointerList.forEach(function(tt, n) {
+        it(`item ${n} has pointer ${tt[0]}`, () => {
+          expect(items[n].pointer).to.equal(tt[0]);
         });
-        test.res.forEach(function(tt, n) {
-          it('item ' + n + ' has ' + test.ptr + " '" + tt[0] + "'", function() {
-            if (test.ptr === 'fragmentId') {
-              expect(items[n].fragmentId).to.equal(tt[0]);
-            } else {
-              expect(items[n].pointer).to.equal(tt[0]);
-            }
-          });
-          it('item ' + n + ' has correct value', function() {
-            expect(items[n].value).to.equal(tt[1]);
-          });
+        it(`item ${n} has value ${tt[1]}`, () => {
+          expect(items[n].value).to.equal(tt[1]);
+        });
+      });
+    });
+    describe('listFragmentIds(target)', function() {
+      const items: UriFragmentIdentifierPointerListItem[] = JsonPointer.listFragmentIds(data);
+      fragmentList.forEach(function(tt, n) {
+        it(`item ${n} has fragmentId ${tt[0]}`, () => {
+          expect(items[n].fragmentId).to.equal(tt[0]);
+        });
+        it(`item ${n} has value ${tt[1]}`, () => {
+          expect(items[n].value).to.equal(tt[1]);
         });
       });
     });

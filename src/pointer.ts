@@ -6,48 +6,27 @@ import {
   encodePointer,
   encodeUriFragmentIdentifier,
   pickDecoder,
-  Encoder,
 } from './util';
+import {
+  JsonStringPointer,
+  UriFragmentIdentifierPointer,
+  Pointer,
+  PathSegments,
+  Encoder,
+  JsonStringPointerListItem,
+  UriFragmentIdentifierPointerListItem,
+} from './types';
 
 /**
  * Signature of visitor functions, used with [[JsonPointer.visit]] method. Visitors are callbacks invoked for every segment/branch of a target's object graph.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Visitor = (ptr: string, val: any) => void;
+export type Visitor = (ptr: string, val: unknown) => void;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let descendingVisit: (target: any, visitor: Visitor, encoder: Encoder, cycle?: boolean) => void = null;
+let descendingVisit: (target: unknown, visitor: Visitor, encoder: Encoder, cycle?: boolean) => void = null;
 
 const $ptr = Symbol('pointer');
 const $frg = Symbol('fragmentId');
 const $get = Symbol('getter');
-
-/**
- * A simple dictionary interface used while calculating pointers present in an object graph.
- */
-export interface Dict {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [ptr: string]: any;
-}
-
-/**
- * A simple interface used to list pointers and their values in an object graph.
- */
-export interface PointerPair {
-  /**
-   * Contains the location of the value in the evaluated object graph. Present unless `fragmentId` is requested during the operation.
-   */
-  pointer?: string;
-  /**
-   * Contains the location (as a fragmentId) of the value in the evaluated object graph. Present if `fragmentId` is requested during the operation.
-   */
-  fragmentId?: string;
-  /**
-   * The value at the pointer's location in the object graph.
-   */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  value: any;
-}
 
 /**
  * Represents a JSON Pointer, capable of getting and setting values on object graphs at the pointer's dereferenced location.
@@ -57,15 +36,15 @@ export interface PointerPair {
  * In most cases, create and reuse instances of JsonPointer within a scope that makes sense for your app. We often use a cache of frequently used pointers, but your use case may support constants, static members, or other long-lived scenarios.
  */
 export class JsonPointer {
-  private [$ptr]: string;
-  private [$frg]: string;
+  private [$ptr]: JsonStringPointer;
+  private [$frg]: UriFragmentIdentifierPointer;
   private [$get]: Dereference;
 
   /**
    * Creates a JsonPointer instance.
    * @param ptr the string representation of a pointer, or it's decoded path.
    */
-  static create(ptr: string | string[]): JsonPointer {
+  static create(ptr: Pointer | PathSegments): JsonPointer {
     return new JsonPointer(ptr);
   }
 
@@ -74,22 +53,22 @@ export class JsonPointer {
    * @param target the target of the operation
    * @param ptr the string representation of a pointer, it's decoded path, or an instance of JsonPointer indicating the where in the object graph to make the determination.
    */
-  static has<T>(target: T, ptr: string | string[] | JsonPointer): boolean {
+  static has<T>(target: T, ptr: Pointer | PathSegments | JsonPointer): boolean {
     if (typeof ptr === 'string' || Array.isArray(ptr)) {
       ptr = new JsonPointer(ptr);
     }
-    return ptr.has(target);
+    return (ptr as JsonPointer).has(target);
   }
   /**
    * Gets the value at the specified pointer's location in the object graph. If there is no value, then the result is `undefined`.
    * @param target the target of the operation
    * @param ptr the string representation of a pointer, it's decoded path, or an instance of JsonPointer indicating the where in the object graph to get the value.
    */
-  static get<T, R>(target: T, ptr: string | string[] | JsonPointer): R {
+  static get<T>(target: T, ptr: Pointer | PathSegments | JsonPointer): unknown {
     if (typeof ptr === 'string' || Array.isArray(ptr)) {
       ptr = new JsonPointer(ptr);
     }
-    return ptr.get(target);
+    return (ptr as JsonPointer).get(target);
   }
 
   /**
@@ -99,18 +78,18 @@ export class JsonPointer {
    * @param val a value to wite into the object graph at the specified pointer location
    * @param force indications whether the operation should force the pointer's location into existence in the object graph.
    */
-  static set<T, V, R>(target: T, ptr: string | string[] | JsonPointer, val: V, force?: boolean): R {
+  static set<T, V>(target: T, ptr: Pointer | PathSegments | JsonPointer, val: V, force?: boolean): unknown {
     if (typeof ptr === 'string' || Array.isArray(ptr)) {
       ptr = new JsonPointer(ptr);
     }
-    return ptr.set(target, val, force);
+    return (ptr as JsonPointer).set(target, val, force);
   }
 
   /**
    * Decodes the specified pointer into path segments.
    * @param ptr a string representation of a JSON Pointer
    */
-  static decode(ptr: string): string[] {
+  static decode(ptr: Pointer): PathSegments {
     return pickDecoder(ptr)(ptr);
   }
 
@@ -125,33 +104,44 @@ export class JsonPointer {
   }
 
   /**
-   * Evaluates the target's object graph, returning a [[PointerPair]] for each location in the graph.
+   * Evaluates the target's object graph, returning a [[JsonStringPointerListItem]] for each location in the graph.
    * @param target the target of the operation
-   * @param fragmentId indicates whether the results are populated with fragment identifiers rather than regular pointers
    */
-  static list<T>(target: T, fragmentId?: boolean): PointerPair[] {
-    const res: PointerPair[] = [];
+  static listPointers<T>(target: T): JsonStringPointerListItem[] {
+    const res: JsonStringPointerListItem[] = [];
     descendingVisit(
       target,
-      fragmentId
-        ? (fragmentId, value): void => {
-            res.push({ fragmentId, value });
-          }
-        : (pointer, value): void => {
-            res.push({ pointer, value });
-          },
-      fragmentId ? encodeUriFragmentIdentifier : encodePointer
+      (pointer, value): void => {
+        res.push({ pointer, value });
+      },
+      encodePointer
     );
     return res;
   }
 
   /**
-   * Evaluates the target's object graph, returning a [[Dict]] populated with pointers and the corresponding values from the graph.
+   * Evaluates the target's object graph, returning a [[UriFragmentIdentifierPointerListItem]] for each location in the graph.
+   * @param target the target of the operation
+   */
+  static listFragmentIds<T>(target: T): UriFragmentIdentifierPointerListItem[] {
+    const res: UriFragmentIdentifierPointerListItem[] = [];
+    descendingVisit(
+      target,
+      (fragmentId, value): void => {
+        res.push({ fragmentId, value });
+      },
+      encodeUriFragmentIdentifier
+    );
+    return res;
+  }
+
+  /**
+   * Evaluates the target's object graph, returning a Record&lt;string, unknown> populated with pointers and the corresponding values from the graph.
    * @param target the target of the operation
    * @param fragmentId indicates whether the results are populated with fragment identifiers rather than regular pointers
    */
-  static flatten<T>(target: T, fragmentId?: boolean): Dict {
-    const res: Dict = {};
+  static flatten<T>(target: T, fragmentId?: boolean): Record<string, unknown> {
+    const res: Record<string, unknown> = {};
     descendingVisit(
       target,
       (p, v) => {
@@ -163,14 +153,12 @@ export class JsonPointer {
   }
 
   /**
-   * Evaluates the target's object graph, returning a Map&lt;string,any>  populated with pointers and the corresponding values form the graph.
+   * Evaluates the target's object graph, returning a Map&lt;string,unknown>  populated with pointers and the corresponding values form the graph.
    * @param target the target of the operation
    * @param fragmentId indicates whether the results are populated with fragment identifiers rather than regular pointers
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  static map<T>(target: T, fragmentId?: boolean): Map<string, any> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const res = new Map<string, any>();
+  static map<T>(target: T, fragmentId?: boolean): Map<string, unknown> {
+    const res = new Map<string, unknown>();
     descendingVisit(target, res.set.bind(res), fragmentId ? encodeUriFragmentIdentifier : encodePointer);
     return res;
   }
@@ -178,13 +166,13 @@ export class JsonPointer {
   /**
    * The pointer's decoded path through the object graph.
    */
-  public path: string[];
+  public readonly path: PathSegments;
 
   /**
    * Creates a new instance.
    * @param ptr a string representation of a JSON Pointer, or a decoded array of path segments.
    */
-  constructor(ptr: string | string[]) {
+  constructor(ptr: Pointer | PathSegments) {
     this.path = decodePtrInit(ptr);
   }
 
@@ -192,7 +180,7 @@ export class JsonPointer {
    * Gets the value the specified target's object graph at this pointer's location.
    * @param target the target of the operation
    */
-  get<T, V>(target: T): V {
+  get<T>(target: T): unknown {
     if (!this[$get]) {
       this[$get] = compilePointerDereference(this.path);
     }
@@ -207,8 +195,7 @@ export class JsonPointer {
    * @param value the value to set
    * @param force indicates whether the pointer's location should be created if it doesn't already exist.
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  set<T, V>(target: T, value: V, force?: boolean): any {
+  set<T, V>(target: T, value: V, force?: boolean): unknown {
     return setValueAtPath(target, value, this.path, force);
   }
 
@@ -271,7 +258,7 @@ export class JsonReference {
     this.$ref = this.pointer.uriFragmentIdentifier;
   }
 
-  resolve<T, R>(target: T): R {
+  resolve<T>(target: T): unknown {
     return this.pointer.get(target);
   }
 }
@@ -286,8 +273,7 @@ interface Item {
   path: string[];
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-descendingVisit = (target: any, visitor: Visitor, encoder: Encoder, cycle: boolean): void => {
+descendingVisit = (target: unknown, visitor: Visitor, encoder: Encoder, cycle: boolean): void => {
   let distinctObjects;
   const q: Item[] = [];
   let cursor2 = 0;
