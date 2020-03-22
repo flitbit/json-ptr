@@ -133,7 +133,7 @@ export function toArrayIndexReference(arr: string[], idx: string): number {
   return parseInt(idx, 10);
 }
 
-export function hasValueAtPath<T>(target: T, path: PathSegments): boolean {
+export function hasValueAtPath(target: unknown, path: PathSegments): boolean {
   let it;
   let len;
   let cursor;
@@ -170,7 +170,7 @@ export function hasValueAtPath<T>(target: T, path: PathSegments): boolean {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function getValueAtPath<T>(target: T, path: PathSegments): any {
+export function getValueAtPath(target: unknown, path: PathSegments): any {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let it: any;
   let len;
@@ -207,7 +207,7 @@ export function getValueAtPath<T>(target: T, path: PathSegments): any {
   return undefined;
 }
 
-export type Dereference = <T>(it: T) => unknown;
+export type Dereference = (it: unknown) => unknown;
 
 export function compilePointerDereference(path: PathSegments): Dereference {
   let body = "if (typeof(it) !== 'undefined'";
@@ -223,7 +223,7 @@ export function compilePointerDereference(path: PathSegments): Dereference {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function setValueAtPath<V>(target: any, val: V, path: PathSegments, force: boolean): any {
+export function setValueAtPath(target: any, val: unknown, path: PathSegments, force: boolean): any {
   if (path.length === 0) {
     throw new Error('Cannot set the root object; assign it directly.');
   }
