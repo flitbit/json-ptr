@@ -233,7 +233,7 @@ export function setValueAtPath(target: unknown, val: unknown, path: PathSegments
   let it: any = target;
   const len = path.length;
   const end = path.length - 1;
-  let step: string;
+  let step: PathSegment;
   let cursor = -1;
   let rem: unknown;
   let p: number;
@@ -286,7 +286,7 @@ export function setValueAtPath(target: unknown, val: unknown, path: PathSegments
   return it;
 }
 
-export function looksLikeFragment(ptr: string): boolean {
+export function looksLikeFragment(ptr: Pointer): boolean {
   return ptr && ptr.length && ptr[0] === '#';
 }
 

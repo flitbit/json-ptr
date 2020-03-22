@@ -20,7 +20,7 @@ import {
 /**
  * Signature of visitor functions, used with [[JsonPointer.visit]] method. Visitors are callbacks invoked for every segment/branch of a target's object graph.
  */
-export type Visitor = (ptr: string, val: unknown) => void;
+export type Visitor = (ptr: JsonStringPointer, val: unknown) => void;
 
 let descendingVisit: (target: unknown, visitor: Visitor, encoder: Encoder, cycle?: boolean) => void = null;
 
@@ -137,12 +137,12 @@ export class JsonPointer {
   }
 
   /**
-   * Evaluates the target's object graph, returning a Record&lt;string, unknown> populated with pointers and the corresponding values from the graph.
+   * Evaluates the target's object graph, returning a Record&lt;Pointer, unknown> populated with pointers and the corresponding values from the graph.
    * @param target the target of the operation
    * @param fragmentId indicates whether the results are populated with fragment identifiers rather than regular pointers
    */
-  static flatten(target: unknown, fragmentId = false): Record<string, unknown> {
-    const res: Record<string, unknown> = {};
+  static flatten(target: unknown, fragmentId = false): Record<Pointer, unknown> {
+    const res: Record<Pointer, unknown> = {};
     descendingVisit(
       target,
       (p, v) => {
@@ -154,12 +154,12 @@ export class JsonPointer {
   }
 
   /**
-   * Evaluates the target's object graph, returning a Map&lt;string,unknown>  populated with pointers and the corresponding values form the graph.
+   * Evaluates the target's object graph, returning a Map&lt;Pointer,unknown>  populated with pointers and the corresponding values form the graph.
    * @param target the target of the operation
    * @param fragmentId indicates whether the results are populated with fragment identifiers rather than regular pointers
    */
-  static map(target: unknown, fragmentId = false): Map<string, unknown> {
-    const res = new Map<string, unknown>();
+  static map(target: unknown, fragmentId = false): Map<Pointer, unknown> {
+    const res = new Map<Pointer, unknown>();
     descendingVisit(target, res.set.bind(res), fragmentId ? encodeUriFragmentIdentifier : encodePointer);
     return res;
   }
@@ -212,14 +212,14 @@ export class JsonPointer {
    * Creates a new instance by concatenating the specified pointer's path with this pointer's path.
    * @param ptr the string representation of a pointer, it's decoded path, or an instance of JsonPointer indicating the additional path to concatenate onto the existing pointer.
    */
-  concat(ptr: JsonPointer | string | string[]): JsonPointer {
+  concat(ptr: JsonPointer | Pointer | PathSegments): JsonPointer {
     return new JsonPointer(this.path.concat(ptr instanceof JsonPointer ? ptr.path : decodePtrInit(ptr)));
   }
 
   /**
    * This pointer's JSON Pointer encoded string representation.
    */
-  get pointer(): string {
+  get pointer(): JsonStringPointer {
     if (!this[$ptr]) {
       this[$ptr] = encodePointer(this.path);
     }
@@ -229,7 +229,7 @@ export class JsonPointer {
   /**
    * This pointer's URI fragment identifier encoded string representation.
    */
-  get uriFragmentIdentifier(): string {
+  get uriFragmentIdentifier(): UriFragmentIdentifierPointer {
     if (!this[$frg]) {
       this[$frg] = encodeUriFragmentIdentifier(this.path);
     }
@@ -252,9 +252,9 @@ export class JsonReference {
   }
 
   public pointer: JsonPointer;
-  public $ref: string;
+  public $ref: UriFragmentIdentifierPointer;
 
-  constructor(ptr: JsonPointer | string | string[]) {
+  constructor(ptr: JsonPointer | Pointer | PathSegments) {
     this.pointer = ptr instanceof JsonPointer ? ptr : new JsonPointer(ptr);
     this.$ref = this.pointer.uriFragmentIdentifier;
   }
@@ -270,7 +270,7 @@ JsonReference.prototype.toString = function toString(): string {
 
 interface Item {
   obj: unknown;
-  path: string[];
+  path: PathSegments;
 }
 
 descendingVisit = (target: unknown, visitor: Visitor, encoder: Encoder, cycle = false): void => {
