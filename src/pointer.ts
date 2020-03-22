@@ -79,7 +79,7 @@ export class JsonPointer {
    * @param val a value to wite into the object graph at the specified pointer location
    * @param force indications whether the operation should force the pointer's location into existence in the object graph.
    */
-  static set(target: unknown, ptr: Pointer | PathSegments | JsonPointer, val: unknown, force?: boolean): unknown {
+  static set(target: unknown, ptr: Pointer | PathSegments | JsonPointer, val: unknown, force = false): unknown {
     if (typeof ptr === 'string' || Array.isArray(ptr)) {
       ptr = new JsonPointer(ptr);
     }
@@ -100,7 +100,7 @@ export class JsonPointer {
    * @param visitor a callback function invoked for each unique pointer location in the object graph
    * @param fragmentId indicates whether the visitor should receive fragment identifiers or regular pointers
    */
-  static visit(target: unknown, visitor: Visitor, fragmentId?: boolean): void {
+  static visit(target: unknown, visitor: Visitor, fragmentId = false): void {
     descendingVisit(target, visitor, fragmentId ? encodeUriFragmentIdentifier : encodePointer);
   }
 
@@ -141,7 +141,7 @@ export class JsonPointer {
    * @param target the target of the operation
    * @param fragmentId indicates whether the results are populated with fragment identifiers rather than regular pointers
    */
-  static flatten(target: unknown, fragmentId?: boolean): Record<string, unknown> {
+  static flatten(target: unknown, fragmentId = false): Record<string, unknown> {
     const res: Record<string, unknown> = {};
     descendingVisit(
       target,
@@ -158,7 +158,7 @@ export class JsonPointer {
    * @param target the target of the operation
    * @param fragmentId indicates whether the results are populated with fragment identifiers rather than regular pointers
    */
-  static map(target: unknown, fragmentId?: boolean): Map<string, unknown> {
+  static map(target: unknown, fragmentId = false): Map<string, unknown> {
     const res = new Map<string, unknown>();
     descendingVisit(target, res.set.bind(res), fragmentId ? encodeUriFragmentIdentifier : encodePointer);
     return res;
@@ -196,7 +196,7 @@ export class JsonPointer {
    * @param value the value to set
    * @param force indicates whether the pointer's location should be created if it doesn't already exist.
    */
-  set(target: unknown, value: unknown, force?: boolean): unknown {
+  set(target: unknown, value: unknown, force = false): unknown {
     return setValueAtPath(target, value, this.path, force);
   }
 
@@ -273,7 +273,7 @@ interface Item {
   path: string[];
 }
 
-descendingVisit = (target: unknown, visitor: Visitor, encoder: Encoder, cycle: boolean): void => {
+descendingVisit = (target: unknown, visitor: Visitor, encoder: Encoder, cycle = false): void => {
   let distinctObjects;
   const q: Item[] = [];
   let cursor2 = 0;

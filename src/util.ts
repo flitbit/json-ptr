@@ -222,7 +222,7 @@ export function compilePointerDereference(path: PathSegments): Dereference {
   return new Function('it', body) as Dereference;
 }
 
-export function setValueAtPath(target: unknown, val: unknown, path: PathSegments, force: boolean): unknown {
+export function setValueAtPath(target: unknown, val: unknown, path: PathSegments, force = false): unknown {
   if (path.length === 0) {
     throw new Error('Cannot set the root object; assign it directly.');
   }
