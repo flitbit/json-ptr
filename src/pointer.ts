@@ -235,14 +235,14 @@ export class JsonPointer {
     }
     return this[$frg];
   }
-}
 
-/**
- * Produces this pointer's JSON Pointer encoded string representation.
- */
-JsonPointer.prototype.toString = function toString(): string {
-  return this.pointer;
-};
+  /**
+   * Produces this pointer's JSON Pointer encoded string representation.
+   */
+  toString(): string {
+    return this.pointer;
+  }
+}
 
 export class JsonReference {
   static isReference(candidate: unknown): candidate is JsonReference {
@@ -262,11 +262,11 @@ export class JsonReference {
   resolve(target: unknown): unknown {
     return this.pointer.get(target);
   }
-}
 
-JsonReference.prototype.toString = function toString(): string {
-  return this.$ref;
-};
+  toString(): string {
+    return this.$ref;
+  }
+}
 
 interface Item {
   obj: unknown;
