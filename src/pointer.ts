@@ -17,6 +17,12 @@ import {
   UriFragmentIdentifierPointerListItem,
 } from './types';
 
+type UnknownObject = { [K in PropertyKey]: unknown };
+
+function isObject(value: unknown): value is UnknownObject {
+  return typeof value === 'object' && value !== null;
+}
+
 /**
  * Signature of visitor functions, used with [[JsonPointer.visit]] method. Visitors are callbacks invoked for every segment/branch of a target's object graph.
  */
@@ -28,31 +34,27 @@ interface Item {
 }
 
 function descendingVisit(target: unknown, visitor: Visitor, encoder: Encoder, cycle = false): void {
-  let distinctObjects;
+  const distinctObjects = new Map<object, JsonPointer>();
   const q: Item[] = [];
   let cursor2 = 0;
   q.push({
     obj: target,
     path: [],
   });
-  if (cycle) {
-    distinctObjects = Object.create(null);
-  }
   visitor(encoder([]), target);
   while (cursor2 < q.length) {
     const cursor = q[cursor2++];
-    const typeT = typeof cursor.obj;
-    if (typeT === 'object' && cursor.obj !== null) {
+    if (isObject(cursor.obj)) {
       if (Array.isArray(cursor.obj)) {
         let j = -1;
         const len2 = cursor.obj.length;
         while (++j < len2) {
           const it = cursor.obj[j];
           const path = cursor.path.concat([j + '']);
-          if (typeof it === 'object' && it !== null) {
-            if (cycle && distinctObjects[it]) {
-              // eslint-disable-next-line @typescript-eslint/no-use-before-define
-              visitor(encoder(path), new JsonReference(distinctObjects[it]));
+          if (isObject(it)) {
+            if (cycle && distinctObjects.has(it)) {
+              // eslint-disable-next-line @typescript-eslint/no-use-before-define,@typescript-eslint/no-non-null-assertion
+              visitor(encoder(path), new JsonReference(distinctObjects.get(it)!));
               continue;
             }
             q.push({
@@ -61,7 +63,7 @@ function descendingVisit(target: unknown, visitor: Visitor, encoder: Encoder, cy
             });
             if (cycle) {
               // eslint-disable-next-line @typescript-eslint/no-use-before-define
-              distinctObjects[it] = new JsonPointer(encodeUriFragmentIdentifier(path));
+              distinctObjects.set(it, new JsonPointer(encodeUriFragmentIdentifier(path)));
             }
           }
           visitor(encoder(path), it);
@@ -71,13 +73,12 @@ function descendingVisit(target: unknown, visitor: Visitor, encoder: Encoder, cy
         const len3 = keys.length;
         let i = -1;
         while (++i < len3) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const it = (cursor.obj as any)[keys[i]];
+          const it = cursor.obj[keys[i]];
           const path = cursor.path.concat(keys[i]);
-          if (typeof it === 'object' && it !== null) {
-            if (cycle && distinctObjects[it]) {
-              // eslint-disable-next-line @typescript-eslint/no-use-before-define
-              visitor(encoder(path), new JsonReference(distinctObjects[it]));
+          if (isObject(it)) {
+            if (cycle && distinctObjects.has(it)) {
+              // eslint-disable-next-line @typescript-eslint/no-use-before-define,@typescript-eslint/no-non-null-assertion
+              visitor(encoder(path), new JsonReference(distinctObjects.get(it)!));
               continue;
             }
             q.push({
@@ -86,7 +87,7 @@ function descendingVisit(target: unknown, visitor: Visitor, encoder: Encoder, cy
             });
             if (cycle) {
               // eslint-disable-next-line @typescript-eslint/no-use-before-define
-              distinctObjects[it] = new JsonPointer(encodeUriFragmentIdentifier(path));
+              distinctObjects.set(it, new JsonPointer(encodeUriFragmentIdentifier(path)));
             }
           }
           visitor(encoder(path), it);
