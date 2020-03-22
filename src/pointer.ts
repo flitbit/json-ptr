@@ -245,7 +245,7 @@ JsonPointer.prototype.toString = function toString(): string {
 };
 
 export class JsonReference {
-  static isReference(candidate: unknown): boolean {
+  static isReference(candidate: unknown): candidate is JsonReference {
     if (!candidate) return false;
     const ref = (candidate as unknown) as JsonReference;
     return typeof ref.$ref === 'string' && typeof ref.resolve === 'function';
