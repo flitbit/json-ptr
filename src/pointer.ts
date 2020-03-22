@@ -269,8 +269,7 @@ JsonReference.prototype.toString = function toString(): string {
 };
 
 interface Item {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  obj: any;
+  obj: unknown;
   path: string[];
 }
 
@@ -316,7 +315,8 @@ descendingVisit = (target: unknown, visitor: Visitor, encoder: Encoder, cycle: b
         const len3 = keys.length;
         let i = -1;
         while (++i < len3) {
-          const it = cursor.obj[keys[i]];
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const it = (cursor.obj as any)[keys[i]];
           const path = cursor.path.concat(keys[i]);
           if (typeof it === 'object' && it !== null) {
             if (cycle && distinctObjects[it]) {
