@@ -1,4 +1,5 @@
-export type PathSegments = readonly string[];
+export type PathSegment = string;
+export type PathSegments = readonly PathSegment[];
 
 export type JsonStringPointer = string;
 export type UriFragmentIdentifierPointer = string;

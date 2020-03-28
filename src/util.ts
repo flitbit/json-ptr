@@ -1,4 +1,4 @@
-import { JsonStringPointer, UriFragmentIdentifierPointer, Pointer, PathSegments, Decoder } from './types';
+import { JsonStringPointer, UriFragmentIdentifierPointer, Pointer, PathSegment, PathSegments, Decoder } from './types';
 
 export function replace(source: string, find: string, repl: string): string {
   let res = '';
@@ -113,7 +113,7 @@ export function encodeUriFragmentIdentifier(path: PathSegments): UriFragmentIden
   return '#/'.concat(encodeFragmentSegments(path).join('/'));
 }
 
-export function toArrayIndexReference(arr: string[], idx: string): number {
+export function toArrayIndexReference(arr: readonly unknown[], idx: string): number {
   const len = idx.length;
   let cursor = 0;
   if (len === 1 && idx[0] === '-') {
@@ -133,13 +133,13 @@ export function toArrayIndexReference(arr: string[], idx: string): number {
   return parseInt(idx, 10);
 }
 
-export function hasValueAtPath<T>(target: T, path: PathSegments): boolean {
-  let it;
-  let len;
-  let cursor;
+export function hasValueAtPath(target: unknown, path: PathSegments): boolean {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let step: any;
-  let p;
+  let it: any;
+  let len: number;
+  let cursor: number;
+  let step: PathSegment;
+  let p: number;
   if (typeof target !== 'undefined') {
     it = target;
     len = path.length;
@@ -150,7 +150,8 @@ export function hasValueAtPath<T>(target: T, path: PathSegments): boolean {
         if (Array.isArray(it)) {
           const n = Number(step);
           if (isNaN(n) || !isFinite(n)) {
-            it = it[step];
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            it = (it as any)[step];
             continue;
           }
           p = toArrayIndexReference(it, step);
@@ -169,14 +170,12 @@ export function hasValueAtPath<T>(target: T, path: PathSegments): boolean {
   return false;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function getValueAtPath<T>(target: T, path: PathSegments): any {
+export function getValueAtPath(target: unknown, path: PathSegments): unknown {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let it: any;
-  let len;
-  let cursor;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let step: any;
+  let len: number;
+  let cursor: number;
+  let step: PathSegment;
   let p;
   if (typeof target !== 'undefined') {
     it = target;
@@ -188,7 +187,8 @@ export function getValueAtPath<T>(target: T, path: PathSegments): any {
         if (Array.isArray(it)) {
           const n = Number(step);
           if (isNaN(n) || !isFinite(n)) {
-            it = it[step];
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            it = (it as any)[step];
             continue;
           }
           p = toArrayIndexReference(it, step);
@@ -207,7 +207,7 @@ export function getValueAtPath<T>(target: T, path: PathSegments): any {
   return undefined;
 }
 
-export type Dereference = <T>(it: T) => unknown;
+export type Dereference = (it: unknown) => unknown;
 
 export function compilePointerDereference(path: PathSegments): Dereference {
   let body = "if (typeof(it) !== 'undefined'";
@@ -222,20 +222,20 @@ export function compilePointerDereference(path: PathSegments): Dereference {
   return new Function('it', body) as Dereference;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function setValueAtPath<V>(target: any, val: V, path: PathSegments, force: boolean): any {
+export function setValueAtPath(target: unknown, val: unknown, path: PathSegments, force = false): unknown {
   if (path.length === 0) {
     throw new Error('Cannot set the root object; assign it directly.');
   }
   if (typeof target === 'undefined') {
     throw new TypeError('Cannot set values on undefined');
   }
-  let it = target;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let it: any = target;
   const len = path.length;
   const end = path.length - 1;
-  let step: string;
+  let step: PathSegment;
   let cursor = -1;
-  let rem;
+  let rem: unknown;
   let p: number;
   if (len) {
     while (++cursor < len) {
@@ -286,8 +286,8 @@ export function setValueAtPath<V>(target: any, val: V, path: PathSegments, force
   return it;
 }
 
-export function looksLikeFragment(ptr: string): boolean {
-  return ptr && ptr.length && ptr[0] === '#';
+export function looksLikeFragment(ptr: Pointer): boolean {
+  return ptr?.length > 0 && ptr[0] === '#';
 }
 
 export function pickDecoder(ptr: Pointer): Decoder {

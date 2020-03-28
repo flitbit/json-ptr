@@ -17,12 +17,85 @@ import {
   UriFragmentIdentifierPointerListItem,
 } from './types';
 
+type UnknownObject = { [K in PropertyKey]: unknown };
+
+function isObject(value: unknown): value is UnknownObject {
+  return typeof value === 'object' && value !== null;
+}
+
 /**
  * Signature of visitor functions, used with [[JsonPointer.visit]] method. Visitors are callbacks invoked for every segment/branch of a target's object graph.
  */
-export type Visitor = (ptr: string, val: unknown) => void;
+export type Visitor = (ptr: JsonStringPointer, val: unknown) => void;
 
-let descendingVisit: (target: unknown, visitor: Visitor, encoder: Encoder, cycle?: boolean) => void = null;
+interface Item {
+  obj: unknown;
+  path: PathSegments;
+}
+
+function descendingVisit(target: unknown, visitor: Visitor, encoder: Encoder, cycle = false): void {
+  const distinctObjects = new Map<object, JsonPointer>();
+  const q: Item[] = [];
+  let cursor2 = 0;
+  q.push({
+    obj: target,
+    path: [],
+  });
+  visitor(encoder([]), target);
+  while (cursor2 < q.length) {
+    const cursor = q[cursor2++];
+    if (isObject(cursor.obj)) {
+      if (Array.isArray(cursor.obj)) {
+        let j = -1;
+        const len2 = cursor.obj.length;
+        while (++j < len2) {
+          const it = cursor.obj[j];
+          const path = cursor.path.concat([j + '']);
+          if (isObject(it)) {
+            if (cycle && distinctObjects.has(it)) {
+              // eslint-disable-next-line @typescript-eslint/no-use-before-define,@typescript-eslint/no-non-null-assertion
+              visitor(encoder(path), new JsonReference(distinctObjects.get(it)!));
+              continue;
+            }
+            q.push({
+              obj: it,
+              path: path,
+            });
+            if (cycle) {
+              // eslint-disable-next-line @typescript-eslint/no-use-before-define
+              distinctObjects.set(it, new JsonPointer(encodeUriFragmentIdentifier(path)));
+            }
+          }
+          visitor(encoder(path), it);
+        }
+      } else {
+        const keys = Object.keys(cursor.obj);
+        const len3 = keys.length;
+        let i = -1;
+        while (++i < len3) {
+          const it = cursor.obj[keys[i]];
+          const path = cursor.path.concat(keys[i]);
+          if (isObject(it)) {
+            if (cycle && distinctObjects.has(it)) {
+              // eslint-disable-next-line @typescript-eslint/no-use-before-define,@typescript-eslint/no-non-null-assertion
+              visitor(encoder(path), new JsonReference(distinctObjects.get(it)!));
+              continue;
+            }
+            q.push({
+              obj: it,
+              path: path,
+            });
+            if (cycle) {
+              // eslint-disable-next-line @typescript-eslint/no-use-before-define
+              distinctObjects.set(it, new JsonPointer(encodeUriFragmentIdentifier(path)));
+            }
+          }
+          visitor(encoder(path), it);
+        }
+      }
+    }
+  }
+}
 
 const $ptr = Symbol('pointer');
 const $frg = Symbol('fragmentId');
@@ -53,18 +126,19 @@ export class JsonPointer {
    * @param target the target of the operation
    * @param ptr the string representation of a pointer, it's decoded path, or an instance of JsonPointer indicating the where in the object graph to make the determination.
    */
-  static has<T>(target: T, ptr: Pointer | PathSegments | JsonPointer): boolean {
+  static has(target: unknown, ptr: Pointer | PathSegments | JsonPointer): boolean {
     if (typeof ptr === 'string' || Array.isArray(ptr)) {
       ptr = new JsonPointer(ptr);
     }
     return (ptr as JsonPointer).has(target);
   }
+
   /**
    * Gets the value at the specified pointer's location in the object graph. If there is no value, then the result is `undefined`.
    * @param target the target of the operation
    * @param ptr the string representation of a pointer, it's decoded path, or an instance of JsonPointer indicating the where in the object graph to get the value.
    */
-  static get<T>(target: T, ptr: Pointer | PathSegments | JsonPointer): unknown {
+  static get(target: unknown, ptr: Pointer | PathSegments | JsonPointer): unknown {
     if (typeof ptr === 'string' || Array.isArray(ptr)) {
       ptr = new JsonPointer(ptr);
     }
@@ -78,7 +152,7 @@ export class JsonPointer {
    * @param val a value to wite into the object graph at the specified pointer location
    * @param force indications whether the operation should force the pointer's location into existence in the object graph.
    */
-  static set<T, V>(target: T, ptr: Pointer | PathSegments | JsonPointer, val: V, force?: boolean): unknown {
+  static set(target: unknown, ptr: Pointer | PathSegments | JsonPointer, val: unknown, force = false): unknown {
     if (typeof ptr === 'string' || Array.isArray(ptr)) {
       ptr = new JsonPointer(ptr);
     }
@@ -99,7 +173,7 @@ export class JsonPointer {
    * @param visitor a callback function invoked for each unique pointer location in the object graph
    * @param fragmentId indicates whether the visitor should receive fragment identifiers or regular pointers
    */
-  static visit<T>(target: T, visitor: Visitor, fragmentId?: boolean): void {
+  static visit(target: unknown, visitor: Visitor, fragmentId = false): void {
     descendingVisit(target, visitor, fragmentId ? encodeUriFragmentIdentifier : encodePointer);
   }
 
@@ -107,7 +181,7 @@ export class JsonPointer {
    * Evaluates the target's object graph, returning a [[JsonStringPointerListItem]] for each location in the graph.
    * @param target the target of the operation
    */
-  static listPointers<T>(target: T): JsonStringPointerListItem[] {
+  static listPointers(target: unknown): JsonStringPointerListItem[] {
     const res: JsonStringPointerListItem[] = [];
     descendingVisit(
       target,
@@ -123,7 +197,7 @@ export class JsonPointer {
    * Evaluates the target's object graph, returning a [[UriFragmentIdentifierPointerListItem]] for each location in the graph.
    * @param target the target of the operation
    */
-  static listFragmentIds<T>(target: T): UriFragmentIdentifierPointerListItem[] {
+  static listFragmentIds(target: unknown): UriFragmentIdentifierPointerListItem[] {
     const res: UriFragmentIdentifierPointerListItem[] = [];
     descendingVisit(
       target,
@@ -136,12 +210,12 @@ export class JsonPointer {
   }
 
   /**
-   * Evaluates the target's object graph, returning a Record&lt;string, unknown> populated with pointers and the corresponding values from the graph.
+   * Evaluates the target's object graph, returning a Record&lt;Pointer, unknown> populated with pointers and the corresponding values from the graph.
    * @param target the target of the operation
    * @param fragmentId indicates whether the results are populated with fragment identifiers rather than regular pointers
    */
-  static flatten<T>(target: T, fragmentId?: boolean): Record<string, unknown> {
-    const res: Record<string, unknown> = {};
+  static flatten(target: unknown, fragmentId = false): Record<Pointer, unknown> {
+    const res: Record<Pointer, unknown> = {};
     descendingVisit(
       target,
       (p, v) => {
@@ -153,12 +227,12 @@ export class JsonPointer {
   }
 
   /**
-   * Evaluates the target's object graph, returning a Map&lt;string,unknown>  populated with pointers and the corresponding values form the graph.
+   * Evaluates the target's object graph, returning a Map&lt;Pointer,unknown>  populated with pointers and the corresponding values form the graph.
    * @param target the target of the operation
    * @param fragmentId indicates whether the results are populated with fragment identifiers rather than regular pointers
    */
-  static map<T>(target: T, fragmentId?: boolean): Map<string, unknown> {
-    const res = new Map<string, unknown>();
+  static map(target: unknown, fragmentId = false): Map<Pointer, unknown> {
+    const res = new Map<Pointer, unknown>();
     descendingVisit(target, res.set.bind(res), fragmentId ? encodeUriFragmentIdentifier : encodePointer);
     return res;
   }
@@ -180,7 +254,7 @@ export class JsonPointer {
    * Gets the value the specified target's object graph at this pointer's location.
    * @param target the target of the operation
    */
-  get<T>(target: T): unknown {
+  get(target: unknown): unknown {
     if (!this[$get]) {
       this[$get] = compilePointerDereference(this.path);
     }
@@ -195,7 +269,7 @@ export class JsonPointer {
    * @param value the value to set
    * @param force indicates whether the pointer's location should be created if it doesn't already exist.
    */
-  set<T, V>(target: T, value: V, force?: boolean): unknown {
+  set(target: unknown, value: unknown, force = false): unknown {
     return setValueAtPath(target, value, this.path, force);
   }
 
@@ -203,7 +277,7 @@ export class JsonPointer {
    * Determines if the specified target's object graph has a value at the pointer's location.
    * @param target the target of the operation
    */
-  has<T>(target: T): boolean {
+  has(target: unknown): boolean {
     return typeof this.get(target) !== 'undefined';
   }
 
@@ -211,14 +285,14 @@ export class JsonPointer {
    * Creates a new instance by concatenating the specified pointer's path with this pointer's path.
    * @param ptr the string representation of a pointer, it's decoded path, or an instance of JsonPointer indicating the additional path to concatenate onto the existing pointer.
    */
-  concat(ptr: JsonPointer | string | string[]): JsonPointer {
+  concat(ptr: JsonPointer | Pointer | PathSegments): JsonPointer {
     return new JsonPointer(this.path.concat(ptr instanceof JsonPointer ? ptr.path : decodePtrInit(ptr)));
   }
 
   /**
    * This pointer's JSON Pointer encoded string representation.
    */
-  get pointer(): string {
+  get pointer(): JsonStringPointer {
     if (!this[$ptr]) {
       this[$ptr] = encodePointer(this.path);
     }
@@ -228,111 +302,41 @@ export class JsonPointer {
   /**
    * This pointer's URI fragment identifier encoded string representation.
    */
-  get uriFragmentIdentifier(): string {
+  get uriFragmentIdentifier(): UriFragmentIdentifierPointer {
     if (!this[$frg]) {
       this[$frg] = encodeUriFragmentIdentifier(this.path);
     }
     return this[$frg];
   }
+
+  /**
+   * Produces this pointer's JSON Pointer encoded string representation.
+   */
+  toString(): string {
+    return this.pointer;
+  }
 }
 
-/**
- * Produces this pointer's JSON Pointer encoded string representation.
- */
-JsonPointer.prototype.toString = function toString(): string {
-  return this.pointer;
-};
-
 export class JsonReference {
-  static isReference<T>(candidate: T): boolean {
+  static isReference(candidate: unknown): candidate is JsonReference {
     if (!candidate) return false;
     const ref = (candidate as unknown) as JsonReference;
     return typeof ref.$ref === 'string' && typeof ref.resolve === 'function';
   }
 
   public pointer: JsonPointer;
-  public $ref: string;
+  public $ref: UriFragmentIdentifierPointer;
 
-  constructor(ptr: JsonPointer | string | string[]) {
+  constructor(ptr: JsonPointer | Pointer | PathSegments) {
     this.pointer = ptr instanceof JsonPointer ? ptr : new JsonPointer(ptr);
     this.$ref = this.pointer.uriFragmentIdentifier;
   }
 
-  resolve<T>(target: T): unknown {
+  resolve(target: unknown): unknown {
     return this.pointer.get(target);
   }
-}
 
-JsonReference.prototype.toString = function toString(): string {
-  return this.$ref;
-};
-
-interface Item {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  obj: any;
-  path: string[];
-}
-
-descendingVisit = (target: unknown, visitor: Visitor, encoder: Encoder, cycle: boolean): void => {
-  let distinctObjects;
-  const q: Item[] = [];
-  let cursor2 = 0;
-  q.push({
-    obj: target,
-    path: [],
-  });
-  if (cycle) {
-    distinctObjects = Object.create(null);
+  toString(): string {
+    return this.$ref;
   }
-  visitor(encoder([]), target);
-  while (cursor2 < q.length) {
-    const cursor = q[cursor2++];
-    const typeT = typeof cursor.obj;
-    if (typeT === 'object' && cursor.obj !== null) {
-      if (Array.isArray(cursor.obj)) {
-        let j = -1;
-        const len2 = cursor.obj.length;
-        while (++j < len2) {
-          const it = cursor.obj[j];
-          const path = cursor.path.concat([j + '']);
-          if (typeof it === 'object' && it !== null) {
-            if (cycle && distinctObjects[it]) {
-              visitor(encoder(path), new JsonReference(distinctObjects[it]));
-              continue;
-            }
-            q.push({
-              obj: it,
-              path: path,
-            });
-            if (cycle) {
-              distinctObjects[it] = new JsonPointer(encodeUriFragmentIdentifier(path));
-            }
-          }
-          visitor(encoder(path), it);
-        }
-      } else {
-        const keys = Object.keys(cursor.obj);
-        const len3 = keys.length;
-        let i = -1;
-        while (++i < len3) {
-          const it = cursor.obj[keys[i]];
-          const path = cursor.path.concat(keys[i]);
-          if (typeof it === 'object' && it !== null) {
-            if (cycle && distinctObjects[it]) {
-              visitor(encoder(path), new JsonReference(distinctObjects[it]));
-              continue;
-            }
-            q.push({
-              obj: it,
-              path: path,
-            });
-            if (cycle) {
-              distinctObjects[it] = new JsonPointer(encodeUriFragmentIdentifier(path));
-            }
-          }
-          visitor(encoder(path), it);
-        }
-      }
-    }
-  }
-};
+}

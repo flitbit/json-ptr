@@ -853,7 +853,7 @@ describe('JsonPointer', function() {
           },
         ],
       },
-      f: null as object,
+      f: null,
       'http://schema.org/name': 'Phillip',
     };
 
@@ -907,7 +907,7 @@ describe('JsonPointer', function() {
       a: 1,
       b: { c: 2 },
       d: { e: [{ a: 3 }, { b: 4 }, { c: 5 }] },
-      f: null as object,
+      f: null,
     };
     const pointerList = [
       ['', data],
