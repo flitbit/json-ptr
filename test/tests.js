@@ -40,6 +40,12 @@
           }).to.throwError();
         });
 
+        it('#delete should throw', function () {
+          expect(function () {
+            p.delete(data);
+          }).to.throwError();
+        });
+
         it('should have an empty path', function () {
           expect(p.path).to.have.length(0);
         });
@@ -65,6 +71,12 @@
             p.set(data, {
               this: 'should cause an exception'
             });
+          }).to.throwError();
+        });
+
+        it('#delete should throw', function () {
+          expect(function () {
+            p.delete(data);
           }).to.throwError();
         });
 
@@ -98,6 +110,12 @@
           p.set(data, capture);
         });
 
+        it('#delete should succeed removing the referenced value', function () {
+          var capture = p.delete(data);
+          expect(typeof p.get(data)).to.eql('undefined');
+          p.set(data, capture, true);
+        });
+
         it('should have a path of [ "foo" ]', function () {
           expect(p.path).to.eql(['foo']);
         });
@@ -126,6 +144,12 @@
           p.set(data, updated);
           expect(p.get(data)).to.eql(updated);
           p.set(data, capture);
+        });
+
+        it('#delete should succeed removing the referenced value', function () {
+          var capture = p.delete(data);
+          expect(typeof p.get(data)).to.eql('undefined');
+          p.set(data, capture, true);
         });
 
         it('should have a path of [ "foo" ]', function () {
@@ -158,6 +182,12 @@
           p.set(data, capture);
         });
 
+        it('#delete should succeed removing the referenced value', function () {
+          var capture = p.delete(data);
+          expect(typeof p.get(data)).to.eql('undefined');
+          p.set(data, capture, true);
+        });
+
         it('should have a path of [ "foo", "0" ]', function () {
           expect(p.path).to.eql(['foo', '0']);
         });
@@ -186,6 +216,12 @@
           p.set(data, updated);
           expect(p.get(data)).to.eql(updated);
           p.set(data, capture);
+        });
+
+        it('#delete should succeed removing the referenced value', function () {
+          var capture = p.delete(data);
+          expect(typeof p.get(data)).to.eql('undefined');
+          p.set(data, capture, true);
         });
 
         it('should have a path of [ "foo", "0" ]', function () {
@@ -219,6 +255,12 @@
           p.set(data, capture);
         });
 
+        it('#delete should succeed removing the referenced value', function () {
+          var capture = p.delete(data);
+          expect(typeof p.get(data)).to.eql('undefined');
+          p.set(data, capture, true);
+        });
+
         it('should have a path of [ "newArray", "0" ]', function () {
           expect(p.path).to.eql(['newArray', '0']);
         });
@@ -247,6 +289,12 @@
           p.set(data, updated);
           expect(p.get(data)).to.eql(updated);
           p.set(data, capture);
+        });
+
+        it('#delete should succeed removing the referenced value', function () {
+          var capture = p.delete(data);
+          expect(typeof p.get(data)).to.eql('undefined');
+          p.set(data, capture, true);
         });
 
         it('should have a path of [ "" ]', function () {
@@ -279,6 +327,12 @@
           p.set(data, capture);
         });
 
+        it('#delete should succeed removing the referenced value', function () {
+          var capture = p.delete(data);
+          expect(typeof p.get(data)).to.eql('undefined');
+          p.set(data, capture, true);
+        });
+
         it('should have a path of [ "" ]', function () {
           expect(p.path).to.eql(['']);
         });
@@ -307,6 +361,12 @@
           p.set(data, updated);
           expect(p.get(data)).to.eql(updated);
           p.set(data, capture);
+        });
+
+        it('#delete should succeed removing the referenced value', function () {
+          var capture = p.delete(data);
+          expect(typeof p.get(data)).to.eql('undefined');
+          p.set(data, capture, true);
         });
 
         it('should have a path of [ "a/b" ]', function () {
@@ -339,6 +399,12 @@
           p.set(data, capture);
         });
 
+        it('#delete should succeed removing the referenced value', function () {
+          var capture = p.delete(data);
+          expect(typeof p.get(data)).to.eql('undefined');
+          p.set(data, capture, true);
+        });
+
         it('should have a path of [ "a/b" ]', function () {
           expect(p.path).to.eql(['a/b']);
         });
@@ -367,6 +433,12 @@
           p.set(data, updated);
           expect(p.get(data)).to.eql(updated);
           p.set(data, capture);
+        });
+
+        it('#delete should succeed removing the referenced value', function () {
+          var capture = p.delete(data);
+          expect(typeof p.get(data)).to.eql('undefined');
+          p.set(data, capture, true);
         });
 
         it('should have a path of [ "c%d" ]', function () {
@@ -399,6 +471,12 @@
           p.set(data, capture);
         });
 
+        it('#delete should succeed removing the referenced value', function () {
+          var capture = p.delete(data);
+          expect(typeof p.get(data)).to.eql('undefined');
+          p.set(data, capture, true);
+        });
+
         it('should have a path of [ "c%d" ]', function () {
           expect(p.path).to.eql(['c%d']);
         });
@@ -427,6 +505,12 @@
           p.set(data, updated);
           expect(p.get(data)).to.eql(updated);
           p.set(data, capture);
+        });
+
+        it('#delete should succeed removing the referenced value', function () {
+          var capture = p.delete(data);
+          expect(typeof p.get(data)).to.eql('undefined');
+          p.set(data, capture, true);
         });
 
         it('should have a path of [ "e^f" ]', function () {
@@ -459,6 +543,12 @@
           p.set(data, capture);
         });
 
+        it('#delete should succeed removing the referenced value', function () {
+          var capture = p.delete(data);
+          expect(typeof p.get(data)).to.eql('undefined');
+          p.set(data, capture, true);
+        });
+
         it('should have a path of [ "e^f" ]', function () {
           expect(p.path).to.eql(['e^f']);
         });
@@ -487,6 +577,12 @@
           p.set(data, updated);
           expect(p.get(data)).to.eql(updated);
           p.set(data, capture);
+        });
+
+        it('#delete should succeed removing the referenced value', function () {
+          var capture = p.delete(data);
+          expect(typeof p.get(data)).to.eql('undefined');
+          p.set(data, capture, true);
         });
 
         it('should have a path of [ "g|h" ]', function () {
@@ -519,6 +615,12 @@
           p.set(data, capture);
         });
 
+        it('#delete should succeed removing the referenced value', function () {
+          var capture = p.delete(data);
+          expect(typeof p.get(data)).to.eql('undefined');
+          p.set(data, capture, true);
+        });
+
         it('should have a path of [ "g|h" ]', function () {
           expect(p.path).to.eql(['g|h']);
         });
@@ -549,6 +651,12 @@
           p.set(data, capture);
         });
 
+        it('#delete should succeed removing the referenced value', function () {
+          var capture = p.delete(data);
+          expect(typeof p.get(data)).to.eql('undefined');
+          p.set(data, capture, true);
+        });
+
         it('should have a path of [ "i\\j" ]', function () {
           expect(p.path).to.eql(['i\\j']);
         });
@@ -577,6 +685,12 @@
           p.set(data, updated);
           expect(p.get(data)).to.eql(updated);
           p.set(data, capture);
+        });
+
+        it('#delete should succeed removing the referenced value', function () {
+          var capture = p.delete(data);
+          expect(typeof p.get(data)).to.eql('undefined');
+          p.set(data, capture, true);
         });
 
         it('should have a path of [ "i\\j" ]', function () {
@@ -611,6 +725,12 @@
           p.set(data, updated);
           expect(p.get(data)).to.eql(updated);
           p.set(data, capture);
+        });
+
+        it('#delete should succeed removing the referenced value', function () {
+          var capture = p.delete(data);
+          expect(typeof p.get(data)).to.eql('undefined');
+          p.set(data, capture, true);
         });
 
         // eslint-disable-next-line no-useless-escape
@@ -649,6 +769,12 @@
           p.set(data, capture);
         });
 
+        it('#delete should succeed removing the referenced value', function () {
+          var capture = p.delete(data);
+          expect(typeof p.get(data)).to.eql('undefined');
+          p.set(data, capture, true);
+        });
+
         // eslint-disable-next-line no-useless-escape
         it('should have a path of [ "k\"l" ]', function () {
           // eslint-disable-next-line no-useless-escape
@@ -683,6 +809,12 @@
           p.set(data, capture);
         });
 
+        it('#delete should succeed removing the referenced value', function () {
+          var capture = p.delete(data);
+          expect(typeof p.get(data)).to.eql('undefined');
+          p.set(data, capture, true);
+        });
+
         it('should have a path of [ " " ]', function () {
           expect(p.path).to.eql([' ']);
         });
@@ -711,6 +843,12 @@
           p.set(data, updated);
           expect(p.get(data)).to.eql(updated);
           p.set(data, capture);
+        });
+
+        it('#delete should succeed removing the referenced value', function () {
+          var capture = p.delete(data);
+          expect(typeof p.get(data)).to.eql('undefined');
+          p.set(data, capture, true);
         });
 
         it('should have a path of [ " " ]', function () {
@@ -743,6 +881,12 @@
           p.set(data, capture);
         });
 
+        it('#delete should succeed removing the referenced value', function () {
+          var capture = p.delete(data);
+          expect(typeof p.get(data)).to.eql('undefined');
+          p.set(data, capture, true);
+        });
+
         it('should have a path of [ "m~n" ]', function () {
           expect(p.path).to.eql(['m~n']);
         });
@@ -773,6 +917,12 @@
           p.set(data, capture);
         });
 
+        it('#delete should succeed removing the referenced value', function () {
+          var capture = p.delete(data);
+          expect(typeof p.get(data)).to.eql('undefined');
+          p.set(data, capture, true);
+        });
+
         it('should have a path of [ "m~n" ]', function () {
           expect(p.path).to.eql(['m~n']);
         });
@@ -791,6 +941,10 @@
 
         it('should not resolve via #get', function () {
           expect(p.get(data)).to.not.be.ok();
+        });
+
+        it('should not remove anything via #delete', function () {
+          expect(p.delete(data)).to.not.be.ok();
         });
 
         it('should set the next element of the array, repeatedly...', function () {
