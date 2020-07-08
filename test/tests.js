@@ -40,9 +40,9 @@
           }).to.throwError();
         });
 
-        it('#delete should throw', function () {
+        it('#unset should throw', function () {
           expect(function () {
-            p.delete(data);
+            p.unset(data);
           }).to.throwError();
         });
 
@@ -74,9 +74,9 @@
           }).to.throwError();
         });
 
-        it('#delete should throw', function () {
+        it('#unset should throw', function () {
           expect(function () {
-            p.delete(data);
+            p.unset(data);
           }).to.throwError();
         });
 
@@ -110,8 +110,8 @@
           p.set(data, capture);
         });
 
-        it('#delete should succeed removing the referenced value', function () {
-          var capture = p.delete(data);
+        it('#unset should succeed removing the referenced value', function () {
+          var capture = p.unset(data);
           expect(typeof p.get(data)).to.eql('undefined');
           p.set(data, capture, true);
         });
@@ -146,8 +146,8 @@
           p.set(data, capture);
         });
 
-        it('#delete should succeed removing the referenced value', function () {
-          var capture = p.delete(data);
+        it('#unset should succeed removing the referenced value', function () {
+          var capture = p.unset(data);
           expect(typeof p.get(data)).to.eql('undefined');
           p.set(data, capture, true);
         });
@@ -182,8 +182,8 @@
           p.set(data, capture);
         });
 
-        it('#delete should succeed removing the referenced value', function () {
-          var capture = p.delete(data);
+        it('#unset should succeed removing the referenced value', function () {
+          var capture = p.unset(data);
           expect(typeof p.get(data)).to.eql('undefined');
           p.set(data, capture, true);
         });
@@ -218,8 +218,8 @@
           p.set(data, capture);
         });
 
-        it('#delete should succeed removing the referenced value', function () {
-          var capture = p.delete(data);
+        it('#unset should succeed removing the referenced value', function () {
+          var capture = p.unset(data);
           expect(typeof p.get(data)).to.eql('undefined');
           p.set(data, capture, true);
         });
@@ -255,8 +255,8 @@
           p.set(data, capture);
         });
 
-        it('#delete should succeed removing the referenced value', function () {
-          var capture = p.delete(data);
+        it('#unset should succeed removing the referenced value', function () {
+          var capture = p.unset(data);
           expect(typeof p.get(data)).to.eql('undefined');
           p.set(data, capture, true);
         });
@@ -291,8 +291,8 @@
           p.set(data, capture);
         });
 
-        it('#delete should succeed removing the referenced value', function () {
-          var capture = p.delete(data);
+        it('#unset should succeed removing the referenced value', function () {
+          var capture = p.unset(data);
           expect(typeof p.get(data)).to.eql('undefined');
           p.set(data, capture, true);
         });
@@ -327,8 +327,8 @@
           p.set(data, capture);
         });
 
-        it('#delete should succeed removing the referenced value', function () {
-          var capture = p.delete(data);
+        it('#unset should succeed removing the referenced value', function () {
+          var capture = p.unset(data);
           expect(typeof p.get(data)).to.eql('undefined');
           p.set(data, capture, true);
         });
@@ -363,8 +363,8 @@
           p.set(data, capture);
         });
 
-        it('#delete should succeed removing the referenced value', function () {
-          var capture = p.delete(data);
+        it('#unset should succeed removing the referenced value', function () {
+          var capture = p.unset(data);
           expect(typeof p.get(data)).to.eql('undefined');
           p.set(data, capture, true);
         });
@@ -399,8 +399,8 @@
           p.set(data, capture);
         });
 
-        it('#delete should succeed removing the referenced value', function () {
-          var capture = p.delete(data);
+        it('#unset should succeed removing the referenced value', function () {
+          var capture = p.unset(data);
           expect(typeof p.get(data)).to.eql('undefined');
           p.set(data, capture, true);
         });
@@ -435,8 +435,8 @@
           p.set(data, capture);
         });
 
-        it('#delete should succeed removing the referenced value', function () {
-          var capture = p.delete(data);
+        it('#unset should succeed removing the referenced value', function () {
+          var capture = p.unset(data);
           expect(typeof p.get(data)).to.eql('undefined');
           p.set(data, capture, true);
         });
@@ -471,8 +471,8 @@
           p.set(data, capture);
         });
 
-        it('#delete should succeed removing the referenced value', function () {
-          var capture = p.delete(data);
+        it('#unset should succeed removing the referenced value', function () {
+          var capture = p.unset(data);
           expect(typeof p.get(data)).to.eql('undefined');
           p.set(data, capture, true);
         });
@@ -507,8 +507,8 @@
           p.set(data, capture);
         });
 
-        it('#delete should succeed removing the referenced value', function () {
-          var capture = p.delete(data);
+        it('#unset should succeed removing the referenced value', function () {
+          var capture = p.unset(data);
           expect(typeof p.get(data)).to.eql('undefined');
           p.set(data, capture, true);
         });
@@ -543,8 +543,8 @@
           p.set(data, capture);
         });
 
-        it('#delete should succeed removing the referenced value', function () {
-          var capture = p.delete(data);
+        it('#unset should succeed removing the referenced value', function () {
+          var capture = p.unset(data);
           expect(typeof p.get(data)).to.eql('undefined');
           p.set(data, capture, true);
         });
@@ -579,8 +579,8 @@
           p.set(data, capture);
         });
 
-        it('#delete should succeed removing the referenced value', function () {
-          var capture = p.delete(data);
+        it('#unset should succeed removing the referenced value', function () {
+          var capture = p.unset(data);
           expect(typeof p.get(data)).to.eql('undefined');
           p.set(data, capture, true);
         });
@@ -615,8 +615,8 @@
           p.set(data, capture);
         });
 
-        it('#delete should succeed removing the referenced value', function () {
-          var capture = p.delete(data);
+        it('#unset should succeed removing the referenced value', function () {
+          var capture = p.unset(data);
           expect(typeof p.get(data)).to.eql('undefined');
           p.set(data, capture, true);
         });
@@ -651,8 +651,8 @@
           p.set(data, capture);
         });
 
-        it('#delete should succeed removing the referenced value', function () {
-          var capture = p.delete(data);
+        it('#unset should succeed removing the referenced value', function () {
+          var capture = p.unset(data);
           expect(typeof p.get(data)).to.eql('undefined');
           p.set(data, capture, true);
         });
@@ -687,8 +687,8 @@
           p.set(data, capture);
         });
 
-        it('#delete should succeed removing the referenced value', function () {
-          var capture = p.delete(data);
+        it('#unset should succeed removing the referenced value', function () {
+          var capture = p.unset(data);
           expect(typeof p.get(data)).to.eql('undefined');
           p.set(data, capture, true);
         });
@@ -727,8 +727,8 @@
           p.set(data, capture);
         });
 
-        it('#delete should succeed removing the referenced value', function () {
-          var capture = p.delete(data);
+        it('#unset should succeed removing the referenced value', function () {
+          var capture = p.unset(data);
           expect(typeof p.get(data)).to.eql('undefined');
           p.set(data, capture, true);
         });
@@ -769,8 +769,8 @@
           p.set(data, capture);
         });
 
-        it('#delete should succeed removing the referenced value', function () {
-          var capture = p.delete(data);
+        it('#unset should succeed removing the referenced value', function () {
+          var capture = p.unset(data);
           expect(typeof p.get(data)).to.eql('undefined');
           p.set(data, capture, true);
         });
@@ -809,8 +809,8 @@
           p.set(data, capture);
         });
 
-        it('#delete should succeed removing the referenced value', function () {
-          var capture = p.delete(data);
+        it('#unset should succeed removing the referenced value', function () {
+          var capture = p.unset(data);
           expect(typeof p.get(data)).to.eql('undefined');
           p.set(data, capture, true);
         });
@@ -845,8 +845,8 @@
           p.set(data, capture);
         });
 
-        it('#delete should succeed removing the referenced value', function () {
-          var capture = p.delete(data);
+        it('#unset should succeed removing the referenced value', function () {
+          var capture = p.unset(data);
           expect(typeof p.get(data)).to.eql('undefined');
           p.set(data, capture, true);
         });
@@ -881,8 +881,8 @@
           p.set(data, capture);
         });
 
-        it('#delete should succeed removing the referenced value', function () {
-          var capture = p.delete(data);
+        it('#unset should succeed removing the referenced value', function () {
+          var capture = p.unset(data);
           expect(typeof p.get(data)).to.eql('undefined');
           p.set(data, capture, true);
         });
@@ -917,8 +917,8 @@
           p.set(data, capture);
         });
 
-        it('#delete should succeed removing the referenced value', function () {
-          var capture = p.delete(data);
+        it('#unset should succeed removing the referenced value', function () {
+          var capture = p.unset(data);
           expect(typeof p.get(data)).to.eql('undefined');
           p.set(data, capture, true);
         });
@@ -943,8 +943,8 @@
           expect(p.get(data)).to.not.be.ok();
         });
 
-        it('should not remove anything via #delete', function () {
-          expect(p.delete(data)).to.not.be.ok();
+        it('should not remove anything via #unset', function () {
+          expect(p.unset(data)).to.not.be.ok();
         });
 
         it('should set the next element of the array, repeatedly...', function () {
