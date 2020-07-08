@@ -1,6 +1,15 @@
+# Logs
+logs
+*.log
+npm-debug.log*
 node_modules/
-coverage/
+coverage
+.nyc_output
 dist/
-.nyc_output/
-test-results.xml
-
+dist.browser/
+.vscode
+!.vscode/tasks.js
+.idea/
+.npm
+.eslintcache
+.DS_Store

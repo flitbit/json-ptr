@@ -4,7 +4,7 @@ import {
   encodeUriFragmentIdentifier,
   JsonStringPointerListItem,
   UriFragmentIdentifierPointerListItem,
-} from '..';
+} from '../src';
 import { expect } from 'chai';
 
 const create = JsonPointer.create;
@@ -56,7 +56,7 @@ describe('JsonPointer', function () {
       const p = create('#');
 
       it('#get should resolve to the object itself', function () {
-        expect(p.get(data)).to.equal(data);
+        expect(p.get(data)).to.eql(data);
       });
 
       it('#set should throw', function () {
@@ -84,7 +84,7 @@ describe('JsonPointer', function () {
       const p = create('/foo');
 
       it('#get should resolve to data["foo"]', function () {
-        expect(p.get(data)).to.equal(data.foo);
+        expect(p.get(data)).to.eql(data.foo);
       });
 
       it('#set should succeed changing the referenced value', function () {
@@ -114,7 +114,7 @@ describe('JsonPointer', function () {
       const p = create('#/foo');
 
       it('#get should resolve to data["foo"]', function () {
-        expect(p.get(data)).to.equal(data.foo);
+        expect(p.get(data)).to.eql(data.foo);
       });
 
       it('#set should succeed changing the referenced value', function () {
@@ -144,7 +144,7 @@ describe('JsonPointer', function () {
       const p = create('/foo/0');
 
       it('#get should resolve to data.foo[0]', function () {
-        expect(p.get(data)).to.equal(data.foo[0]);
+        expect(p.get(data)).to.eql(data.foo[0]);
       });
 
       it('#set should succeed changing the referenced value', function () {
@@ -174,7 +174,7 @@ describe('JsonPointer', function () {
       const p = create('#/foo/0');
 
       it('#get should resolve to data.foo[0]', function () {
-        expect(p.get(data)).to.equal(data.foo[0]);
+        expect(p.get(data)).to.eql(data.foo[0]);
       });
 
       it('#set should succeed changing the referenced value', function () {
@@ -204,11 +204,11 @@ describe('JsonPointer', function () {
       const p = create('#/newArray/0');
 
       it('#get should resolve to undefined', function () {
-        expect(p.get(data)).to.equal(undefined);
+        expect(p.get(data)).to.eql(undefined);
       });
 
       interface ItemWithNewArray {
-        newArray?: object[];
+        newArray?: unknown[];
       }
 
       it('#set with force should succeed creating an array and setting the referenced value', function () {
@@ -218,7 +218,7 @@ describe('JsonPointer', function () {
           this: 'should succeed',
         };
         p.set(blank, updated, true);
-        expect(blank.newArray).to.be.an('array');
+        expect(Array.isArray(blank.newArray)).to.eql(true);
         expect(p.get(blank)).to.eql(updated);
         p.set(blank, capture);
       });
@@ -240,7 +240,7 @@ describe('JsonPointer', function () {
       const p = create('/');
 
       it('#get should resolve to data[""]', function () {
-        expect(p.get(data)).to.equal(data['']);
+        expect(p.get(data)).to.eql(data['']);
       });
 
       it('#set should succeed changing the referenced value', function () {
@@ -270,7 +270,7 @@ describe('JsonPointer', function () {
       const p = create('#/');
 
       it('#get should resolve to data[""]', function () {
-        expect(p.get(data)).to.equal(data['']);
+        expect(p.get(data)).to.eql(data['']);
       });
 
       it('#set should succeed changing the referenced value', function () {
@@ -300,7 +300,7 @@ describe('JsonPointer', function () {
       const p = create('/a~1b');
 
       it('#get should resolve to data["a/b"]', function () {
-        expect(p.get(data)).to.equal(data['a/b']);
+        expect(p.get(data)).to.eql(data['a/b']);
       });
 
       it('#set should succeed changing the referenced value', function () {
@@ -330,7 +330,7 @@ describe('JsonPointer', function () {
       const p = create('#/a~1b');
 
       it('#get should resolve to data["a/b"]', function () {
-        expect(p.get(data)).to.equal(data['a/b']);
+        expect(p.get(data)).to.eql(data['a/b']);
       });
 
       it('#set should succeed changing the referenced value', function () {
@@ -360,7 +360,7 @@ describe('JsonPointer', function () {
       const p = create('/c%d');
 
       it('#get should resolve to data["c%d"]', function () {
-        expect(p.get(data)).to.equal(data['c%d']);
+        expect(p.get(data)).to.eql(data['c%d']);
       });
 
       it('#set should succeed changing the referenced value', function () {
@@ -390,7 +390,7 @@ describe('JsonPointer', function () {
       const p = create('#/c%25d');
 
       it('#get should resolve to data["c%d"]', function () {
-        expect(p.get(data)).to.equal(data['c%d']);
+        expect(p.get(data)).to.eql(data['c%d']);
       });
 
       it('#set should succeed changing the referenced value', function () {
@@ -420,7 +420,7 @@ describe('JsonPointer', function () {
       const p = create('/e^f');
 
       it('#get should resolve to data["e^f"]', function () {
-        expect(p.get(data)).to.equal(data['e^f']);
+        expect(p.get(data)).to.eql(data['e^f']);
       });
 
       it('#set should succeed changing the referenced value', function () {
@@ -450,7 +450,7 @@ describe('JsonPointer', function () {
       const p = create('#/e%5Ef');
 
       it('#get should resolve to data["e^f"]', function () {
-        expect(p.get(data)).to.equal(data['e^f']);
+        expect(p.get(data)).to.eql(data['e^f']);
       });
 
       it('#set should succeed changing the referenced value', function () {
@@ -480,7 +480,7 @@ describe('JsonPointer', function () {
       const p = create('/g|h');
 
       it('#get should resolve to data["g|h"]', function () {
-        expect(p.get(data)).to.equal(data['g|h']);
+        expect(p.get(data)).to.eql(data['g|h']);
       });
 
       it('#set should succeed changing the referenced value', function () {
@@ -510,7 +510,7 @@ describe('JsonPointer', function () {
       const p = create('#/g%7Ch');
 
       it('#get should resolve to data["g|h"]', function () {
-        expect(p.get(data)).to.equal(data['g|h']);
+        expect(p.get(data)).to.eql(data['g|h']);
       });
 
       it('#set should succeed changing the referenced value', function () {
@@ -540,7 +540,7 @@ describe('JsonPointer', function () {
       const p = create('/i\\j');
 
       it('#get should resolve to data["i\\j"]', function () {
-        expect(p.get(data)).to.equal(data['i\\j']);
+        expect(p.get(data)).to.eql(data['i\\j']);
       });
 
       it('#set should succeed changing the referenced value', function () {
@@ -570,7 +570,7 @@ describe('JsonPointer', function () {
       const p = create('#/i%5Cj');
 
       it('#get should resolve to data["i\\j"]', function () {
-        expect(p.get(data)).to.equal(data['i\\j']);
+        expect(p.get(data)).to.eql(data['i\\j']);
       });
 
       it('#set should succeed changing the referenced value', function () {
@@ -603,7 +603,7 @@ describe('JsonPointer', function () {
       // eslint-disable-next-line no-useless-escape
       it('#get should resolve to data["k"l"]', function () {
         // eslint-disable-next-line no-useless-escape
-        expect(p.get(data)).to.equal(data['k"l']);
+        expect(p.get(data)).to.eql(data['k"l']);
       });
 
       it('#set should succeed changing the referenced value', function () {
@@ -639,7 +639,7 @@ describe('JsonPointer', function () {
       // eslint-disable-next-line no-useless-escape
       it('#get should resolve to data["k"l"]', function () {
         // eslint-disable-next-line no-useless-escape
-        expect(p.get(data)).to.equal(data['k"l']);
+        expect(p.get(data)).to.eql(data['k"l']);
       });
 
       it('#set should succeed changing the referenced value', function () {
@@ -673,7 +673,7 @@ describe('JsonPointer', function () {
       const p = create('/ ');
 
       it('#get should resolve to data[" "]', function () {
-        expect(p.get(data)).to.equal(data[' ']);
+        expect(p.get(data)).to.eql(data[' ']);
       });
 
       it('#set should succeed changing the referenced value', function () {
@@ -703,7 +703,7 @@ describe('JsonPointer', function () {
       const p = create('#/%20');
 
       it('#get should resolve to data[" "]', function () {
-        expect(p.get(data)).to.equal(data[' ']);
+        expect(p.get(data)).to.eql(data[' ']);
       });
 
       it('#set should succeed changing the referenced value', function () {
@@ -733,7 +733,7 @@ describe('JsonPointer', function () {
       const p = create('/m~0n');
 
       it('#get should resolve to data["m~n"]', function () {
-        expect(p.get(data)).to.equal(data['m~n']);
+        expect(p.get(data)).to.eql(data['m~n']);
       });
 
       it('#set should succeed changing the referenced value', function () {
@@ -763,7 +763,7 @@ describe('JsonPointer', function () {
       const p = create('#/m~0n');
 
       it('#get should resolve to data["m~n"]', function () {
-        expect(p.get(data)).to.equal(data['m~n']);
+        expect(p.get(data)).to.eql(data['m~n']);
       });
 
       it('#set should succeed changing the referenced value', function () {
@@ -793,7 +793,7 @@ describe('JsonPointer', function () {
       const p = create('/foo/-');
 
       it('should not resolve via #get', function () {
-        expect(p.get(data)).to.be.an('undefined');
+        expect(p.get(data)).to.be.undefined;
       });
 
       it('should set the next element of the array, repeatedly...', function () {
@@ -853,18 +853,18 @@ describe('JsonPointer', function () {
           },
         ],
       },
-      f: null,
+      f: null as string,
       'http://schema.org/name': 'Phillip',
     };
 
     it('#get should return `undefined` when the requested element is undefined (#/g/h)', function () {
       const unk = JsonPointer.get(data, '#/g/h');
-      expect(unk).to.be.an('undefined');
+      expect(unk).to.be.undefined;
     });
 
     it('#get should return null when the requested element has a null value (#/f)', function () {
       const unk = JsonPointer.get(data, '#/f');
-      expect(unk).to.eql(null);
+      expect(unk).to.be.null;
     });
 
     it('#get should return the value of a prop named with multiple slahes (#/http:~1~1schema.org~1name)', function () {
@@ -907,7 +907,7 @@ describe('JsonPointer', function () {
       a: 1,
       b: { c: 2 },
       d: { e: [{ a: 3 }, { b: 4 }, { c: 5 }] },
-      f: null,
+      f: null as string,
     };
     const pointerList = [
       ['', data],
@@ -943,10 +943,10 @@ describe('JsonPointer', function () {
       const items: JsonStringPointerListItem[] = JsonPointer.listPointers(data);
       pointerList.forEach(function (tt, n) {
         it(`item ${n} has pointer ${tt[0]}`, () => {
-          expect(items[n].pointer).to.equal(tt[0]);
+          expect(items[n].pointer).to.eql(tt[0]);
         });
         it(`item ${n} has value ${tt[1]}`, () => {
-          expect(items[n].value).to.equal(tt[1]);
+          expect(items[n].value).to.eql(tt[1]);
         });
       });
     });
@@ -954,10 +954,10 @@ describe('JsonPointer', function () {
       const items: UriFragmentIdentifierPointerListItem[] = JsonPointer.listFragmentIds(data);
       fragmentList.forEach(function (tt, n) {
         it(`item ${n} has fragmentId ${tt[0]}`, () => {
-          expect(items[n].fragmentId).to.equal(tt[0]);
+          expect(items[n].fragmentId).to.eql(tt[0]);
         });
         it(`item ${n} has value ${tt[1]}`, () => {
-          expect(items[n].value).to.equal(tt[1]);
+          expect(items[n].value).to.eql(tt[1]);
         });
       });
     });
@@ -971,7 +971,7 @@ describe('when data contains an array early in the path', function () {
   it('#set(o, val, true) should create the path through the array #/foo/0/wilbur/idiocies', function () {
     const p = create('#/foo/0/wilbur/idiocies');
     p.set(data, 5, true);
-    expect(p.get(data) as number).to.equal(5);
+    expect(p.get(data) as number).to.eql(5);
   });
 });
 

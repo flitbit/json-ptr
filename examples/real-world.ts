@@ -16,7 +16,7 @@ const dataColumns: number[] = [];
 
 const getJSON = bent('json');
 getJSON(url)
-  .then((data: object) => {
+  .then((data: unknown) => {
     console.log(`Report: ${datasetName.get(data)}`);
 
     const columns = datasetColumns.get(data) as Column[];
@@ -30,13 +30,13 @@ getJSON(url)
       }
     }
 
-    const rows = datasetData.get(data) as any[];
+    const rows = datasetData.get(data) as Record<string, unknown>[];
     for (const row of rows) {
       console.log(
         `${row[dataColumns[0]]} "${row[dataColumns[3]]}" ${row[dataColumns[2]]} ${row[dataColumns[1]]}yo died in ${
-          row[dataColumns[4]]
+        row[dataColumns[4]]
         } of ${row[dataColumns[6]]} ${
-          row[dataColumns[5]] && row[dataColumns[5]] !== 'null' ? '(' + row[dataColumns[5]] + ')' : ''
+        row[dataColumns[5]] && row[dataColumns[5]] !== 'null' ? '(' + row[dataColumns[5]] + ')' : ''
         }`
       );
     }

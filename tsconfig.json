@@ -1,41 +1,25 @@
 {
   "compilerOptions": {
+    "target": "es6",
     "module": "commonjs",
-    "target": "es2017",
-    "strict": true,
     "moduleResolution": "node",
-    "declaration": true,
-    "outDir": "dist",
-    "rootDir": "src",
+    "allowSyntheticDefaultImports": true,
+    "allowJs": true,
+    "importHelpers": true,
+    "alwaysStrict": true,
     "sourceMap": true,
-    "resolveJsonModule": true,
-    "baseUrl": ".",
-    "paths": {
-      "*": [
-        "node_modules/*",
-        "src/types/*"
-      ]
-    },
-    "allowSyntheticDefaultImports": true
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "strictNullChecks": false,
   },
   "include": [
-    "./src/**/*"
-  ],
-  "exclude": [
-    "node_modules"
-  ],
-  "typedocOptions": {
-    "inputFiles": [
-      "./src"
-    ],
-    "exclude": [
-      "./src/__test__"
-    ],
-    "mode": "modules",
-    "out": "docs",
-    "includeDeclarations": true,
-    "excludeExternals": true,
-    "excludePrivate": true,
-    "excludeNotExported": true,
-  }
+    "src/**/*",
+    "__tests__/**/*",
+    "examples/**/*.ts",
+  ]
 }

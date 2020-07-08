@@ -34,7 +34,7 @@ interface Item {
 }
 
 function descendingVisit(target: unknown, visitor: Visitor, encoder: Encoder, cycle = false): void {
-  const distinctObjects = new Map<object, JsonPointer>();
+  const distinctObjects = new Map<unknown, JsonPointer>();
   const q: Item[] = [];
   let cursor2 = 0;
   q.push({
