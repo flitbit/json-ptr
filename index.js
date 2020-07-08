@@ -301,7 +301,7 @@
     return it;
   }
 
-  function deleteValueAtPath(target, path) {
+  function unsetValueAtPath(target, path) {
     var it;
     var len;
     var end;
@@ -390,10 +390,10 @@
           return typeof ($compiledGetter(target)) !== 'undefined';
         }
       },
-      delete: {
+      unset: {
         enumerable: true,
         value: function (target) {
-          return deleteValueAtPath(target, localPath);
+          return unsetValueAtPath(target, localPath);
         }
       },
       concat: {
@@ -551,8 +551,8 @@
     return setValueAtPath(target, val, pickDecoder(ptr)(ptr), force);
   };
 
-  JsonPointer.delete = function (target, ptr) {
-    return deleteValueAtPath(target, pickDecoder(ptr)(ptr));
+  JsonPointer.unset = function (target, ptr) {
+    return unsetValueAtPath(target, pickDecoder(ptr)(ptr));
   };
 
   JsonPointer.list = function (target, fragmentId) {
