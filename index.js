@@ -301,6 +301,58 @@
     return it;
   }
 
+  function unsetValueAtPath(target, path) {
+    var it;
+    var len;
+    var end;
+    var cursor;
+    var step;
+    var p;
+    var rem;
+    var nonexistent;
+    if (path.length === 0) {
+      throw new Error('Cannot set the root object; assign it directly.');
+    }
+    if (typeof target === 'undefined') {
+      throw new TypeError('Cannot set values on undefined');
+    }
+    it = target;
+    len = path.length;
+    end = path.length - 1;
+    cursor = -1;
+    if (len) {
+      while (++cursor < len) {
+        step = path[cursor];
+        if (Array.isArray(it)) {
+          p = toArrayIndexReference(it, step);
+          if (it.length > p) {
+            if (cursor === end) {
+              rem = it[p];
+              delete it[p];
+              return rem;
+            }
+            it = it[p];
+          } else if (it.length === p) {
+            if (cursor === end) {
+              return nonexistent;
+            }
+          }
+        } else {
+          if (typeof it[step] === 'undefined') {
+            return nonexistent;
+          }
+          if (cursor === end) {
+            rem = it[step];
+            delete it[step];
+            return rem;
+          }
+          it = it[step];
+        }
+      }
+    }
+    return it;
+  }
+
   function looksLikeFragment(ptr) {
     return ptr && ptr.length && ptr[0] === '#';
   }
@@ -336,6 +388,12 @@
         enumerable: true,
         value: function (target) {
           return typeof ($compiledGetter(target)) !== 'undefined';
+        }
+      },
+      unset: {
+        enumerable: true,
+        value: function (target) {
+          return unsetValueAtPath(target, localPath);
         }
       },
       concat: {
@@ -491,6 +549,10 @@
 
   JsonPointer.set = function (target, ptr, val, force) {
     return setValueAtPath(target, val, pickDecoder(ptr)(ptr), force);
+  };
+
+  JsonPointer.unset = function (target, ptr) {
+    return unsetValueAtPath(target, pickDecoder(ptr)(ptr));
   };
 
   JsonPointer.list = function (target, fragmentId) {
