@@ -46,7 +46,6 @@ var ptr = require('json-ptr')
 * [`.has(target,pointer)`](#user-content-hastargetpointer)
 * [`.get(target,pointer)`](#user-content-gettargetpointer)
 * [`.set(target,pointer,value,force)`](#user-content-settarget-pointer-value-force)
-* [`.delete(target,pointer`](#user-content-deletetarget-pointer-value-force)
 * [`.flatten(target,fragmentId)`](#user-content-flattentarget-fragmentid)
 * [`.list(target,fragmentId)`](#user-content-listtarget-fragmentid)
 * [`.map(target,fragmentId)`](#user-content-maptarget-fragmentid)
@@ -170,9 +169,9 @@ console.log(JSON.stringify(data, null, '  '));
 }
 ```
 
-#### .delete(target, pointer)
+#### .unset(target, pointer)
 
-Deletes the `value` at the specified `pointer` on the `target` and returns the value. The default behavior is to do nothing if `pointer` is nonexistent.
+Unsets the `value` at the specified `pointer` on the `target` and returns the value. The default behavior is to do nothing if `pointer` is nonexistent.
 
 _arguments:_
 
@@ -186,7 +185,7 @@ _returns:_
 _example:_
 
 ```javascript
-var prior = ptr.delete(data, '#/legumes/1/instock');
+var prior = ptr.unset(data, '#/legumes/1/instock');
 ```
 
 example force:
@@ -194,8 +193,8 @@ example force:
 ```javascript
 var data = {};
 
-ptr.delete(data, '#/peter/piper');
-ptr.delete(data, '#/peter/pan');
+ptr.unset(data, '#/peter/piper');
+ptr.unset(data, '#/peter/pan');
 
 console.log(JSON.stringify(data, null, '  '));
 ```
