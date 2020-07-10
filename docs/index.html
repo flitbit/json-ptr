@@ -186,11 +186,28 @@
 				<a href="#api-documentation" id="api-documentation" style="color: inherit; text-decoration: none;">
 					<h2>API Documentation</h2>
 				</a>
-				<p>The API documentation is generated from code comments by typedoc and <a href="">hosted here</a>.</p>
+				<p>The API documentation is generated from code comments by typedoc and <a href="http://flitbit.github.io/json-ptr/">hosted on github</a>. Read the docs.</p>
 				<p>We welcome new issues if you have questions or need additional documentation.</p>
+				<a href="#tests" id="tests" style="color: inherit; text-decoration: none;">
+					<h2>Tests</h2>
+				</a>
+				<p>We&#39;re maintaining near 100% test coverage. Visit our <a href="https://app.circleci.com/pipelines/github/flitbit/json-ptr">circleci build page</a> and drill down on a recent build&#39;s <em>build and test</em> step to see where we&#39;re at. It should look something like:</p>
+				<pre><code class="language-text">=============================== Coverage summary ===============================
+Statements   : 100% ( 270/270 )
+Branches     : 100% ( 172/172 )
+Functions    : 100% ( 49/49 )
+Lines        : 100% ( 265/265 )
+================================================================================</code></pre>
+				<p>We use <a href="https://mochajs.org/">mocha</a> so you can also clone the code and:</p>
+				<pre><code class="language-text">$ npm install
+$ npm test</code></pre>
+				<p>Once you&#39;ve run the tests on the command line you can open up <a href="https://github.com/flitbit/json-ptr/blob/master/tests.html">./tests.html</a> in the browser of your choice.</p>
 				<a href="#performance" id="performance" style="color: inherit; text-decoration: none;">
 					<h2>Performance</h2>
 				</a>
+				<blockquote>
+					<p>WARNING! These performance metrics are quite outdated. We&#39;ll be updating as soon as we have time.</p>
+				</blockquote>
 				<p>This repository has a <a href="https://github.com/flitbit/json-pointer-comparison">companion repository that makes some performance comparisons</a> between <code>json-ptr</code>, <a href="https://www.npmjs.com/package/jsonpointer"><code>jsonpointer</code></a> and <a href="https://www.npmjs.com/package/json-pointer"><code>json-pointer</code></a>.</p>
 				<p><strong>All timings are expressed as nanoseconds:</strong></p>
 				<pre><code class="language-text">.flatten(obj)
@@ -238,66 +255,17 @@ json-pointer | get    |          | 1000000 | 2619 | 346.17%
 					<p>These results have been elided because there is too much detail in the actual. Your results will vary slightly depending on the resources available where you run it.</p>
 				</blockquote>
 				<p>It is important to recognize in the performance results that <em>compiled</em> options are faster. As a general rule, you should <em>compile</em> any pointers you&#39;ll be using repeatedly.</p>
-				<p><em>Consider this example code that queries the flickr API and prints results to the console:</em></p>
-				<pre><code class="language-javascript"><span class="hljs-meta">&#x27;use strict&#x27;</span>;
-
-<span class="hljs-keyword">let</span> ptr = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;..&#x27;</span>),
-  http = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;http&#x27;</span>),
-  util = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;util&#x27;</span>);
-
-<span class="hljs-comment">// A flickr feed, tags surf,pipeline</span>
-<span class="hljs-keyword">let</span> feed = <span class="hljs-string">&#x27;http://api.flickr.com/services/feeds/photos_public.gne?tags=surf,pipeline&amp;tagmode=all&amp;format=json&amp;jsoncallback=processResponse&#x27;</span>;
-
-<span class="hljs-comment">// Compile/prepare the pointers...</span>
-<span class="hljs-keyword">let</span> items = ptr.create(<span class="hljs-string">&#x27;#/items&#x27;</span>);
-<span class="hljs-keyword">let</span> author = ptr.create(<span class="hljs-string">&#x27;#/author&#x27;</span>);
-<span class="hljs-keyword">let</span> media = ptr.create(<span class="hljs-string">&#x27;#/media/m&#x27;</span>);
-
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">processResponse</span>(<span class="hljs-params">json</span>) </span>{
-  <span class="hljs-keyword">let</span> data = items.get(json);
-
-  <span class="hljs-keyword">if</span> (data &amp;&amp; <span class="hljs-built_in">Array</span>.isArray(data)) {
-    <span class="hljs-keyword">let</span> images = data.reduce(<span class="hljs-function">(<span class="hljs-params">acc, it</span>) =&gt;</span> {
-      <span class="hljs-comment">// Using the prepared pointers to select parts...</span>
-      acc.push({
-        <span class="hljs-attr">author</span>: author.get(it),
-        <span class="hljs-attr">media</span>: media.get(it)
-      });
-      <span class="hljs-keyword">return</span> acc;
-    }, []);
-    <span class="hljs-built_in">console</span>.log(util.inspect(images, <span class="hljs-literal">false</span>, <span class="hljs-number">9</span>));
-  }
-}
-
-http.get(feed, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">res</span>) </span>{
-  <span class="hljs-keyword">let</span> data = <span class="hljs-string">&#x27;&#x27;</span>;
-
-  res.on(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">chunk</span>) </span>{
-    data += chunk;
-  });
-
-  res.on(<span class="hljs-string">&#x27;end&#x27;</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-    <span class="hljs-comment">// result is formatted as jsonp... this is for illustration only.</span>
-    data = <span class="hljs-built_in">eval</span>(data); <span class="hljs-comment">// eslint-disable-line no-eval</span>
-    processResponse(data);
-  });
-}).on(<span class="hljs-string">&#x27;error&#x27;</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e</span>) </span>{
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;Got error: &#x27;</span> + e.message);
-});</code></pre>
-				<blockquote>
-					<p>[<a href="https://github.com/flitbit/json-ptr/blob/master/examples/real-world.js">example/real-world.js</a>]</p>
-				</blockquote>
-				<a href="#tests" id="tests" style="color: inherit; text-decoration: none;">
-					<h2>Tests</h2>
-				</a>
-				<p>Tests are written using <a href="https://mochajs.org/">mocha</a> and <a href="https://github.com/Automattic/expect.js">expect.js</a>.</p>
-				<pre><code class="language-bash">npm <span class="hljs-built_in">test</span></code></pre>
-				<p>... or ...</p>
-				<pre><code class="language-bash">mocha</code></pre>
 				<a href="#releases" id="releases" style="color: inherit; text-decoration: none;">
 					<h2>Releases</h2>
 				</a>
 				<ul>
+					<li><p>2020-07-10 — <strong>1.3.0</strong></p>
+						<ul>
+							<li>Merged new <code>.unset()</code> function contributed by @chrishalbert, updated dependencies.</li>
+							<li>Migrated to typescript and retooled build/test/deploy pipeline. Definitely typed.</li>
+							<li>100% test coverage which illuminated some idiosyncrasies; maybe we killed unobserved bugs, nobody knows.</li>
+						</ul>
+					</li>
 					<li><p>2019-09-14 — <strong>1.2.0</strong></p>
 						<ul>
 							<li>Merged new <code>.concat</code> function contributed by @vuwuv, updated dependencies.</li>

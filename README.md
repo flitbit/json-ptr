@@ -126,7 +126,7 @@ console.log(primaryGuestName(reservationV1_1));
 
 ## API Documentation
 
-The API documentation is generated from code comments by typedoc and [hosted here](<>).
+The API documentation is generated from code comments by typedoc and [hosted on github](http://flitbit.github.io/json-ptr/). Read the docs.
 
 We welcome new issues if you have questions or need additional documentation.
 
