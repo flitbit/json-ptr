@@ -8,8 +8,6 @@ A complete implementation of JSON Pointer ([RFC 6901](https://tools.ietf.org/htm
 
 I wrote this a few years back when I was unable to find a _complete implementation_ of [RFC 6901](https://tools.ietf.org/html/rfc6901). It turns out that I now use the hell out of it.
 
-Since there are a few npm modules for you to choose from, see [the section on performance later in this _readme_](#user-content-performance); you can use your own judgement as to which package you should employ.
-
 ## Install
 
 ```bash
@@ -132,7 +130,31 @@ The API documentation is generated from code comments by typedoc and [hosted her
 
 We welcome new issues if you have questions or need additional documentation.
 
+## Tests
+
+We're maintaining near 100% test coverage. Visit our [circleci build page](https://app.circleci.com/pipelines/github/flitbit/json-ptr) and drill down on a recent build's _build and test_ step to see where we're at. It should look something like:
+
+```text
+=============================== Coverage summary ===============================
+Statements   : 100% ( 270/270 )
+Branches     : 100% ( 172/172 )
+Functions    : 100% ( 49/49 )
+Lines        : 100% ( 265/265 )
+================================================================================
+```
+
+We use [mocha](https://mochajs.org/) so you can also clone the code and:
+
+```text
+$ npm install
+$ npm test
+```
+
+Once you've run the tests on the command line you can open up [./tests.html](https://github.com/flitbit/json-ptr/blob/master/tests.html) in the browser of your choice.
+
 ## Performance
+
+> WARNING! These performance metrics are quite outdated. We'll be updating as soon as we have time.
 
 This repository has a [companion repository that makes some performance comparisons](https://github.com/flitbit/json-pointer-comparison) between `json-ptr`, [`jsonpointer`](https://www.npmjs.com/package/jsonpointer) and [`json-pointer`](https://www.npmjs.com/package/json-pointer).
 
@@ -186,73 +208,12 @@ json-pointer | get    |          | 1000000 | 2619 | 346.17%
 
 It is important to recognize in the performance results that _compiled_ options are faster. As a general rule, you should _compile_ any pointers you'll be using repeatedly.
 
-_Consider this example code that queries the flickr API and prints results to the console:_
-
-```javascript
-'use strict';
-
-let ptr = require('..'),
-  http = require('http'),
-  util = require('util');
-
-// A flickr feed, tags surf,pipeline
-let feed = 'http://api.flickr.com/services/feeds/photos_public.gne?tags=surf,pipeline&tagmode=all&format=json&jsoncallback=processResponse';
-
-// Compile/prepare the pointers...
-let items = ptr.create('#/items');
-let author = ptr.create('#/author');
-let media = ptr.create('#/media/m');
-
-function processResponse(json) {
-  let data = items.get(json);
-
-  if (data && Array.isArray(data)) {
-    let images = data.reduce((acc, it) => {
-      // Using the prepared pointers to select parts...
-      acc.push({
-        author: author.get(it),
-        media: media.get(it)
-      });
-      return acc;
-    }, []);
-    console.log(util.inspect(images, false, 9));
-  }
-}
-
-http.get(feed, function(res) {
-  let data = '';
-
-  res.on('data', function(chunk) {
-    data += chunk;
-  });
-
-  res.on('end', function() {
-    // result is formatted as jsonp... this is for illustration only.
-    data = eval(data); // eslint-disable-line no-eval
-    processResponse(data);
-  });
-}).on('error', function(e) {
-  console.log('Got error: ' + e.message);
-});
-```
-
-> \[[example/real-world.js](https://github.com/flitbit/json-ptr/blob/master/examples/real-world.js)]
-
-## Tests
-
-Tests are written using [mocha](https://mochajs.org/) and [expect.js](https://github.com/Automattic/expect.js).
-
-```bash
-npm test
-```
-
-... or ...
-
-```bash
-mocha
-```
-
 ## Releases
+
+-   2020-07-10 — **1.3.0**
+    -   Merged new `.unset()` function contributed by @chrishalbert, updated dependencies.
+    -   Migrated to typescript and retooled build/test/deploy pipeline. Definitely typed.
+    -   100% test coverage which illuminated some idiosyncrasies; maybe we killed unobserved bugs, nobody knows.
 
 -   2019-09-14 — **1.2.0**
     -   Merged new `.concat` function contributed by @vuwuv, updated dependencies.
