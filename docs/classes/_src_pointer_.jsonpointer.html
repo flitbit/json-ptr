@@ -72,10 +72,105 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>Represents a JSON Pointer, capable of getting and setting values on object graphs at the pointer&#39;s dereferenced location.</p>
+						<p>Represents a JSON Pointer, capable of getting and setting the value on target
+						objects at the pointer&#39;s location.</p>
 					</div>
-					<p>While there are static variants for most operations, our recommendation is to use the instance level methods, which enables you avoid repeated compiling/emitting transient accessors. Take a look at the speed comparisons for our justification.</p>
-					<p>In most cases, create and reuse instances of JsonPointer within a scope that makes sense for your app. We often use a cache of frequently used pointers, but your use case may support constants, static members, or other long-lived scenarios.</p>
+					<p>While there are static variants for most operations, our recommendation is
+						to use the instance level methods, which enables you avoid repeated
+						compiling/emitting transient accessors. Take a look at the speed comparisons
+					for our justification.</p>
+					<p>In most cases, you should create and reuse instances of JsonPointer within
+						scope that makes sense for your app. We often create constants for frequently
+					used pointers, but your use case may vary.</p>
+					<p>The following is a contrived example showing a function that uses pointers to
+					deal with changes in the structure of data (a version independent function):</p>
+					<pre><code class="language-ts"><span class="hljs-keyword">import</span> { JsonPointer } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;json-ptr&#x27;</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">type</span> SupportedVersion = <span class="hljs-string">&#x27;1.0&#x27;</span> | <span class="hljs-string">&#x27;1.1&#x27;</span>;
+
+<span class="hljs-keyword">interface</span> PrimaryGuestNamePointers {
+  name: JsonPointer;
+  surname: JsonPointer;
+  honorific: JsonPointer;
+}
+<span class="hljs-keyword">const</span> versions: Record&lt;SupportedVersion, PrimaryGuestNamePointers&gt; = {
+  <span class="hljs-string">&#x27;1.0&#x27;</span>: {
+    name: JsonPointer.create(<span class="hljs-string">&#x27;/guests/0/name&#x27;</span>),
+    surname: JsonPointer.create(<span class="hljs-string">&#x27;/guests/0/surname&#x27;</span>),
+    honorific: JsonPointer.create(<span class="hljs-string">&#x27;/guests/0/honorific&#x27;</span>),
+  },
+  <span class="hljs-string">&#x27;1.1&#x27;</span>: {
+    name: JsonPointer.create(<span class="hljs-string">&#x27;/primary/primaryGuest/name&#x27;</span>),
+    surname: JsonPointer.create(<span class="hljs-string">&#x27;/primary/primaryGuest/surname&#x27;</span>),
+    honorific: JsonPointer.create(<span class="hljs-string">&#x27;/primary/primaryGuest/honorific&#x27;</span>),
+  }
+};
+
+<span class="hljs-keyword">interface</span> Reservation <span class="hljs-keyword">extends</span> Record&lt;string, unknown&gt; {
+  version?: SupportedVersion;
+}
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">primaryGuestName</span>(<span class="hljs-params">reservation: Reservation</span>): <span class="hljs-title">string</span> </span>{
+  <span class="hljs-keyword">const</span> pointers = versions[reservation.version || <span class="hljs-string">&#x27;1.0&#x27;</span>];
+  <span class="hljs-keyword">const</span> name = pointers.name.get(reservation) <span class="hljs-keyword">as</span> <span class="hljs-built_in">string</span>;
+  <span class="hljs-keyword">const</span> surname = pointers.surname.get(reservation) <span class="hljs-keyword">as</span> <span class="hljs-built_in">string</span>;
+  <span class="hljs-keyword">const</span> honorific = pointers.honorific.get(reservation) <span class="hljs-keyword">as</span> <span class="hljs-built_in">string</span>;
+  <span class="hljs-keyword">const</span> names: <span class="hljs-built_in">string</span>[] = [];
+  <span class="hljs-keyword">if</span> (honorific) names.push(honorific);
+  <span class="hljs-keyword">if</span> (name) names.push(name);
+  <span class="hljs-keyword">if</span> (surname) names.push(surname);
+  <span class="hljs-keyword">return</span> names.join(<span class="hljs-string">&#x27; &#x27;</span>);
+}
+
+<span class="hljs-comment">// The original layout of a reservation (only the parts relevant to our example)</span>
+<span class="hljs-keyword">const</span> reservationV1: Reservation = {
+  guests: [{
+    name: <span class="hljs-string">&#x27;Wilbur&#x27;</span>,
+    surname: <span class="hljs-string">&#x27;Finkle&#x27;</span>,
+    honorific: <span class="hljs-string">&#x27;Mr.&#x27;</span>
+  }, {
+    name: <span class="hljs-string">&#x27;Wanda&#x27;</span>,
+    surname: <span class="hljs-string">&#x27;Finkle&#x27;</span>,
+    honorific: <span class="hljs-string">&#x27;Mrs.&#x27;</span>
+  }, {
+    name: <span class="hljs-string">&#x27;Wilma&#x27;</span>,
+    surname: <span class="hljs-string">&#x27;Finkle&#x27;</span>,
+    honorific: <span class="hljs-string">&#x27;Miss&#x27;</span>,
+    child: <span class="hljs-literal">true</span>,
+    age: <span class="hljs-number">12</span>
+  }]
+  <span class="hljs-comment">// ...</span>
+};
+
+<span class="hljs-comment">// The new layout of a reservation (only the parts relevant to our example)</span>
+<span class="hljs-keyword">const</span> reservationV1_1: Reservation = {
+  version: <span class="hljs-string">&#x27;1.1&#x27;</span>,
+  primary: {
+    primaryGuest: {
+      name: <span class="hljs-string">&#x27;Wilbur&#x27;</span>,
+      surname: <span class="hljs-string">&#x27;Finkle&#x27;</span>,
+      honorific: <span class="hljs-string">&#x27;Mr.&#x27;</span>
+    },
+    additionalGuests: [{
+      name: <span class="hljs-string">&#x27;Wanda&#x27;</span>,
+      surname: <span class="hljs-string">&#x27;Finkle&#x27;</span>,
+      honorific: <span class="hljs-string">&#x27;Mrs.&#x27;</span>
+    }, {
+      name: <span class="hljs-string">&#x27;Wilma&#x27;</span>,
+      surname: <span class="hljs-string">&#x27;Finkle&#x27;</span>,
+      honorific: <span class="hljs-string">&#x27;Miss&#x27;</span>,
+      child: <span class="hljs-literal">true</span>,
+      age: <span class="hljs-number">12</span>
+    }]
+    <span class="hljs-comment">// ...</span>
+  }
+  <span class="hljs-comment">// ...</span>
+};
+
+<span class="hljs-built_in">console</span>.log(primaryGuestName(reservationV1));
+<span class="hljs-built_in">console</span>.log(primaryGuestName(reservationV1_1));
+</code></pre>
+					<p>There are many uses for pointers.</p>
 				</div>
 			</section>
 			<section class="tsd-panel tsd-hierarchy">
@@ -146,7 +241,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/93dc79c/src/pointer.ts#L265">src/pointer.ts:265</a></li>
+									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/54cfffa/src/pointer.ts#L451">src/pointer.ts:451</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -178,7 +273,7 @@
 					<div class="tsd-signature tsd-kind-icon">path<span class="tsd-signature-symbol">:</span> <a href="../modules/_src_types_.html#pathsegments" class="tsd-signature-type">PathSegments</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/93dc79c/src/pointer.ts#L265">src/pointer.ts:265</a></li>
+							<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/54cfffa/src/pointer.ts#L451">src/pointer.ts:451</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -200,7 +295,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/93dc79c/src/pointer.ts#L330">src/pointer.ts:330</a></li>
+									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/54cfffa/src/pointer.ts#L516">src/pointer.ts:516</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -222,7 +317,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/93dc79c/src/pointer.ts#L340">src/pointer.ts:340</a></li>
+									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/54cfffa/src/pointer.ts#L526">src/pointer.ts:526</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -247,7 +342,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/93dc79c/src/pointer.ts#L323">src/pointer.ts:323</a></li>
+									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/54cfffa/src/pointer.ts#L509">src/pointer.ts:509</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -278,7 +373,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/93dc79c/src/pointer.ts#L279">src/pointer.ts:279</a></li>
+									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/54cfffa/src/pointer.ts#L465">src/pointer.ts:465</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -309,7 +404,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/93dc79c/src/pointer.ts#L315">src/pointer.ts:315</a></li>
+									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/54cfffa/src/pointer.ts#L501">src/pointer.ts:501</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -340,7 +435,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/93dc79c/src/pointer.ts#L297">src/pointer.ts:297</a></li>
+									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/54cfffa/src/pointer.ts#L483">src/pointer.ts:483</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -386,12 +481,12 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/93dc79c/src/pointer.ts#L350">src/pointer.ts:350</a></li>
+									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/54cfffa/src/pointer.ts#L536">src/pointer.ts:536</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Produces this pointer&#39;s JSON Pointer encoded string representation.</p>
+									<p>Emits the JSON Pointer encoded string representation.</p>
 								</div>
 							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
@@ -408,12 +503,12 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/93dc79c/src/pointer.ts#L307">src/pointer.ts:307</a></li>
+									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/54cfffa/src/pointer.ts#L493">src/pointer.ts:493</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Removes the value from the target&#39;s object graph.</p>
+									<p>Removes the target object&#39;s value at the pointer&#39;s location.</p>
 								</div>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -434,24 +529,27 @@
 					<a name="create" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagStatic">Static</span> create</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static">
-						<li class="tsd-signature tsd-kind-icon">create<span class="tsd-signature-symbol">(</span>ptr<span class="tsd-signature-symbol">: </span><a href="../modules/_src_types_.html#pointer" class="tsd-signature-type">Pointer</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_src_types_.html#pathsegments" class="tsd-signature-type">PathSegments</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_src_pointer_.jsonpointer.html" class="tsd-signature-type">JsonPointer</a></li>
+						<li class="tsd-signature tsd-kind-icon">create<span class="tsd-signature-symbol">(</span>pointer<span class="tsd-signature-symbol">: </span><a href="../modules/_src_types_.html#pointer" class="tsd-signature-type">Pointer</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_src_types_.html#pathsegments" class="tsd-signature-type">PathSegments</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_src_pointer_.jsonpointer.html" class="tsd-signature-type">JsonPointer</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/93dc79c/src/pointer.ts#L126">src/pointer.ts:126</a></li>
+									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/54cfffa/src/pointer.ts#L234">src/pointer.ts:234</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Creates a JsonPointer instance.</p>
+									<p>Factory function that creates a JsonPointer instance.</p>
 								</div>
+								<pre><code class="language-ts"><span class="hljs-keyword">const</span> ptr = JsonPointer.create(<span class="hljs-string">&#x27;/deeply/nested/data/0/here&#x27;</span>);</code></pre>
+								<p><em>or</em></p>
+								<pre><code class="language-ts"><span class="hljs-keyword">const</span> ptr = JsonPointer.create([<span class="hljs-string">&#x27;deeply&#x27;</span>, <span class="hljs-string">&#x27;nested&#x27;</span>, <span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-number">0</span>, <span class="hljs-string">&#x27;here&#x27;</span>]);</code></pre>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>ptr: <a href="../modules/_src_types_.html#pointer" class="tsd-signature-type">Pointer</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_src_types_.html#pathsegments" class="tsd-signature-type">PathSegments</a></h5>
+									<h5>pointer: <a href="../modules/_src_types_.html#pointer" class="tsd-signature-type">Pointer</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_src_types_.html#pathsegments" class="tsd-signature-type">PathSegments</a></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>the pointer or path.</p>
 									</div>
@@ -465,13 +563,13 @@
 					<a name="decode" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagStatic">Static</span> decode</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static">
-						<li class="tsd-signature tsd-kind-icon">decode<span class="tsd-signature-symbol">(</span>ptr<span class="tsd-signature-symbol">: </span><a href="../modules/_src_types_.html#pointer" class="tsd-signature-type">Pointer</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../modules/_src_types_.html#pathsegments" class="tsd-signature-type">PathSegments</a></li>
+						<li class="tsd-signature tsd-kind-icon">decode<span class="tsd-signature-symbol">(</span>pointer<span class="tsd-signature-symbol">: </span><a href="../modules/_src_types_.html#pointer" class="tsd-signature-type">Pointer</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../modules/_src_types_.html#pathsegments" class="tsd-signature-type">PathSegments</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/93dc79c/src/pointer.ts#L188">src/pointer.ts:188</a></li>
+									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/54cfffa/src/pointer.ts#L374">src/pointer.ts:374</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -482,7 +580,7 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>ptr: <a href="../modules/_src_types_.html#pointer" class="tsd-signature-type">Pointer</a></h5>
+									<h5>pointer: <a href="../modules/_src_types_.html#pointer" class="tsd-signature-type">Pointer</a></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>a string representation of a JSON Pointer</p>
 									</div>
@@ -502,7 +600,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/93dc79c/src/pointer.ts#L239">src/pointer.ts:239</a></li>
+									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/54cfffa/src/pointer.ts#L425">src/pointer.ts:425</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -533,19 +631,29 @@
 					<a name="get-1" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagStatic">Static</span> get</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static">
-						<li class="tsd-signature tsd-kind-icon">get<span class="tsd-signature-symbol">(</span>target<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span>, ptr<span class="tsd-signature-symbol">: </span><a href="../modules/_src_types_.html#pointer" class="tsd-signature-type">Pointer</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_src_types_.html#pathsegments" class="tsd-signature-type">PathSegments</a><span class="tsd-signature-symbol"> | </span><a href="_src_pointer_.jsonpointer.html" class="tsd-signature-type">JsonPointer</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<span class="tsd-signature-symbol">(</span>target<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span>, pointer<span class="tsd-signature-symbol">: </span><a href="../modules/_src_types_.html#pointer" class="tsd-signature-type">Pointer</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_src_types_.html#pathsegments" class="tsd-signature-type">PathSegments</a><span class="tsd-signature-symbol"> | </span><a href="_src_pointer_.jsonpointer.html" class="tsd-signature-type">JsonPointer</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/93dc79c/src/pointer.ts#L147">src/pointer.ts:147</a></li>
+									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/54cfffa/src/pointer.ts#L283">src/pointer.ts:283</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Gets the value at the specified pointer&#39;s location in the object graph. If there is no value, then the result is <code>undefined</code>.</p>
+									<p>Gets the <code>target</code> object&#39;s value at the <code>pointer</code>&#39;s location.</p>
 								</div>
+								<pre><code class="language-ts"><span class="hljs-keyword">const</span> target = {
+  first: <span class="hljs-string">&#x27;second&#x27;</span>,
+  third: [<span class="hljs-string">&#x27;fourth&#x27;</span>, <span class="hljs-string">&#x27;fifth&#x27;</span>, { sixth: <span class="hljs-string">&#x27;seventh&#x27;</span> }],
+  eighth: <span class="hljs-string">&#x27;ninth&#x27;</span>
+};
+
+<span class="hljs-built_in">console</span>.log(JsonPointer.get(target, <span class="hljs-string">&#x27;/third/2/sixth&#x27;</span>));
+<span class="hljs-comment">// seventh</span>
+<span class="hljs-built_in">console</span>.log(JsonPointer.get(target, <span class="hljs-string">&#x27;/tenth&#x27;</span>));
+<span class="hljs-comment">// undefined</span></code></pre>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
@@ -556,7 +664,7 @@
 									</div>
 								</li>
 								<li>
-									<h5>ptr: <a href="../modules/_src_types_.html#pointer" class="tsd-signature-type">Pointer</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_src_types_.html#pathsegments" class="tsd-signature-type">PathSegments</a><span class="tsd-signature-symbol"> | </span><a href="_src_pointer_.jsonpointer.html" class="tsd-signature-type">JsonPointer</a></h5>
+									<h5>pointer: <a href="../modules/_src_types_.html#pointer" class="tsd-signature-type">Pointer</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_src_types_.html#pathsegments" class="tsd-signature-type">PathSegments</a><span class="tsd-signature-symbol"> | </span><a href="_src_pointer_.jsonpointer.html" class="tsd-signature-type">JsonPointer</a></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>the pointer or path.</p>
 									</div>
@@ -570,19 +678,29 @@
 					<a name="has-1" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagStatic">Static</span> has</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static">
-						<li class="tsd-signature tsd-kind-icon">has<span class="tsd-signature-symbol">(</span>target<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span>, ptr<span class="tsd-signature-symbol">: </span><a href="../modules/_src_types_.html#pointer" class="tsd-signature-type">Pointer</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_src_types_.html#pathsegments" class="tsd-signature-type">PathSegments</a><span class="tsd-signature-symbol"> | </span><a href="_src_pointer_.jsonpointer.html" class="tsd-signature-type">JsonPointer</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+						<li class="tsd-signature tsd-kind-icon">has<span class="tsd-signature-symbol">(</span>target<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span>, pointer<span class="tsd-signature-symbol">: </span><a href="../modules/_src_types_.html#pointer" class="tsd-signature-type">Pointer</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_src_types_.html#pathsegments" class="tsd-signature-type">PathSegments</a><span class="tsd-signature-symbol"> | </span><a href="_src_pointer_.jsonpointer.html" class="tsd-signature-type">JsonPointer</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/93dc79c/src/pointer.ts#L135">src/pointer.ts:135</a></li>
+									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/54cfffa/src/pointer.ts#L257">src/pointer.ts:257</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Determines if the <code>target</code> object has a value at the pointer&#39;s location in the object graph.</p>
+									<p>Determines if the specified <code>target</code>&#39;s object graph has a value at the <code>pointer</code>&#39;s location.</p>
 								</div>
+								<pre><code class="language-ts"><span class="hljs-keyword">const</span> target = {
+  first: <span class="hljs-string">&#x27;second&#x27;</span>,
+  third: [<span class="hljs-string">&#x27;fourth&#x27;</span>, <span class="hljs-string">&#x27;fifth&#x27;</span>, { sixth: <span class="hljs-string">&#x27;seventh&#x27;</span> }],
+  eighth: <span class="hljs-string">&#x27;ninth&#x27;</span>
+};
+
+<span class="hljs-built_in">console</span>.log(JsonPointer.has(target, <span class="hljs-string">&#x27;/third/0&#x27;</span>));
+<span class="hljs-comment">// true</span>
+<span class="hljs-built_in">console</span>.log(JsonPointer.has(target, <span class="hljs-string">&#x27;/tenth&#x27;</span>));
+<span class="hljs-comment">// false</span></code></pre>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
@@ -593,7 +711,7 @@
 									</div>
 								</li>
 								<li>
-									<h5>ptr: <a href="../modules/_src_types_.html#pointer" class="tsd-signature-type">Pointer</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_src_types_.html#pathsegments" class="tsd-signature-type">PathSegments</a><span class="tsd-signature-symbol"> | </span><a href="_src_pointer_.jsonpointer.html" class="tsd-signature-type">JsonPointer</a></h5>
+									<h5>pointer: <a href="../modules/_src_types_.html#pointer" class="tsd-signature-type">Pointer</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_src_types_.html#pathsegments" class="tsd-signature-type">PathSegments</a><span class="tsd-signature-symbol"> | </span><a href="_src_pointer_.jsonpointer.html" class="tsd-signature-type">JsonPointer</a></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>the pointer or path</p>
 									</div>
@@ -613,7 +731,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/93dc79c/src/pointer.ts#L222">src/pointer.ts:222</a></li>
+									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/54cfffa/src/pointer.ts#L408">src/pointer.ts:408</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -644,7 +762,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/93dc79c/src/pointer.ts#L206">src/pointer.ts:206</a></li>
+									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/54cfffa/src/pointer.ts#L392">src/pointer.ts:392</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -675,7 +793,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/93dc79c/src/pointer.ts#L256">src/pointer.ts:256</a></li>
+									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/54cfffa/src/pointer.ts#L442">src/pointer.ts:442</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -706,19 +824,42 @@
 					<a name="set-1" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagStatic">Static</span> set</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static">
-						<li class="tsd-signature tsd-kind-icon">set<span class="tsd-signature-symbol">(</span>target<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span>, ptr<span class="tsd-signature-symbol">: </span><a href="../modules/_src_types_.html#pointer" class="tsd-signature-type">Pointer</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_src_types_.html#pathsegments" class="tsd-signature-type">PathSegments</a><span class="tsd-signature-symbol"> | </span><a href="_src_pointer_.jsonpointer.html" class="tsd-signature-type">JsonPointer</a>, val<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span>, force<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span></li>
+						<li class="tsd-signature tsd-kind-icon">set<span class="tsd-signature-symbol">(</span>target<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span>, pointer<span class="tsd-signature-symbol">: </span><a href="../modules/_src_types_.html#pointer" class="tsd-signature-type">Pointer</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_src_types_.html#pathsegments" class="tsd-signature-type">PathSegments</a><span class="tsd-signature-symbol"> | </span><a href="_src_pointer_.jsonpointer.html" class="tsd-signature-type">JsonPointer</a>, val<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span>, force<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/93dc79c/src/pointer.ts#L163">src/pointer.ts:163</a></li>
+									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/54cfffa/src/pointer.ts#L326">src/pointer.ts:326</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Set the value at the specified pointer&#39;s location in the object graph.</p>
+									<p>Sets the <code>target</code> object&#39;s value, as specified, at the <code>pointer</code>&#39;s location.</p>
 								</div>
+								<pre><code class="language-ts"><span class="hljs-keyword">const</span> target = {
+  first: <span class="hljs-string">&#x27;second&#x27;</span>,
+  third: [<span class="hljs-string">&#x27;fourth&#x27;</span>, <span class="hljs-string">&#x27;fifth&#x27;</span>, { sixth: <span class="hljs-string">&#x27;seventh&#x27;</span> }],
+  eighth: <span class="hljs-string">&#x27;ninth&#x27;</span>
+};
+
+<span class="hljs-built_in">console</span>.log(JsonPointer.set(target, <span class="hljs-string">&#x27;/third/2/sixth&#x27;</span>, <span class="hljs-string">&#x27;tenth&#x27;</span>));
+<span class="hljs-comment">// seventh</span>
+<span class="hljs-built_in">console</span>.log(JsonPointer.set(target, <span class="hljs-string">&#x27;/tenth&#x27;</span>, <span class="hljs-string">&#x27;eleventh&#x27;</span>, <span class="hljs-literal">true</span>));
+<span class="hljs-comment">// undefined</span>
+<span class="hljs-built_in">console</span>.log(<span class="hljs-built_in">JSON</span>.stringify(target, <span class="hljs-literal">null</span>, <span class="hljs-string">&#x27; &#x27;</span>));
+<span class="hljs-comment">// {</span>
+<span class="hljs-comment">// &quot;first&quot;: &quot;second&quot;,</span>
+<span class="hljs-comment">// &quot;third&quot;: [</span>
+<span class="hljs-comment">//  &quot;fourth&quot;,</span>
+<span class="hljs-comment">//  &quot;fifth&quot;,</span>
+<span class="hljs-comment">//  {</span>
+<span class="hljs-comment">//   &quot;sixth&quot;: &quot;tenth&quot;</span>
+<span class="hljs-comment">//  }</span>
+<span class="hljs-comment">// ],</span>
+<span class="hljs-comment">// &quot;eighth&quot;: &quot;ninth&quot;,</span>
+<span class="hljs-comment">// &quot;tenth&quot;: &quot;eleventh&quot;</span>
+<span class="hljs-comment">// }</span></code></pre>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
@@ -729,7 +870,7 @@
 									</div>
 								</li>
 								<li>
-									<h5>ptr: <a href="../modules/_src_types_.html#pointer" class="tsd-signature-type">Pointer</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_src_types_.html#pathsegments" class="tsd-signature-type">PathSegments</a><span class="tsd-signature-symbol"> | </span><a href="_src_pointer_.jsonpointer.html" class="tsd-signature-type">JsonPointer</a></h5>
+									<h5>pointer: <a href="../modules/_src_types_.html#pointer" class="tsd-signature-type">Pointer</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_src_types_.html#pathsegments" class="tsd-signature-type">PathSegments</a><span class="tsd-signature-symbol"> | </span><a href="_src_pointer_.jsonpointer.html" class="tsd-signature-type">JsonPointer</a></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>the pointer or path</p>
 									</div>
@@ -737,7 +878,7 @@
 								<li>
 									<h5>val: <span class="tsd-signature-type">unknown</span></h5>
 									<div class="tsd-comment tsd-typography">
-										<p>a value to wite into the object graph at the specified pointer location</p>
+										<p>a value to write into the object graph at the specified pointer location</p>
 									</div>
 								</li>
 								<li>
@@ -756,19 +897,39 @@
 					<a name="unset-1" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagStatic">Static</span> unset</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static">
-						<li class="tsd-signature tsd-kind-icon">unset<span class="tsd-signature-symbol">(</span>target<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span>, ptr<span class="tsd-signature-symbol">: </span><a href="../modules/_src_types_.html#pointer" class="tsd-signature-type">Pointer</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_src_types_.html#pathsegments" class="tsd-signature-type">PathSegments</a><span class="tsd-signature-symbol"> | </span><a href="_src_pointer_.jsonpointer.html" class="tsd-signature-type">JsonPointer</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span></li>
+						<li class="tsd-signature tsd-kind-icon">unset<span class="tsd-signature-symbol">(</span>target<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span>, pointer<span class="tsd-signature-symbol">: </span><a href="../modules/_src_types_.html#pointer" class="tsd-signature-type">Pointer</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_src_types_.html#pathsegments" class="tsd-signature-type">PathSegments</a><span class="tsd-signature-symbol"> | </span><a href="_src_pointer_.jsonpointer.html" class="tsd-signature-type">JsonPointer</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/93dc79c/src/pointer.ts#L177">src/pointer.ts:177</a></li>
+									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/54cfffa/src/pointer.ts#L363">src/pointer.ts:363</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Removes the value at the specified pointer&#39;s location in the object graph.</p>
+									<p>Removes the <code>target</code> object&#39;s value at the <code>pointer</code>&#39;s location.</p>
 								</div>
+								<pre><code class="language-ts"><span class="hljs-keyword">const</span> target = {
+  first: <span class="hljs-string">&#x27;second&#x27;</span>,
+  third: [<span class="hljs-string">&#x27;fourth&#x27;</span>, <span class="hljs-string">&#x27;fifth&#x27;</span>, { sixth: <span class="hljs-string">&#x27;seventh&#x27;</span> }],
+  eighth: <span class="hljs-string">&#x27;ninth&#x27;</span>
+};
+
+<span class="hljs-built_in">console</span>.log(JsonPointer.unset(target, <span class="hljs-string">&#x27;/third/2/sixth&#x27;</span>));
+<span class="hljs-comment">// seventh</span>
+<span class="hljs-built_in">console</span>.log(JsonPointer.unset(target, <span class="hljs-string">&#x27;/tenth&#x27;</span>));
+<span class="hljs-comment">// undefined</span>
+<span class="hljs-built_in">console</span>.log(<span class="hljs-built_in">JSON</span>.stringify(target, <span class="hljs-literal">null</span>, <span class="hljs-string">&#x27; &#x27;</span>));
+<span class="hljs-comment">// {</span>
+<span class="hljs-comment">// &quot;first&quot;: &quot;second&quot;,</span>
+<span class="hljs-comment">// &quot;third&quot;: [</span>
+<span class="hljs-comment">//  &quot;fourth&quot;,</span>
+<span class="hljs-comment">//  &quot;fifth&quot;,</span>
+<span class="hljs-comment">//  {}</span>
+<span class="hljs-comment">// ],</span>
+<span class="hljs-comment">// &quot;eighth&quot;: &quot;ninth&quot;,</span>
+<span class="hljs-comment">// }</span></code></pre>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
@@ -779,7 +940,7 @@
 									</div>
 								</li>
 								<li>
-									<h5>ptr: <a href="../modules/_src_types_.html#pointer" class="tsd-signature-type">Pointer</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_src_types_.html#pathsegments" class="tsd-signature-type">PathSegments</a><span class="tsd-signature-symbol"> | </span><a href="_src_pointer_.jsonpointer.html" class="tsd-signature-type">JsonPointer</a></h5>
+									<h5>pointer: <a href="../modules/_src_types_.html#pointer" class="tsd-signature-type">Pointer</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_src_types_.html#pathsegments" class="tsd-signature-type">PathSegments</a><span class="tsd-signature-symbol"> | </span><a href="_src_pointer_.jsonpointer.html" class="tsd-signature-type">JsonPointer</a></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>the pointer or path</p>
 									</div>
@@ -800,7 +961,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/93dc79c/src/pointer.ts#L198">src/pointer.ts:198</a></li>
+									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/54cfffa/src/pointer.ts#L384">src/pointer.ts:384</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">

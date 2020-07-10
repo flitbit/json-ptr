@@ -3,9 +3,10 @@
  * @packageDocumentation
  */
 
-
-import { JsonPointer } from '../src';
+import { JsonPointer } from '../dist';
 import * as bent from 'bent';
+
+const getJSON = bent('json');
 
 const url = 'https://data.ct.gov/api/views/rybz-nyjw/rows.json?accessType=DOWNLOAD';
 
@@ -20,33 +21,34 @@ interface Column {
 }
 const dataColumns: number[] = [];
 
-const getJSON = bent('json');
-getJSON(url)
-  .then((data: unknown) => {
-    console.log(`Report: ${datasetName.get(data)}`);
+async function run(): Promise<void> {
+  const data: unknown = await getJSON(url);
 
-    const columns = datasetColumns.get(data) as Column[];
-    // positions are offset by metadata.
-    let i = -1;
-    for (const c of columns) {
-      ++i;
-      const idx = ColumnsOfInterest.indexOf(c.name);
-      if (idx !== -1) {
-        dataColumns[idx] = i;
-      }
-    }
+  console.log(`Report: ${datasetName.get(data)}`);
 
-    const rows = datasetData.get(data) as Record<string, unknown>[];
-    for (const row of rows) {
-      console.log(
-        `${row[dataColumns[0]]} "${row[dataColumns[3]]}" ${row[dataColumns[2]]} ${row[dataColumns[1]]}yo died in ${
-        row[dataColumns[4]]
-        } of ${row[dataColumns[6]]} ${
-        row[dataColumns[5]] && row[dataColumns[5]] !== 'null' ? '(' + row[dataColumns[5]] + ')' : ''
-        }`
-      );
+  const columns = datasetColumns.get(data) as Column[];
+  // positions are offset by metadata.
+  let i = -1;
+  for (const c of columns) {
+    ++i;
+    const idx = ColumnsOfInterest.indexOf(c.name);
+    if (idx !== -1) {
+      dataColumns[idx] = i;
     }
-  })
-  .catch((e: Error) => {
-    console.error(`Got error: ${e.stack || e}`);
-  });
+  }
+
+  const rows = datasetData.get(data) as Record<string, unknown>[];
+  for (const row of rows) {
+    console.log(
+      `${row[dataColumns[0]]} "${row[dataColumns[3]]}" ${row[dataColumns[2]]} ${row[dataColumns[1]]}yo died in ${
+      row[dataColumns[4]]
+      } of ${row[dataColumns[6]]} ${
+      row[dataColumns[5]] && row[dataColumns[5]] !== 'null' ? '(' + row[dataColumns[5]] + ')' : ''
+      }`
+    );
+  }
+}
+
+run().catch((e: Error) => {
+  console.error(`Got error: ${e.stack || e}`);
+});

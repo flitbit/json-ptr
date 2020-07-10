@@ -69,6 +69,15 @@
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>A reference to a location in an object graph.</p>
+					</div>
+					<p>This type is used by this module to break cycles in an object graph and to
+					reference locations that have already been visited when enumerating pointers.</p>
+				</div>
+			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
@@ -91,7 +100,6 @@
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_src_pointer_.jsonreference.html#_ref" class="tsd-kind-icon">$ref</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_src_pointer_.jsonreference.html#__pointer_" class="tsd-kind-icon">[$pointer]</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
@@ -112,19 +120,29 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Json<wbr>Reference<span class="tsd-signature-symbol">(</span>ptr<span class="tsd-signature-symbol">: </span><a href="_src_pointer_.jsonpointer.html" class="tsd-signature-type">JsonPointer</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_src_types_.html#pointer" class="tsd-signature-type">Pointer</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_src_types_.html#pathsegments" class="tsd-signature-type">PathSegments</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_src_pointer_.jsonreference.html" class="tsd-signature-type">JsonReference</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Json<wbr>Reference<span class="tsd-signature-symbol">(</span>pointer<span class="tsd-signature-symbol">: </span><a href="_src_pointer_.jsonpointer.html" class="tsd-signature-type">JsonPointer</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_src_types_.html#pointer" class="tsd-signature-type">Pointer</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_src_types_.html#pathsegments" class="tsd-signature-type">PathSegments</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_src_pointer_.jsonreference.html" class="tsd-signature-type">JsonReference</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/93dc79c/src/pointer.ts#L366">src/pointer.ts:366</a></li>
+									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/54cfffa/src/pointer.ts#L568">src/pointer.ts:568</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Creates a new instance.</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>ptr: <a href="_src_pointer_.jsonpointer.html" class="tsd-signature-type">JsonPointer</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_src_types_.html#pointer" class="tsd-signature-type">Pointer</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_src_types_.html#pathsegments" class="tsd-signature-type">PathSegments</a></h5>
+									<h5>pointer: <a href="_src_pointer_.jsonpointer.html" class="tsd-signature-type">JsonPointer</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_src_types_.html#pointer" class="tsd-signature-type">Pointer</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_src_types_.html#pathsegments" class="tsd-signature-type">PathSegments</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+											<p>a JSON Pointer for the reference.</p>
+										</div>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="_src_pointer_.jsonreference.html" class="tsd-signature-type">JsonReference</a></h4>
@@ -140,19 +158,14 @@
 					<div class="tsd-signature tsd-kind-icon">$ref<span class="tsd-signature-symbol">:</span> <a href="../modules/_src_types_.html#urifragmentidentifierpointer" class="tsd-signature-type">UriFragmentIdentifierPointer</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/93dc79c/src/pointer.ts#L366">src/pointer.ts:366</a></li>
+							<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/54cfffa/src/pointer.ts#L568">src/pointer.ts:568</a></li>
 						</ul>
 					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
-					<a name="__pointer_" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> <span class="tsd-flag ts-flagReadonly">Readonly</span> [$pointer]</h3>
-					<div class="tsd-signature tsd-kind-icon">[$pointer]<span class="tsd-signature-symbol">:</span> <a href="_src_pointer_.jsonpointer.html" class="tsd-signature-type">JsonPointer</a></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/93dc79c/src/pointer.ts#L365">src/pointer.ts:365</a></li>
-						</ul>
-					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>A reference to a position if an object graph.</p>
+						</div>
+					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
@@ -167,9 +180,14 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/93dc79c/src/pointer.ts#L377">src/pointer.ts:377</a></li>
+									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/54cfffa/src/pointer.ts#L591">src/pointer.ts:591</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Gets the reference&#39;s pointer.</p>
+								</div>
+							</div>
 							<h4 class="tsd-returns-title">Returns <a href="_src_pointer_.jsonpointer.html" class="tsd-signature-type">JsonPointer</a></h4>
 						</li>
 					</ul>
@@ -184,13 +202,22 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/93dc79c/src/pointer.ts#L373">src/pointer.ts:373</a></li>
+									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/54cfffa/src/pointer.ts#L584">src/pointer.ts:584</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Resolves the reference against the <code>target</code> object, returning the value at
+									the referenced pointer&#39;s location.</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>target: <span class="tsd-signature-type">unknown</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>the target object</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">unknown</span></h4>
@@ -207,9 +234,14 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/93dc79c/src/pointer.ts#L379">src/pointer.ts:379</a></li>
+									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/54cfffa/src/pointer.ts#L596">src/pointer.ts:596</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Gets the reference pointer&#39;s string representation (a URI fragment identifier).</p>
+								</div>
+							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
 						</li>
 					</ul>
@@ -224,13 +256,21 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/93dc79c/src/pointer.ts#L359">src/pointer.ts:359</a></li>
+									<li>Defined in <a href="https://github.com/flitbit/json-ptr/blob/54cfffa/src/pointer.ts#L556">src/pointer.ts:556</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Determines if the specified <code>candidate</code> is a JsonReference.</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>candidate: <span class="tsd-signature-type">unknown</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>the candidate</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">candidate</span><span class="tsd-signature-symbol"> is </span><span class="tsd-signature-type">JsonReference</span></h4>
@@ -272,9 +312,6 @@
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="_src_pointer_.jsonreference.html#_ref" class="tsd-kind-icon">$ref</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
-								<a href="_src_pointer_.jsonreference.html#__pointer_" class="tsd-kind-icon">[$pointer]</a>
-							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_src_pointer_.jsonreference.html#pointer" class="tsd-kind-icon">pointer</a>
 							</li>
@@ -315,9 +352,6 @@
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>

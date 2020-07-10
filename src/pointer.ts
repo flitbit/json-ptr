@@ -104,11 +104,111 @@ const $frg = Symbol('fragmentId');
 const $get = Symbol('getter');
 
 /**
- * Represents a JSON Pointer, capable of getting and setting values on object graphs at the pointer's dereferenced location.
+ * Represents a JSON Pointer, capable of getting and setting the value on target
+ * objects at the pointer's location.
  *
- * While there are static variants for most operations, our recommendation is to use the instance level methods, which enables you avoid repeated compiling/emitting transient accessors. Take a look at the speed comparisons for our justification.
+ * While there are static variants for most operations, our recommendation is
+ * to use the instance level methods, which enables you avoid repeated
+ * compiling/emitting transient accessors. Take a look at the speed comparisons
+ * for our justification.
  *
- * In most cases, create and reuse instances of JsonPointer within a scope that makes sense for your app. We often use a cache of frequently used pointers, but your use case may support constants, static members, or other long-lived scenarios.
+ * In most cases, you should create and reuse instances of JsonPointer within
+ * scope that makes sense for your app. We often create constants for frequently
+ * used pointers, but your use case may vary.
+ *
+ * The following is a contrived example showing a function that uses pointers to
+ * deal with changes in the structure of data (a version independent function):
+ *
+ * ```ts
+ * import { JsonPointer } from 'json-ptr';
+ *
+ * export type SupportedVersion = '1.0' | '1.1';
+ *
+ * interface PrimaryGuestNamePointers {
+ *   name: JsonPointer;
+ *   surname: JsonPointer;
+ *   honorific: JsonPointer;
+ * }
+ * const versions: Record<SupportedVersion, PrimaryGuestNamePointers> = {
+ *   '1.0': {
+ *     name: JsonPointer.create('/guests/0/name'),
+ *     surname: JsonPointer.create('/guests/0/surname'),
+ *     honorific: JsonPointer.create('/guests/0/honorific'),
+ *   },
+ *   '1.1': {
+ *     name: JsonPointer.create('/primary/primaryGuest/name'),
+ *     surname: JsonPointer.create('/primary/primaryGuest/surname'),
+ *     honorific: JsonPointer.create('/primary/primaryGuest/honorific'),
+ *   }
+ * };
+ *
+ * interface Reservation extends Record<string, unknown> {
+ *   version?: SupportedVersion;
+ * }
+ *
+ * function primaryGuestName(reservation: Reservation): string {
+ *   const pointers = versions[reservation.version || '1.0'];
+ *   const name = pointers.name.get(reservation) as string;
+ *   const surname = pointers.surname.get(reservation) as string;
+ *   const honorific = pointers.honorific.get(reservation) as string;
+ *   const names: string[] = [];
+ *   if (honorific) names.push(honorific);
+ *   if (name) names.push(name);
+ *   if (surname) names.push(surname);
+ *   return names.join(' ');
+ * }
+ *
+ * // The original layout of a reservation (only the parts relevant to our example)
+ * const reservationV1: Reservation = {
+ *   guests: [{
+ *     name: 'Wilbur',
+ *     surname: 'Finkle',
+ *     honorific: 'Mr.'
+ *   }, {
+ *     name: 'Wanda',
+ *     surname: 'Finkle',
+ *     honorific: 'Mrs.'
+ *   }, {
+ *     name: 'Wilma',
+ *     surname: 'Finkle',
+ *     honorific: 'Miss',
+ *     child: true,
+ *     age: 12
+ *   }]
+ *   // ...
+ * };
+ *
+ * // The new layout of a reservation (only the parts relevant to our example)
+ * const reservationV1_1: Reservation = {
+ *   version: '1.1',
+ *   primary: {
+ *     primaryGuest: {
+ *       name: 'Wilbur',
+ *       surname: 'Finkle',
+ *       honorific: 'Mr.'
+ *     },
+ *     additionalGuests: [{
+ *       name: 'Wanda',
+ *       surname: 'Finkle',
+ *       honorific: 'Mrs.'
+ *     }, {
+ *       name: 'Wilma',
+ *       surname: 'Finkle',
+ *       honorific: 'Miss',
+ *       child: true,
+ *       age: 12
+ *     }]
+ *     // ...
+ *   }
+ *   // ...
+ * };
+ *
+ * console.log(primaryGuestName(reservationV1));
+ * console.log(primaryGuestName(reservationV1_1));
+ *
+ * ```
+ *
+ * There are many uses for pointers.
  */
 export class JsonPointer {
 
@@ -120,73 +220,159 @@ export class JsonPointer {
   private [$get]: Dereference;
 
   /**
-   * Creates a JsonPointer instance.
-   * @param ptr the pointer or path.
+   * Factory function that creates a JsonPointer instance.
+   *
+   * ```ts
+   * const ptr = JsonPointer.create('/deeply/nested/data/0/here');
+   * ```
+   * _or_
+   * ```ts
+   * const ptr = JsonPointer.create(['deeply', 'nested', 'data', 0, 'here']);
+   * ```
+   * @param pointer the pointer or path.
    */
-  static create(ptr: Pointer | PathSegments): JsonPointer {
-    return new JsonPointer(ptr);
+  static create(pointer: Pointer | PathSegments): JsonPointer {
+    return new JsonPointer(pointer);
   }
 
   /**
-   * Determines if the `target` object has a value at the pointer's location in the object graph.
+   * Determines if the specified `target`'s object graph has a value at the `pointer`'s location.
+   *
+   * ```ts
+   * const target = {
+   *   first: 'second',
+   *   third: ['fourth', 'fifth', { sixth: 'seventh' }],
+   *   eighth: 'ninth'
+   * };
+   *
+   * console.log(JsonPointer.has(target, '/third/0'));
+   * // true
+   * console.log(JsonPointer.has(target, '/tenth'));
+   * // false
+   * ```
+   *
    * @param target the target of the operation
-   * @param ptr the pointer or path
+   * @param pointer the pointer or path
    */
-  static has(target: unknown, ptr: Pointer | PathSegments | JsonPointer): boolean {
-    if (typeof ptr === 'string' || Array.isArray(ptr)) {
-      ptr = new JsonPointer(ptr);
+  static has(target: unknown, pointer: Pointer | PathSegments | JsonPointer): boolean {
+    if (typeof pointer === 'string' || Array.isArray(pointer)) {
+      pointer = new JsonPointer(pointer);
     }
-    return (ptr as JsonPointer).has(target);
+    return (pointer as JsonPointer).has(target);
   }
 
   /**
-   * Gets the value at the specified pointer's location in the object graph. If there is no value, then the result is `undefined`.
+   * Gets the `target` object's value at the `pointer`'s location.
+   *
+   * ```ts
+   * const target = {
+   *   first: 'second',
+   *   third: ['fourth', 'fifth', { sixth: 'seventh' }],
+   *   eighth: 'ninth'
+   * };
+   *
+   * console.log(JsonPointer.get(target, '/third/2/sixth'));
+   * // seventh
+   * console.log(JsonPointer.get(target, '/tenth'));
+   * // undefined
+   * ```
+   *
    * @param target the target of the operation
-   * @param ptr the pointer or path.
+   * @param pointer the pointer or path.
    */
-  static get(target: unknown, ptr: Pointer | PathSegments | JsonPointer): unknown {
-    if (typeof ptr === 'string' || Array.isArray(ptr)) {
-      ptr = new JsonPointer(ptr);
+  static get(target: unknown, pointer: Pointer | PathSegments | JsonPointer): unknown {
+    if (typeof pointer === 'string' || Array.isArray(pointer)) {
+      pointer = new JsonPointer(pointer);
     }
-    return (ptr as JsonPointer).get(target);
+    return (pointer as JsonPointer).get(target);
   }
 
   /**
-   * Set the value at the specified pointer's location in the object graph.
+   * Sets the `target` object's value, as specified, at the `pointer`'s location.
+   *
+   * ```ts
+   * const target = {
+   *   first: 'second',
+   *   third: ['fourth', 'fifth', { sixth: 'seventh' }],
+   *   eighth: 'ninth'
+   * };
+   *
+   * console.log(JsonPointer.set(target, '/third/2/sixth', 'tenth'));
+   * // seventh
+   * console.log(JsonPointer.set(target, '/tenth', 'eleventh', true));
+   * // undefined
+   * console.log(JSON.stringify(target, null, ' '));
+   * // {
+   * // "first": "second",
+   * // "third": [
+   * //  "fourth",
+   * //  "fifth",
+   * //  {
+   * //   "sixth": "tenth"
+   * //  }
+   * // ],
+   * // "eighth": "ninth",
+   * // "tenth": "eleventh"
+   * // }
+   * ```
+   *
    * @param target the target of the operation
-   * @param ptr the pointer or path
-   * @param val a value to wite into the object graph at the specified pointer location
+   * @param pointer the pointer or path
+   * @param val a value to write into the object graph at the specified pointer location
    * @param force indications whether the operation should force the pointer's location into existence in the object graph.
    *
    * @returns the prior value at the pointer's location in the object graph.
    */
-  static set(target: unknown, ptr: Pointer | PathSegments | JsonPointer, val: unknown, force = false): unknown {
-    if (typeof ptr === 'string' || Array.isArray(ptr)) {
-      ptr = new JsonPointer(ptr);
+  static set(target: unknown, pointer: Pointer | PathSegments | JsonPointer, val: unknown, force = false): unknown {
+    if (typeof pointer === 'string' || Array.isArray(pointer)) {
+      pointer = new JsonPointer(pointer);
     }
-    return (ptr as JsonPointer).set(target, val, force);
+    return (pointer as JsonPointer).set(target, val, force);
   }
 
   /**
-   * Removes the value at the specified pointer's location in the object graph.
+   * Removes the `target` object's value at the `pointer`'s location.
+   *
+   * ```ts
+   * const target = {
+   *   first: 'second',
+   *   third: ['fourth', 'fifth', { sixth: 'seventh' }],
+   *   eighth: 'ninth'
+   * };
+   *
+   * console.log(JsonPointer.unset(target, '/third/2/sixth'));
+   * // seventh
+   * console.log(JsonPointer.unset(target, '/tenth'));
+   * // undefined
+   * console.log(JSON.stringify(target, null, ' '));
+   * // {
+   * // "first": "second",
+   * // "third": [
+   * //  "fourth",
+   * //  "fifth",
+   * //  {}
+   * // ],
+   * // "eighth": "ninth",
+   * // }
+   * ```
    * @param target the target of the operation
-   * @param ptr the pointer or path
+   * @param pointer the pointer or path
    *
    * @returns the value that was removed from the object graph.
    */
-  static unset(target: unknown, ptr: Pointer | PathSegments | JsonPointer): unknown {
-    if (typeof ptr === 'string' || Array.isArray(ptr)) {
-      ptr = new JsonPointer(ptr);
+  static unset(target: unknown, pointer: Pointer | PathSegments | JsonPointer): unknown {
+    if (typeof pointer === 'string' || Array.isArray(pointer)) {
+      pointer = new JsonPointer(pointer);
     }
-    return (ptr as JsonPointer).unset(target);
+    return (pointer as JsonPointer).unset(target);
   }
 
   /**
    * Decodes the specified pointer into path segments.
-   * @param ptr a string representation of a JSON Pointer
+   * @param pointer a string representation of a JSON Pointer
    */
-  static decode(ptr: Pointer): PathSegments {
-    return pickDecoder(ptr)(ptr);
+  static decode(pointer: Pointer): PathSegments {
+    return pickDecoder(pointer)(pointer);
   }
 
   /**
@@ -355,27 +541,58 @@ export class JsonPointer {
 /** @hidden */
 const $pointer = Symbol('pointer');
 
+/**
+ * A reference to a location in an object graph.
+ *
+ * This type is used by this module to break cycles in an object graph and to
+ * reference locations that have already been visited when enumerating pointers.
+ */
 export class JsonReference {
+
+  /**
+   * Determines if the specified `candidate` is a JsonReference.
+   * @param candidate the candidate
+   */
   static isReference(candidate: unknown): candidate is JsonReference {
     if (!candidate) return false;
     const ref = (candidate as unknown) as JsonReference;
     return typeof ref.$ref === 'string' && typeof ref.resolve === 'function';
   }
 
+  /** @hidden */
   private readonly [$pointer]: JsonPointer;
+
+  /**
+   * A reference to a position if an object graph.
+   */
   public readonly $ref: UriFragmentIdentifierPointer;
 
-  constructor(ptr: JsonPointer | Pointer | PathSegments) {
-    this[$pointer] = ptr instanceof JsonPointer ? ptr : new JsonPointer(ptr);
+  /**
+   * Creates a new instance.
+   * @param pointer a JSON Pointer for the reference.
+   */
+  constructor(pointer: JsonPointer | Pointer | PathSegments) {
+    this[$pointer] = pointer instanceof JsonPointer ? pointer : new JsonPointer(pointer);
     this.$ref = this[$pointer].uriFragmentIdentifier;
   }
 
+  /**
+   * Resolves the reference against the `target` object, returning the value at
+   * the referenced pointer's location.
+   * @param target the target object
+   */
   resolve(target: unknown): unknown {
     return this[$pointer].get(target);
   }
 
+  /**
+   * Gets the reference's pointer.
+   */
   pointer(): JsonPointer { return this[$pointer]; }
 
+  /**
+   * Gets the reference pointer's string representation (a URI fragment identifier).
+   */
   toString(): string {
     return this.$ref;
   }
