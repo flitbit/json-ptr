@@ -6,6 +6,7 @@ import {
   encodePointer,
   encodeUriFragmentIdentifier,
   pickDecoder,
+  unsetValueAtPath,
 } from './util';
 import {
   JsonStringPointer,
@@ -17,9 +18,7 @@ import {
   UriFragmentIdentifierPointerListItem,
 } from './types';
 
-type UnknownObject = { [K in PropertyKey]: unknown };
-
-function isObject(value: unknown): value is UnknownObject {
+function isObject(value: unknown): boolean {
   return typeof value === 'object' && value !== null;
 }
 
@@ -33,64 +32,53 @@ interface Item {
   path: PathSegments;
 }
 
-function descendingVisit(target: unknown, visitor: Visitor, encoder: Encoder, cycle = false): void {
+function shouldDescend(obj: unknown): boolean {
+  return isObject(obj) && !JsonReference.isReference(obj);
+}
+
+function descendingVisit(target: unknown, visitor: Visitor, encoder: Encoder): void {
   const distinctObjects = new Map<unknown, JsonPointer>();
-  const q: Item[] = [];
-  let cursor2 = 0;
-  q.push({
-    obj: target,
-    path: [],
-  });
-  visitor(encoder([]), target);
-  while (cursor2 < q.length) {
-    const cursor = q[cursor2++];
-    if (isObject(cursor.obj)) {
-      if (Array.isArray(cursor.obj)) {
-        let j = -1;
-        const len2 = cursor.obj.length;
-        while (++j < len2) {
-          const it = cursor.obj[j];
-          const path = cursor.path.concat([j + '']);
-          if (isObject(it)) {
-            if (cycle && distinctObjects.has(it)) {
-              // eslint-disable-next-line @typescript-eslint/no-use-before-define,@typescript-eslint/no-non-null-assertion
-              visitor(encoder(path), new JsonReference(distinctObjects.get(it)!));
-              continue;
-            }
+  const q: Item[] = [{ obj: target, path: [] }];
+  while (q.length) {
+    const { obj, path } = q.shift();
+    visitor(encoder(path), obj);
+    if (shouldDescend(obj)) {
+      distinctObjects.set(obj, new JsonPointer(encodeUriFragmentIdentifier(path)));
+      if (!Array.isArray(obj)) {
+        const keys = Object.keys(obj);
+        const len = keys.length;
+        let i = -1;
+        while (++i < len) {
+          const it = (obj as Record<string, unknown>)[keys[i]];
+          if (isObject(it) && distinctObjects.has(it)) {
+            q.push({
+              obj: new JsonReference(distinctObjects.get(it)),
+              path: path.concat(keys[i])
+            });
+          } else {
             q.push({
               obj: it,
-              path: path,
+              path: path.concat(keys[i])
             });
-            if (cycle) {
-              // eslint-disable-next-line @typescript-eslint/no-use-before-define
-              distinctObjects.set(it, new JsonPointer(encodeUriFragmentIdentifier(path)));
-            }
           }
-          visitor(encoder(path), it);
         }
       } else {
-        const keys = Object.keys(cursor.obj);
-        const len3 = keys.length;
-        let i = -1;
-        while (++i < len3) {
-          const it = cursor.obj[keys[i]];
-          const path = cursor.path.concat(keys[i]);
-          if (isObject(it)) {
-            if (cycle && distinctObjects.has(it)) {
-              // eslint-disable-next-line @typescript-eslint/no-use-before-define,@typescript-eslint/no-non-null-assertion
-              visitor(encoder(path), new JsonReference(distinctObjects.get(it)!));
-              continue;
-            }
+        // handleArray
+        let j = -1;
+        const len = obj.length;
+        while (++j < len) {
+          const it = obj[j];
+          if (isObject(it) && distinctObjects.has(it)) {
+            q.push({
+              obj: new JsonReference(distinctObjects.get(it)),
+              path: path.concat([j + ''])
+            });
+          } else {
             q.push({
               obj: it,
-              path: path,
+              path: path.concat([j + ''])
             });
-            if (cycle) {
-              // eslint-disable-next-line @typescript-eslint/no-use-before-define
-              distinctObjects.set(it, new JsonPointer(encodeUriFragmentIdentifier(path)));
-            }
           }
-          visitor(encoder(path), it);
         }
       }
     }
@@ -115,7 +103,7 @@ export class JsonPointer {
 
   /**
    * Creates a JsonPointer instance.
-   * @param ptr the string representation of a pointer, or it's decoded path.
+   * @param ptr the pointer or path.
    */
   static create(ptr: Pointer | PathSegments): JsonPointer {
     return new JsonPointer(ptr);
@@ -124,7 +112,7 @@ export class JsonPointer {
   /**
    * Determines if the `target` object has a value at the pointer's location in the object graph.
    * @param target the target of the operation
-   * @param ptr the string representation of a pointer, it's decoded path, or an instance of JsonPointer indicating the where in the object graph to make the determination.
+   * @param ptr the pointer or path
    */
   static has(target: unknown, ptr: Pointer | PathSegments | JsonPointer): boolean {
     if (typeof ptr === 'string' || Array.isArray(ptr)) {
@@ -136,7 +124,7 @@ export class JsonPointer {
   /**
    * Gets the value at the specified pointer's location in the object graph. If there is no value, then the result is `undefined`.
    * @param target the target of the operation
-   * @param ptr the string representation of a pointer, it's decoded path, or an instance of JsonPointer indicating the where in the object graph to get the value.
+   * @param ptr the pointer or path.
    */
   static get(target: unknown, ptr: Pointer | PathSegments | JsonPointer): unknown {
     if (typeof ptr === 'string' || Array.isArray(ptr)) {
@@ -148,15 +136,31 @@ export class JsonPointer {
   /**
    * Set the value at the specified pointer's location in the object graph.
    * @param target the target of the operation
-   * @param ptr the string representation
+   * @param ptr the pointer or path
    * @param val a value to wite into the object graph at the specified pointer location
    * @param force indications whether the operation should force the pointer's location into existence in the object graph.
+   *
+   * @returns the prior value at the pointer's location in the object graph.
    */
   static set(target: unknown, ptr: Pointer | PathSegments | JsonPointer, val: unknown, force = false): unknown {
     if (typeof ptr === 'string' || Array.isArray(ptr)) {
       ptr = new JsonPointer(ptr);
     }
     return (ptr as JsonPointer).set(target, val, force);
+  }
+
+  /**
+   * Removes the value at the specified pointer's location in the object graph.
+   * @param target the target of the operation
+   * @param ptr the pointer or path
+   *
+   * @returns the value that was removed from the object graph.
+   */
+  static unset(target: unknown, ptr: Pointer | PathSegments | JsonPointer): unknown {
+    if (typeof ptr === 'string' || Array.isArray(ptr)) {
+      ptr = new JsonPointer(ptr);
+    }
+    return (ptr as JsonPointer).unset(target);
   }
 
   /**
@@ -273,6 +277,16 @@ export class JsonPointer {
     return setValueAtPath(target, value, this.path, force);
   }
 
+  /***
+   * Removes the value from the target's object graph.
+   * @param target the target of the operation
+   *
+   * @returns the value that was removed from the object graph.
+   */
+  unset(target: unknown): unknown {
+    return unsetValueAtPath(target, this.path);
+  }
+
   /**
    * Determines if the specified target's object graph has a value at the pointer's location.
    * @param target the target of the operation
@@ -293,7 +307,7 @@ export class JsonPointer {
    * This pointer's JSON Pointer encoded string representation.
    */
   get pointer(): JsonStringPointer {
-    if (!this[$ptr]) {
+    if (this[$ptr] === undefined) {
       this[$ptr] = encodePointer(this.path);
     }
     return this[$ptr];
@@ -317,6 +331,8 @@ export class JsonPointer {
   }
 }
 
+const $pointer = Symbol('pointer');
+
 export class JsonReference {
   static isReference(candidate: unknown): candidate is JsonReference {
     if (!candidate) return false;
@@ -324,17 +340,19 @@ export class JsonReference {
     return typeof ref.$ref === 'string' && typeof ref.resolve === 'function';
   }
 
-  public pointer: JsonPointer;
-  public $ref: UriFragmentIdentifierPointer;
+  private readonly [$pointer]: JsonPointer;
+  public readonly $ref: UriFragmentIdentifierPointer;
 
   constructor(ptr: JsonPointer | Pointer | PathSegments) {
-    this.pointer = ptr instanceof JsonPointer ? ptr : new JsonPointer(ptr);
-    this.$ref = this.pointer.uriFragmentIdentifier;
+    this[$pointer] = ptr instanceof JsonPointer ? ptr : new JsonPointer(ptr);
+    this.$ref = this[$pointer].uriFragmentIdentifier;
   }
 
   resolve(target: unknown): unknown {
-    return this.pointer.get(target);
+    return this[$pointer].get(target);
   }
+
+  pointer(): JsonPointer { return this[$pointer]; }
 
   toString(): string {
     return this.$ref;

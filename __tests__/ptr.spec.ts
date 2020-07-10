@@ -39,6 +39,12 @@ describe('JsonPointer', function () {
         }).to.throw();
       });
 
+      it('#unset should throw', function () {
+        expect(function () {
+          p.unset(data);
+        }).to.throw('Cannot unset the root object; assign it directly.');
+      });
+
       it('should have an empty path', function () {
         expect(p.path).to.have.length(0);
       });

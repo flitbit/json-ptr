@@ -160,6 +160,44 @@ console.log(JSON.stringify(data, null, '  '));
 }
 ```
 
+#### .unset(target, pointer)
+
+Unsets the `value` at the specified `pointer` on the `target` and returns the value. The default behavior is to do nothing if `pointer` is nonexistent.
+
+_arguments:_
+
+* `target` : _object, required_ &ndash; the target object
+* `pointer` : _string, required_ &ndash; a JSON pointer in [JSON string representation](https://tools.ietf.org/html/rfc6901#section-5) or [URI fragment identifier representation](https://tools.ietf.org/html/rfc6901#section-6)
+
+_returns:_
+
+* The dereferenced value or _undefined_ if nonexistent
+
+_example:_
+
+```javascript
+var prior = ptr.unset(data, '#/legumes/1/instock');
+```
+
+example force:
+
+```javascript
+var data = {};
+
+ptr.unset(data, '#/peter/piper');
+ptr.unset(data, '#/peter/pan');
+
+console.log(JSON.stringify(data, null, '  '));
+```
+
+```json
+{
+  "peter": {
+    "pickle": "dunno"
+  }
+}
+```
+
 #### .list(target, fragmentId)
 
 Lists all of the pointers available on the specified `target`.
