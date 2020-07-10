@@ -1,3 +1,9 @@
+/**
+ * @hidden
+ * @packageDocumentation
+ */
+
+
 import { JsonPointer } from '../src';
 import * as bent from 'bent';
 

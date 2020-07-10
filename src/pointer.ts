@@ -18,24 +18,35 @@ import {
   UriFragmentIdentifierPointerListItem,
 } from './types';
 
+/**
+ * Determines if the value is an object (not null)
+ * @param value the value
+ * @returns true if the value is a non-null object; otherwise false.
+ *
+ * @hidden
+ */
 function isObject(value: unknown): boolean {
   return typeof value === 'object' && value !== null;
 }
 
 /**
  * Signature of visitor functions, used with [[JsonPointer.visit]] method. Visitors are callbacks invoked for every segment/branch of a target's object graph.
+ *
+ * Tree descent occurs in-order, breadth first.
  */
 export type Visitor = (ptr: JsonStringPointer, val: unknown) => void;
 
+/** @hidden */
 interface Item {
   obj: unknown;
   path: PathSegments;
 }
 
+/** @hidden */
 function shouldDescend(obj: unknown): boolean {
   return isObject(obj) && !JsonReference.isReference(obj);
 }
-
+/** @hidden */
 function descendingVisit(target: unknown, visitor: Visitor, encoder: Encoder): void {
   const distinctObjects = new Map<unknown, JsonPointer>();
   const q: Item[] = [{ obj: target, path: [] }];
@@ -85,8 +96,11 @@ function descendingVisit(target: unknown, visitor: Visitor, encoder: Encoder): v
   }
 }
 
+/** @hidden */
 const $ptr = Symbol('pointer');
+/** @hidden */
 const $frg = Symbol('fragmentId');
+/** @hidden */
 const $get = Symbol('getter');
 
 /**
@@ -97,8 +111,12 @@ const $get = Symbol('getter');
  * In most cases, create and reuse instances of JsonPointer within a scope that makes sense for your app. We often use a cache of frequently used pointers, but your use case may support constants, static members, or other long-lived scenarios.
  */
 export class JsonPointer {
+
+  /** @hidden */
   private [$ptr]: JsonStringPointer;
+  /** @hidden */
   private [$frg]: UriFragmentIdentifierPointer;
+  /** @hidden */
   private [$get]: Dereference;
 
   /**
@@ -242,7 +260,7 @@ export class JsonPointer {
   }
 
   /**
-   * The pointer's decoded path through the object graph.
+   * The pointer's decoded path segments.
    */
   public readonly path: PathSegments;
 
@@ -255,7 +273,7 @@ export class JsonPointer {
   }
 
   /**
-   * Gets the value the specified target's object graph at this pointer's location.
+   * Gets the target object's value at the pointer's location.
    * @param target the target of the operation
    */
   get(target: unknown): unknown {
@@ -266,9 +284,12 @@ export class JsonPointer {
   }
 
   /**
-   * Set's the specified value in the specified target's object graph at this pointer's location.
+   * Sets the target object's value, as specified, at the pointer's location.
    *
-   * If any part of the pointer's path does not exist, the operation returns unless the caller indicates that pointer's location should be created.
+   * If any part of the pointer's path does not exist, the operation aborts
+   * without modification, unless the caller indicates that pointer's location
+   * should be created.
+   *
    * @param target the target of the operation
    * @param value the value to set
    * @param force indicates whether the pointer's location should be created if it doesn't already exist.
@@ -277,8 +298,8 @@ export class JsonPointer {
     return setValueAtPath(target, value, this.path, force);
   }
 
-  /***
-   * Removes the value from the target's object graph.
+  /**
+   * Removes the target object's value at the pointer's location.
    * @param target the target of the operation
    *
    * @returns the value that was removed from the object graph.
@@ -296,8 +317,8 @@ export class JsonPointer {
   }
 
   /**
-   * Creates a new instance by concatenating the specified pointer's path with this pointer's path.
-   * @param ptr the string representation of a pointer, it's decoded path, or an instance of JsonPointer indicating the additional path to concatenate onto the existing pointer.
+   * Creates a new instance by concatenating the specified pointer's path onto this pointer's path.
+   * @param ptr the string representation of a pointer, it's decoded path, or an instance of JsonPointer indicating the additional path to concatenate onto the pointer.
    */
   concat(ptr: JsonPointer | Pointer | PathSegments): JsonPointer {
     return new JsonPointer(this.path.concat(ptr instanceof JsonPointer ? ptr.path : decodePtrInit(ptr)));
@@ -324,13 +345,14 @@ export class JsonPointer {
   }
 
   /**
-   * Produces this pointer's JSON Pointer encoded string representation.
+   * Emits the JSON Pointer encoded string representation.
    */
   toString(): string {
     return this.pointer;
   }
 }
 
+/** @hidden */
 const $pointer = Symbol('pointer');
 
 export class JsonReference {

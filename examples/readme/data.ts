@@ -1,3 +1,9 @@
+/**
+ * @hidden
+ * @packageDocumentation
+ */
+
+
 export const data = {
   legumes: [
     {

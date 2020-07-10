@@ -1,0 +1,669 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>json-ptr</title>
+	<meta name="description" content="Documentation for json-ptr">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.json" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">json-ptr</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="globals.html">Globals</a>
+				</li>
+			</ul>
+			<h1>json-ptr</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<a href="#json-ptr" id="json-ptr" style="color: inherit; text-decoration: none;">
+					<h1>json-ptr</h1>
+				</a>
+				<p><a href="https://circleci.com/gh/flitbit/json-ptr/tree/master"><img src="https://circleci.com/gh/flitbit/json-ptr/tree/master.svg?style=svg" alt="CircleCI"></a></p>
+				<p>A complete implementation of JSON Pointer (<a href="https://tools.ietf.org/html/rfc6901">RFC 6901</a>) for nodejs and modern browsers.</p>
+				<a href="#background" id="background" style="color: inherit; text-decoration: none;">
+					<h2>Background</h2>
+				</a>
+				<p>I wrote this module a couple of years ago when I was unable to find what I considered a <em>complete implementation</em> of <a href="https://tools.ietf.org/html/rfc6901">RFC 6901</a>. It turns out that I now use the hell out of it.</p>
+				<p>Since there are a few npm modules for you to choose from, see <a href="#user-content-performance">the section on performance later in this <em>readme</em></a>; you can use your own judgement as to which package you should employ.</p>
+				<a href="#install" id="install" style="color: inherit; text-decoration: none;">
+					<h2>Install</h2>
+				</a>
+				<pre><code class="language-bash">npm install json-ptr</code></pre>
+				<a href="#use" id="use" style="color: inherit; text-decoration: none;">
+					<h2>Use</h2>
+				</a>
+				<a href="#nodejs" id="nodejs" style="color: inherit; text-decoration: none;">
+					<h3><a href="https://nodejs.org/en/">nodejs</a></h3>
+				</a>
+				<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { JsonPointer, create } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;json-ptr&#x27;</span>;</code></pre>
+				<a href="#module-api" id="module-api" style="color: inherit; text-decoration: none;">
+					<h3>Module API</h3>
+				</a>
+				<a href="#classes" id="classes" style="color: inherit; text-decoration: none;">
+					<h4>Classes</h4>
+				</a>
+				<ul>
+					<li><a href="#user-content-jsonpointer-class"><code>JsonPointer</code></a> : <em>class</em> – a convenience class for working with JSON pointers.</li>
+					<li><a href="#user-content-jsonreference-class"><code>JsonReference</code></a> : <em>class</em> – a convenience class for working with JSON references.</li>
+				</ul>
+				<a href="#functions" id="functions" style="color: inherit; text-decoration: none;">
+					<h4>Functions</h4>
+				</a>
+				<ul>
+					<li><a href="#user-content-createpointer"><code>.create(pointer)</code></a></li>
+					<li><a href="#user-content-hastargetpointer"><code>.has(target,pointer)</code></a></li>
+					<li><a href="#user-content-gettargetpointer"><code>.get(target,pointer)</code></a></li>
+					<li><a href="#user-content-settarget-pointer-value-force"><code>.set(target,pointer,value,force)</code></a></li>
+					<li><a href="#user-content-settarget-pointer-value-force"><code>.unset(target,pointer,value,force)</code></a></li>
+					<li><a href="#user-content-flattentarget-fragmentid"><code>.flatten(target,fragmentId)</code></a></li>
+					<li><a href="#user-content-listtarget-fragmentid"><code>.list(target,fragmentId)</code></a></li>
+					<li><a href="#user-content-maptarget-fragmentid"><code>.map(target,fragmentId)</code></a></li>
+				</ul>
+				<p>All example code assumes data has this structure:</p>
+				<pre><code class="language-javascript"><span class="hljs-keyword">const</span> data = {
+  <span class="hljs-attr">legumes</span>: [{
+    <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;pinto beans&#x27;</span>,
+    <span class="hljs-attr">unit</span>: <span class="hljs-string">&#x27;lbs&#x27;</span>,
+    <span class="hljs-attr">instock</span>: <span class="hljs-number">4</span>
+  }, {
+    <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;lima beans&#x27;</span>,
+    <span class="hljs-attr">unit</span>: <span class="hljs-string">&#x27;lbs&#x27;</span>,
+    <span class="hljs-attr">instock</span>: <span class="hljs-number">21</span>
+  }, {
+    <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;black eyed peas&#x27;</span>,
+    <span class="hljs-attr">unit</span>: <span class="hljs-string">&#x27;lbs&#x27;</span>,
+    <span class="hljs-attr">instock</span>: <span class="hljs-number">13</span>
+  }, {
+    <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;split peas&#x27;</span>,
+    <span class="hljs-attr">unit</span>: <span class="hljs-string">&#x27;lbs&#x27;</span>,
+    <span class="hljs-attr">instock</span>: <span class="hljs-number">8</span>
+  }]
+}</code></pre>
+				<a href="#createpointer-string--string-jsonpointer" id="createpointer-string--string-jsonpointer" style="color: inherit; text-decoration: none;">
+					<h4>.create(pointer: string | string[]): JsonPointer</h4>
+				</a>
+				<p>Creates an instance of the <code>JsonPointer</code> class.</p>
+				<p><em>arguments:</em></p>
+				<ul>
+					<li><code>pointer</code> : <em>string, required</em> – a JSON pointer in <a href="https://tools.ietf.org/html/rfc6901#section-5">JSON string representation</a> or <a href="https://tools.ietf.org/html/rfc6901#section-6">URI fragment identifier representation</a></li>
+				</ul>
+				<p><em>returns:</em></p>
+				<ul>
+					<li>a new <a href="#user-content-jsonpointer-class"><code>JsonPointer</code> instance</a></li>
+				</ul>
+				<p><em>example:</em></p>
+				<pre><code class="language-ts"><span class="hljs-keyword">const</span> pointer = JsonPointer.create(<span class="hljs-string">&#x27;/legumes/0&#x27;</span>);
+<span class="hljs-comment">// fragmentId: #/legumes/0</span></code></pre>
+				<a href="#hastarget-unknown-pointer-string--string--jsonpointer-boolean" id="hastarget-unknown-pointer-string--string--jsonpointer-boolean" style="color: inherit; text-decoration: none;">
+					<h4>.has(target: unknown, pointer: string | string[] | JsonPointer): boolean</h4>
+				</a>
+				<p>Determines whether the specified <code>target</code> has a value at the <code>pointer</code>&#39;s path.</p>
+				<p><em>arguments:</em></p>
+				<ul>
+					<li><code>target</code> : <em>object, required</em> – the target object</li>
+					<li><code>pointer</code> : <em>string, required</em> – a JSON pointer in <a href="https://tools.ietf.org/html/rfc6901#section-5">JSON string representation</a> or <a href="https://tools.ietf.org/html/rfc6901#section-6">URI fragment identifier representation</a></li>
+				</ul>
+				<p><em>returns:</em></p>
+				<ul>
+					<li>the dereferenced value or <em>undefined</em> if nonexistent</li>
+				</ul>
+				<a href="#gettargetpointer" id="gettargetpointer" style="color: inherit; text-decoration: none;">
+					<h4>.get(target,pointer)</h4>
+				</a>
+				<p>Gets a value from the specified <code>target</code> object at the <code>pointer</code>&#39;s path</p>
+				<p><em>arguments:</em></p>
+				<ul>
+					<li><code>target</code> : <em>object, required</em> – the target object</li>
+					<li><code>pointer</code> : <em>string, required</em> – a JSON pointer in <a href="https://tools.ietf.org/html/rfc6901#section-5">JSON string representation</a> or <a href="https://tools.ietf.org/html/rfc6901#section-6">URI fragment identifier representation</a></li>
+				</ul>
+				<p><em>returns:</em></p>
+				<ul>
+					<li>the dereferenced value or <em>undefined</em> if nonexistent</li>
+				</ul>
+				<p><em>example:</em></p>
+				<pre><code class="language-javascript"><span class="hljs-keyword">let</span> value = JsonPointer.get(data, <span class="hljs-string">&#x27;/legumes/1&#x27;</span>);
+<span class="hljs-comment">// fragmentId: #/legumes/1</span></code></pre>
+				<a href="#settarget-pointer-value-force" id="settarget-pointer-value-force" style="color: inherit; text-decoration: none;">
+					<h4>.set(target, pointer, value, force)</h4>
+				</a>
+				<p>Sets the <code>value</code> at the specified <code>pointer</code> on the <code>target</code>. The default behavior is to do nothing if <code>pointer</code> is nonexistent.</p>
+				<p><em>arguments:</em></p>
+				<ul>
+					<li><code>target</code> : <em>object, required</em> – the target object</li>
+					<li><code>pointer</code> : <em>string, required</em> – a JSON pointer in <a href="https://tools.ietf.org/html/rfc6901#section-5">JSON string representation</a> or <a href="https://tools.ietf.org/html/rfc6901#section-6">URI fragment identifier representation</a></li>
+					<li><code>value</code> : <em>any</em> – the value to be set at the specified <code>pointer</code>&#39;s path</li>
+					<li><code>force</code> : <em>boolean, optional</em> – indicates <a href="https://tools.ietf.org/html/rfc6901#section-7">whether nonexistent paths are created during the call</a></li>
+				</ul>
+				<p><em>returns:</em></p>
+				<ul>
+					<li>The prior value at the pointer&#39;s path — therefore, <em>undefined</em> means the pointer&#39;s path was nonexistent.</li>
+				</ul>
+				<p><em>example:</em></p>
+				<pre><code class="language-javascript"><span class="hljs-keyword">let</span> prior = JsonPointer.set(data, <span class="hljs-string">&#x27;#/legumes/1/instock&#x27;</span>, <span class="hljs-number">50</span>);</code></pre>
+				<p>example force:</p>
+				<pre><code class="language-javascript"><span class="hljs-keyword">let</span> data = {};
+
+JsonPointer.set(data, <span class="hljs-string">&#x27;#/peter/piper&#x27;</span>, <span class="hljs-string">&#x27;man&#x27;</span>, <span class="hljs-literal">true</span>);
+JsonPointer.set(data, <span class="hljs-string">&#x27;#/peter/pan&#x27;</span>, <span class="hljs-string">&#x27;boy&#x27;</span>, <span class="hljs-literal">true</span>);
+JsonPointer.set(data, <span class="hljs-string">&#x27;#/peter/pickle&#x27;</span>, <span class="hljs-string">&#x27;dunno&#x27;</span>, <span class="hljs-literal">true</span>);
+
+<span class="hljs-built_in">console</span>.log(<span class="hljs-built_in">JSON</span>.stringify(data, <span class="hljs-literal">null</span>, <span class="hljs-string">&#x27;  &#x27;</span>));</code></pre>
+				<pre><code class="language-json">{
+  <span class="hljs-attr">&quot;peter&quot;</span>: {
+    <span class="hljs-attr">&quot;piper&quot;</span>: <span class="hljs-string">&quot;man&quot;</span>,
+    <span class="hljs-attr">&quot;pan&quot;</span>: <span class="hljs-string">&quot;boy&quot;</span>,
+    <span class="hljs-attr">&quot;pickle&quot;</span>: <span class="hljs-string">&quot;dunno&quot;</span>
+  }
+}</code></pre>
+				<a href="#unsettarget-pointer" id="unsettarget-pointer" style="color: inherit; text-decoration: none;">
+					<h4>.unset(target, pointer)</h4>
+				</a>
+				<p>Unsets the <code>value</code> at the specified <code>pointer</code> on the <code>target</code> and returns the value. The default behavior is to do nothing if <code>pointer</code> is nonexistent.</p>
+				<p><em>arguments:</em></p>
+				<ul>
+					<li><code>target</code> : <em>object, required</em> – the target object</li>
+					<li><code>pointer</code> : <em>string, required</em> – a JSON pointer in <a href="https://tools.ietf.org/html/rfc6901#section-5">JSON string representation</a> or <a href="https://tools.ietf.org/html/rfc6901#section-6">URI fragment identifier representation</a></li>
+				</ul>
+				<p><em>returns:</em></p>
+				<ul>
+					<li>The dereferenced value or <em>undefined</em> if nonexistent</li>
+				</ul>
+				<p><em>example:</em></p>
+				<pre><code class="language-javascript"><span class="hljs-keyword">var</span> prior = ptr.unset(data, <span class="hljs-string">&#x27;#/legumes/1/instock&#x27;</span>);</code></pre>
+				<p>example force:</p>
+				<pre><code class="language-javascript"><span class="hljs-keyword">var</span> data = {};
+
+ptr.unset(data, <span class="hljs-string">&#x27;#/peter/piper&#x27;</span>);
+ptr.unset(data, <span class="hljs-string">&#x27;#/peter/pan&#x27;</span>);
+
+<span class="hljs-built_in">console</span>.log(<span class="hljs-built_in">JSON</span>.stringify(data, <span class="hljs-literal">null</span>, <span class="hljs-string">&#x27;  &#x27;</span>));</code></pre>
+				<pre><code class="language-json">{
+  <span class="hljs-attr">&quot;peter&quot;</span>: {
+    <span class="hljs-attr">&quot;pickle&quot;</span>: <span class="hljs-string">&quot;dunno&quot;</span>
+  }
+}</code></pre>
+				<a href="#listtarget-fragmentid" id="listtarget-fragmentid" style="color: inherit; text-decoration: none;">
+					<h4>.list(target, fragmentId)</h4>
+				</a>
+				<p>Lists all of the pointers available on the specified <code>target</code>.</p>
+				<blockquote>
+					<p>See <a href="#user-content-object-graph-cycles-and-recursion">a discussion about cycles in the object graph later in this document</a> if you have interest in how such is dealt with.</p>
+				</blockquote>
+				<p><em>arguments:</em></p>
+				<ul>
+					<li><code>target</code> : <em>object, required</em> – the target object</li>
+					<li><code>fragmentId</code> : <em>boolean, optional</em> – indicates whether fragment identifiers should be listed instead of pointers</li>
+				</ul>
+				<p><em>returns:</em></p>
+				<ul>
+					<li>an array of <code>pointer-value</code> pairs</li>
+				</ul>
+				<p><em>example:</em></p>
+				<pre><code class="language-javascript"><span class="hljs-keyword">let</span> list = JsonPointer.list(data);</code></pre>
+				<pre><code class="language-json">[ ...
+  {
+    <span class="hljs-attr">&quot;pointer&quot;</span>: <span class="hljs-string">&quot;/legumes/2/unit&quot;</span>,
+    <span class="hljs-attr">&quot;value&quot;</span>: <span class="hljs-string">&quot;ea&quot;</span>
+  },
+  {
+    <span class="hljs-attr">&quot;pointer&quot;</span>: <span class="hljs-string">&quot;/legumes/2/instock&quot;</span>,
+    <span class="hljs-attr">&quot;value&quot;</span>: <span class="hljs-number">9340</span>
+  },
+  {
+    <span class="hljs-attr">&quot;pointer&quot;</span>: <span class="hljs-string">&quot;/legumes/3/name&quot;</span>,
+    <span class="hljs-attr">&quot;value&quot;</span>: <span class="hljs-string">&quot;plit peas&quot;</span>
+  },
+  {
+    <span class="hljs-attr">&quot;pointer&quot;</span>: <span class="hljs-string">&quot;/legumes/3/unit&quot;</span>,
+    <span class="hljs-attr">&quot;value&quot;</span>: <span class="hljs-string">&quot;lbs&quot;</span>
+  },
+  {
+    <span class="hljs-attr">&quot;pointer&quot;</span>: <span class="hljs-string">&quot;/legumes/3/instock&quot;</span>,
+    <span class="hljs-attr">&quot;value&quot;</span>: <span class="hljs-number">8</span>
+  }
+]</code></pre>
+				<p><em><code>fragmentId</code> example:</em></p>
+				<pre><code class="language-javascript"><span class="hljs-keyword">let</span> list = JsonPointer.list(data, <span class="hljs-literal">true</span>);</code></pre>
+				<pre><code class="language-json">[ ...
+  {
+    <span class="hljs-attr">&quot;fragmentId&quot;</span>: <span class="hljs-string">&quot;#/legumes/2/unit&quot;</span>,
+    <span class="hljs-attr">&quot;value&quot;</span>: <span class="hljs-string">&quot;ea&quot;</span>
+  },
+  {
+    <span class="hljs-attr">&quot;fragmentId&quot;</span>: <span class="hljs-string">&quot;#/legumes/2/instock&quot;</span>,
+    <span class="hljs-attr">&quot;value&quot;</span>: <span class="hljs-number">9340</span>
+  },
+  {
+    <span class="hljs-attr">&quot;fragmentId&quot;</span>: <span class="hljs-string">&quot;#/legumes/3/name&quot;</span>,
+    <span class="hljs-attr">&quot;value&quot;</span>: <span class="hljs-string">&quot;plit peas&quot;</span>
+  },
+  {
+    <span class="hljs-attr">&quot;fragmentId&quot;</span>: <span class="hljs-string">&quot;#/legumes/3/unit&quot;</span>,
+    <span class="hljs-attr">&quot;value&quot;</span>: <span class="hljs-string">&quot;lbs&quot;</span>
+  },
+  {
+    <span class="hljs-attr">&quot;fragmentId&quot;</span>: <span class="hljs-string">&quot;#/legumes/3/instock&quot;</span>,
+    <span class="hljs-attr">&quot;value&quot;</span>: <span class="hljs-number">8</span>
+  }
+]</code></pre>
+				<a href="#flattentarget-fragmentid" id="flattentarget-fragmentid" style="color: inherit; text-decoration: none;">
+					<h4>.flatten(target, fragmentId)</h4>
+				</a>
+				<p>Flattens an object graph (the <code>target</code>) into a single-level object of <code>pointer-value</code> pairs.</p>
+				<p><em>arguments:</em></p>
+				<ul>
+					<li><code>target</code> : <em>object, required</em> – the target object</li>
+					<li><code>fragmentId</code> : <em>boolean, optional</em> – indicates whether fragment identifiers should be listed instead of pointers</li>
+				</ul>
+				<p><em>returns:</em></p>
+				<ul>
+					<li>a flattened object of <code>property-value</code> pairs as properties.</li>
+				</ul>
+				<p><em>example:</em></p>
+				<pre><code class="language-javascript"><span class="hljs-keyword">let</span> obj = JsonPointer.flatten(data, <span class="hljs-literal">true</span>);</code></pre>
+				<pre><code class="language-json">{ ...
+  &quot;#/legumes/1/name&quot;: &quot;lima beans&quot;,
+  &quot;#/legumes/1/unit&quot;: &quot;lbs&quot;,
+  &quot;#/legumes/1/instock&quot;: 21,
+  &quot;#/legumes/2/name&quot;: &quot;black eyed peas&quot;,
+  &quot;#/legumes/2/unit&quot;: &quot;ea&quot;,
+  &quot;#/legumes/2/instock&quot;: 9340,
+  &quot;#/legumes/3/name&quot;: &quot;plit peas&quot;,
+  &quot;#/legumes/3/unit&quot;: &quot;lbs&quot;,
+  &quot;#/legumes/3/instock&quot;: 8
+}</code></pre>
+				<a href="#maptarget-fragmentid" id="maptarget-fragmentid" style="color: inherit; text-decoration: none;">
+					<h4>.map(target, fragmentId)</h4>
+				</a>
+				<p>Flattens an object graph (the <code>target</code>) into a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map">Map object</a>.</p>
+				<p><em>arguments:</em></p>
+				<ul>
+					<li><code>target</code> : <em>object, required</em> – the target object</li>
+					<li><code>fragmentId</code> : <em>boolean, optional</em> – indicates whether fragment identifiers should be listed instead of pointers</li>
+				</ul>
+				<p><em>returns:</em></p>
+				<ul>
+					<li>a Map object containing key-value pairs where keys are pointers.</li>
+				</ul>
+				<p><em>example:</em></p>
+				<pre><code class="language-javascript"><span class="hljs-keyword">let</span> map = JsonPointer.map(data, <span class="hljs-literal">true</span>);
+
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> it <span class="hljs-keyword">of</span> map) {
+  <span class="hljs-built_in">console</span>.log(<span class="hljs-built_in">JSON</span>.stringify(it, <span class="hljs-literal">null</span>, <span class="hljs-string">&#x27;  &#x27;</span>));
+}</code></pre>
+				<pre><code class="language-json">...
+[&quot;#/legumes/0/name&quot;, &quot;pinto beans&quot;]
+[&quot;#/legumes/0/unit&quot;, &quot;lbs&quot;]
+[&quot;#/legumes/0/instock&quot;, 4 ]
+[&quot;#/legumes/1/name&quot;, &quot;lima beans&quot;]
+[&quot;#/legumes/1/unit&quot;, &quot;lbs&quot;]
+[&quot;#/legumes/1/instock&quot;, 21 ]
+[&quot;#/legumes/2/name&quot;, &quot;black eyed peas&quot;]
+[&quot;#/legumes/2/unit&quot;, &quot;ea&quot;]
+[&quot;#/legumes/2/instock&quot;, 9340 ]
+[&quot;#/legumes/3/name&quot;, &quot;plit peas&quot;]
+[&quot;#/legumes/3/unit&quot;, &quot;lbs&quot;]
+[&quot;#/legumes/3/instock&quot;, 8 ]</code></pre>
+				<a href="#decodepointer" id="decodepointer" style="color: inherit; text-decoration: none;">
+					<h4>.decode(pointer)</h4>
+				</a>
+				<p>Decodes the specified <code>pointer</code>.</p>
+				<p><em>arguments:</em></p>
+				<ul>
+					<li><code>pointer</code> : <em>string, required</em> – a JSON pointer in <a href="https://tools.ietf.org/html/rfc6901#section-5">JSON string representation</a> or <a href="https://tools.ietf.org/html/rfc6901#section-6">URI fragment identifier representation</a>.</li>
+				</ul>
+				<p><em>returns:</em></p>
+				<ul>
+					<li>An array of path segments used as indexers to descend from a root/<code>target</code> object to a referenced value.</li>
+				</ul>
+				<p><em>example:</em></p>
+				<pre><code class="language-javascript"><span class="hljs-keyword">let</span> path = JsonPointer.decode(<span class="hljs-string">&#x27;#/legumes/1/instock&#x27;</span>);</code></pre>
+				<pre><code class="language-json">[ <span class="hljs-string">&quot;legumes&quot;</span>, <span class="hljs-string">&quot;1&quot;</span>, <span class="hljs-string">&quot;instock&quot;</span> ]</code></pre>
+				<a href="#decodepointerpointer" id="decodepointerpointer" style="color: inherit; text-decoration: none;">
+					<h4>decodePointer(pointer)</h4>
+				</a>
+				<p>Decodes the specified <code>pointer</code>.</p>
+				<p><em>arguments:</em></p>
+				<ul>
+					<li><code>pointer</code> : <em>string, required</em> – a JSON pointer in <a href="https://tools.ietf.org/html/rfc6901#section-5">JSON string representation</a>.</li>
+				</ul>
+				<p><em>returns:</em></p>
+				<ul>
+					<li>An array of path segments used as indexers to descend from a root/<code>target</code> object to a referenced value.</li>
+				</ul>
+				<p><em>example:</em></p>
+				<pre><code class="language-javascript"><span class="hljs-keyword">let</span> path = decodePointer(<span class="hljs-string">&#x27;/people/wilbur dongleworth/age&#x27;</span>);</code></pre>
+				<pre><code class="language-json">[ <span class="hljs-string">&quot;people&quot;</span>, <span class="hljs-string">&quot;wilbur dongleworth&quot;</span>, <span class="hljs-string">&quot;age&quot;</span> ]</code></pre>
+				<a href="#encodepointerpath" id="encodepointerpath" style="color: inherit; text-decoration: none;">
+					<h4>encodePointer(path)</h4>
+				</a>
+				<p>Encodes the specified <code>path</code> as a JSON pointer in <a href="https://tools.ietf.org/html/rfc6901#section-5">JSON string representation</a>.</p>
+				<p><em>arguments:</em></p>
+				<ul>
+					<li><code>path</code> : <em>Array, required</em> – an array of path segments</li>
+				</ul>
+				<p><em>returns:</em></p>
+				<ul>
+					<li>A JSON pointer in <a href="https://tools.ietf.org/html/rfc6901#section-5">JSON string representation</a>.</li>
+				</ul>
+				<p><em>example:</em></p>
+				<pre><code class="language-javascript"><span class="hljs-keyword">let</span> path = encodePointer([<span class="hljs-string">&#x27;people&#x27;</span>, <span class="hljs-string">&#x27;wilbur dongleworth&#x27;</span>, <span class="hljs-string">&#x27;age&#x27;</span>]);</code></pre>
+				<pre><code class="language-json"><span class="hljs-string">&quot;/people/wilbur dongleworth/age&quot;</span></code></pre>
+				<a href="#decodeurifragmentidentifierpointer" id="decodeurifragmentidentifierpointer" style="color: inherit; text-decoration: none;">
+					<h4>decodeUriFragmentIdentifier(pointer)</h4>
+				</a>
+				<p>Decodes the specified <code>pointer</code>.</p>
+				<p><em>arguments:</em></p>
+				<ul>
+					<li><code>pointer</code> : <em>string, required</em> – a JSON pointer in <a href="https://tools.ietf.org/html/rfc6901#section-6">URI fragment identifier representation</a>.</li>
+				</ul>
+				<p><em>returns:</em></p>
+				<ul>
+					<li>An array of path segments used as indexers to descend from a root/<code>target</code> object to a referenced value.</li>
+				</ul>
+				<p><em>example:</em></p>
+				<pre><code class="language-javascript"><span class="hljs-keyword">let</span> path = decodePointer(<span class="hljs-string">&#x27;#/people/wilbur%20dongleworth/age&#x27;</span>);</code></pre>
+				<pre><code class="language-json">[ <span class="hljs-string">&quot;people&quot;</span>, <span class="hljs-string">&quot;wilbur dongleworth&quot;</span>, <span class="hljs-string">&quot;age&quot;</span> ]</code></pre>
+				<a href="#encodeurifragmentidentifierpath" id="encodeurifragmentidentifierpath" style="color: inherit; text-decoration: none;">
+					<h4>encodeUriFragmentIdentifier(path)</h4>
+				</a>
+				<p>Encodes the specified <code>path</code> as a JSON pointer in <a href="https://tools.ietf.org/html/rfc6901#section-6">URI fragment identifier representation</a>.</p>
+				<p><em>arguments:</em></p>
+				<ul>
+					<li><code>path</code> : <em>Array, required</em> - an array of path segments</li>
+				</ul>
+				<p><em>returns:</em></p>
+				<ul>
+					<li>A JSON pointer in <a href="https://tools.ietf.org/html/rfc6901#section-6">URI fragment identifier representation</a>.</li>
+				</ul>
+				<p><em>example:</em></p>
+				<pre><code class="language-javascript"><span class="hljs-keyword">let</span> path = ptr.encodePointer([<span class="hljs-string">&#x27;people&#x27;</span>, <span class="hljs-string">&#x27;wilbur dongleworth&#x27;</span>, <span class="hljs-string">&#x27;age&#x27;</span>]);</code></pre>
+				<pre><code class="language-json"><span class="hljs-string">&quot;#/people/wilbur%20dongleworth/age&quot;</span></code></pre>
+				<a href="#jsonpointer-class" id="jsonpointer-class" style="color: inherit; text-decoration: none;">
+					<h3><code>JsonPointer</code> Class</h3>
+				</a>
+				<p>Encapsulates pointer related operations for a specified <code>pointer</code>.</p>
+				<p><em>properties:</em></p>
+				<ul>
+					<li><code>.path</code> : <em>array</em> – contains the pointer&#39;s path segements.</li>
+					<li><code>.pointer</code> : <em>string</em> – the pointer&#39;s <a href="https://tools.ietf.org/html/rfc6901#section-5">JSON string representation</a></li>
+					<li><code>.uriFragmentIdentifier</code> : <em>string</em> – the pointer&#39;s <a href="https://tools.ietf.org/html/rfc6901#section-6">URI fragment identifier representation</a></li>
+				</ul>
+				<p><em>methods:</em></p>
+				<a href="#hastarget" id="hastarget" style="color: inherit; text-decoration: none;">
+					<h4>.has(target)</h4>
+				</a>
+				<p>Determins whether the specified <code>target</code> has a value at the pointer&#39;s path.</p>
+				<a href="#gettarget" id="gettarget" style="color: inherit; text-decoration: none;">
+					<h4>.get(target)</h4>
+				</a>
+				<p>Looks up the specified <code>target</code>&#39;s value at the pointer&#39;s path if such exists; otherwise <em>undefined</em>.</p>
+				<a href="#settarget-value-force" id="settarget-value-force" style="color: inherit; text-decoration: none;">
+					<h4>.set(target, value, force)</h4>
+				</a>
+				<p>Sets the specified <code>target</code>&#39;s value at the pointer&#39;s path, if such exists.If <code>force</code> is specified (<em>truthy</em>), missing path segments are created and the value is always set at the pointer&#39;s path.</p>
+				<p><em>arguments:</em></p>
+				<ul>
+					<li><code>target</code> : <em>object, required</em> – the target object</li>
+					<li><code>value</code> : <em>any</em> – the value to be set at the specified <code>pointer</code>&#39;s path</li>
+					<li><code>force</code> : <em>boolean, optional</em> – indicates <a href="https://tools.ietf.org/html/rfc6901#section-7">whether nonexistent paths are created during the call</a></li>
+				</ul>
+				<p><em>result:</em></p>
+				<ul>
+					<li>The prior value at the pointer&#39;s path — therefore, <em>undefined</em> means the pointer&#39;s path was nonexistent.</li>
+				</ul>
+				<a href="#concattarget" id="concattarget" style="color: inherit; text-decoration: none;">
+					<h4>.concat(target)</h4>
+				</a>
+				<p>Creates new pointer appending target to the current pointer&#39;s path</p>
+				<p><em>arguments:</em></p>
+				<ul>
+					<li><code>target</code> : <em>JsonPointer, array or string, required</em> – the path to be appended to the current path</li>
+				</ul>
+				<a href="#performance" id="performance" style="color: inherit; text-decoration: none;">
+					<h2>Performance</h2>
+				</a>
+				<p>This repository has a <a href="https://github.com/flitbit/json-pointer-comparison">companion repository that makes some performance comparisons</a> between <code>json-ptr</code>, <a href="https://www.npmjs.com/package/jsonpointer"><code>jsonpointer</code></a> and <a href="https://www.npmjs.com/package/json-pointer"><code>json-pointer</code></a>.</p>
+				<p><strong>All timings are expressed as nanoseconds:</strong></p>
+				<pre><code class="language-text">.flatten(obj)
+...
+MODULE       | METHOD  | COMPILED | SAMPLES |       AVG | SLOWER
+json-pointer | dict    |          | 10      | 464455181 |
+json-ptr     | flatten |          | 10      | 770424039 | 65.88%
+jsonpointer  | n/a     |          | -       |         - |
+
+.has(obj, pointer)
+...
+MODULE       | METHOD | COMPILED | SAMPLES | AVG  | SLOWER
+json-ptr     | has    | compiled | 1000000 | 822  |
+json-ptr     | has    |          | 1000000 | 1747 | 112.53%
+json-pointer | has    |          | 1000000 | 2683 | 226.4%
+jsonpointer  | n/a    |          | -       | -    |
+
+.has(obj, fragmentId)
+...
+MODULE       | METHOD | COMPILED | SAMPLES | AVG  | SLOWER
+json-ptr     | has    | compiled | 1000000 | 602  |
+json-ptr     | has    |          | 1000000 | 1664 | 176.41%
+json-pointer | has    |          | 1000000 | 2569 | 326.74%
+jsonpointer  | n/a    |          | -       | -    |
+
+.get(obj, pointer)
+...
+MODULE       | METHOD | COMPILED | SAMPLES | AVG  | SLOWER
+json-ptr     | get    | compiled | 1000000 | 590  |
+json-ptr     | get    |          | 1000000 | 1676 | 184.07%
+jsonpointer  | get    | compiled | 1000000 | 2102 | 256.27%
+jsonpointer  | get    |          | 1000000 | 2377 | 302.88%
+json-pointer | get    |          | 1000000 | 2585 | 338.14%
+
+.get(obj, fragmentId)
+...
+MODULE       | METHOD | COMPILED | SAMPLES | AVG  | SLOWER
+json-ptr     | get    | compiled | 1000000 | 587  |
+json-ptr     | get    |          | 1000000 | 1673 | 185.01%
+jsonpointer  | get    | compiled | 1000000 | 2105 | 258.6%
+jsonpointer  | get    |          | 1000000 | 2451 | 317.55%
+json-pointer | get    |          | 1000000 | 2619 | 346.17%
+</code></pre>
+				<blockquote>
+					<p>These results have been elided because there is too much detail in the actual. Your results will vary slightly depending on the resources available where you run it.</p>
+				</blockquote>
+				<p>It is important to recognize in the performance results that <em>compiled</em> options are faster. As a general rule, you should <em>compile</em> any pointers you&#39;ll be using repeatedly.</p>
+				<p><em>Consider this example code that queries the flickr API and prints results to the console:</em></p>
+				<pre><code class="language-javascript"><span class="hljs-meta">&#x27;use strict&#x27;</span>;
+
+<span class="hljs-keyword">let</span> ptr = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;..&#x27;</span>),
+  http = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;http&#x27;</span>),
+  util = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;util&#x27;</span>);
+
+<span class="hljs-comment">// A flickr feed, tags surf,pipeline</span>
+<span class="hljs-keyword">let</span> feed = <span class="hljs-string">&#x27;http://api.flickr.com/services/feeds/photos_public.gne?tags=surf,pipeline&amp;tagmode=all&amp;format=json&amp;jsoncallback=processResponse&#x27;</span>;
+
+<span class="hljs-comment">// Compile/prepare the pointers...</span>
+<span class="hljs-keyword">let</span> items = ptr.create(<span class="hljs-string">&#x27;#/items&#x27;</span>);
+<span class="hljs-keyword">let</span> author = ptr.create(<span class="hljs-string">&#x27;#/author&#x27;</span>);
+<span class="hljs-keyword">let</span> media = ptr.create(<span class="hljs-string">&#x27;#/media/m&#x27;</span>);
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">processResponse</span>(<span class="hljs-params">json</span>) </span>{
+  <span class="hljs-keyword">let</span> data = items.get(json);
+
+  <span class="hljs-keyword">if</span> (data &amp;&amp; <span class="hljs-built_in">Array</span>.isArray(data)) {
+    <span class="hljs-keyword">let</span> images = data.reduce(<span class="hljs-function">(<span class="hljs-params">acc, it</span>) =&gt;</span> {
+      <span class="hljs-comment">// Using the prepared pointers to select parts...</span>
+      acc.push({
+        <span class="hljs-attr">author</span>: author.get(it),
+        <span class="hljs-attr">media</span>: media.get(it)
+      });
+      <span class="hljs-keyword">return</span> acc;
+    }, []);
+    <span class="hljs-built_in">console</span>.log(util.inspect(images, <span class="hljs-literal">false</span>, <span class="hljs-number">9</span>));
+  }
+}
+
+http.get(feed, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">res</span>) </span>{
+  <span class="hljs-keyword">let</span> data = <span class="hljs-string">&#x27;&#x27;</span>;
+
+  res.on(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">chunk</span>) </span>{
+    data += chunk;
+  });
+
+  res.on(<span class="hljs-string">&#x27;end&#x27;</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+    <span class="hljs-comment">// result is formatted as jsonp... this is for illustration only.</span>
+    data = <span class="hljs-built_in">eval</span>(data); <span class="hljs-comment">// eslint-disable-line no-eval</span>
+    processResponse(data);
+  });
+}).on(<span class="hljs-string">&#x27;error&#x27;</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e</span>) </span>{
+  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;Got error: &#x27;</span> + e.message);
+});</code></pre>
+				<blockquote>
+					<p>[<a href="https://github.com/flitbit/json-ptr/blob/master/examples/real-world.js">example/real-world.js</a>]</p>
+				</blockquote>
+				<a href="#tests" id="tests" style="color: inherit; text-decoration: none;">
+					<h2>Tests</h2>
+				</a>
+				<p>Tests are written using <a href="https://mochajs.org/">mocha</a> and <a href="https://github.com/Automattic/expect.js">expect.js</a>.</p>
+				<pre><code class="language-bash">npm <span class="hljs-built_in">test</span></code></pre>
+				<p>... or ...</p>
+				<pre><code class="language-bash">mocha</code></pre>
+				<a href="#releases" id="releases" style="color: inherit; text-decoration: none;">
+					<h2>Releases</h2>
+				</a>
+				<ul>
+					<li><p>2019-09-14 — <strong>1.2.0</strong></p>
+						<ul>
+							<li>Merged new <code>.concat</code> function contributed by @vuwuv, updated dependencies.</li>
+						</ul>
+					</li>
+					<li><p>2019-03-10 — <strong>1.1.2</strong></p>
+						<ul>
+							<li>Updated packages to remove critical security concern among dev dependencies&#39;</li>
+						</ul>
+					</li>
+					<li><p>2016-07-26 — <strong>1.0.1</strong></p>
+						<ul>
+							<li>Fixed a problem with the Babel configuration</li>
+						</ul>
+					</li>
+					<li><p>2016-01-12 — <strong>1.0.0</strong></p>
+						<ul>
+							<li>Rolled major version to 1 to reflect breaking change in <code>.list(obj, fragmentId)</code>.</li>
+						</ul>
+					</li>
+					<li><p>2016-01-02 — <strong>0.3.0</strong></p>
+						<ul>
+							<li>Retooled for node 4+</li>
+							<li>Better compiled pointers</li>
+							<li>Unrolled recursive <code>.list</code> function</li>
+							<li>Added <code>.map</code> function</li>
+							<li>Fully linted</li>
+							<li>Lots more tests and examples.</li>
+							<li>Documented many previously undocumented features.</li>
+						</ul>
+					</li>
+					<li><p>2014-10-21 — <strong>0.2.0</strong>  Added #list function to enumerate all properties in a graph, producing fragmentId/value pairs.</p>
+					</li>
+				</ul>
+				<a href="#license" id="license" style="color: inherit; text-decoration: none;">
+					<h2>License</h2>
+				</a>
+				<p><a href="https://github.com/flitbit/json-ptr/blob/master/LICENSE">MIT</a></p>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="globals.html"><em>Globals</em></a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_src_pointer_.html">&quot;src/pointer&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_src_types_.html">&quot;src/types&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_src_util_.html">&quot;src/util&quot;</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

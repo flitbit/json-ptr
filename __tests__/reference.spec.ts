@@ -1,3 +1,9 @@
+/**
+ * @hidden
+ * @packageDocumentation
+ */
+
+
 import { expect } from 'chai';
 
 import { JsonReference, JsonPointer, } from '../src';

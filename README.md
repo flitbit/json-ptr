@@ -28,18 +28,19 @@ import { JsonPointer, create } from 'json-ptr';
 
 #### Classes
 
-* [`JsonPointer`](#user-content-jsonpointer-class) : _class_ &ndash; a convenience class for working with JSON pointers.
-* [`JsonReference`](#user-content-jsonreference-class) : _class_ &ndash; a convenience class for working with JSON references.
+-   [`JsonPointer`](#user-content-jsonpointer-class) : _class_ – a convenience class for working with JSON pointers.
+-   [`JsonReference`](#user-content-jsonreference-class) : _class_ – a convenience class for working with JSON references.
 
 #### Functions
 
-* [`.create(pointer)`](#user-content-createpointer)
-* [`.has(target,pointer)`](#user-content-hastargetpointer)
-* [`.get(target,pointer)`](#user-content-gettargetpointer)
-* [`.set(target,pointer,value,force)`](#user-content-settarget-pointer-value-force)
-* [`.flatten(target,fragmentId)`](#user-content-flattentarget-fragmentid)
-* [`.list(target,fragmentId)`](#user-content-listtarget-fragmentid)
-* [`.map(target,fragmentId)`](#user-content-maptarget-fragmentid)
+-   [`.create(pointer)`](#user-content-createpointer)
+-   [`.has(target,pointer)`](#user-content-hastargetpointer)
+-   [`.get(target,pointer)`](#user-content-gettargetpointer)
+-   [`.set(target,pointer,value,force)`](#user-content-settarget-pointer-value-force)
+-   [`.unset(target,pointer,value,force)`](#user-content-settarget-pointer-value-force)
+-   [`.flatten(target,fragmentId)`](#user-content-flattentarget-fragmentid)
+-   [`.list(target,fragmentId)`](#user-content-listtarget-fragmentid)
+-   [`.map(target,fragmentId)`](#user-content-maptarget-fragmentid)
 
 All example code assumes data has this structure:
 
@@ -58,24 +59,24 @@ const data = {
     unit: 'lbs',
     instock: 13
   }, {
-    name: 'plit peas',
+    name: 'split peas',
     unit: 'lbs',
     instock: 8
   }]
 }
 ```
 
-#### .create(pointer: string | string[]): JsonPointer
+#### .create(pointer: string | string\[]): JsonPointer
 
 Creates an instance of the `JsonPointer` class.
 
 _arguments:_
 
-* `pointer` : _string, required_ &ndash; a JSON pointer in [JSON string representation](https://tools.ietf.org/html/rfc6901#section-5) or [URI fragment identifier representation](https://tools.ietf.org/html/rfc6901#section-6)
+-   `pointer` : _string, required_ – a JSON pointer in [JSON string representation](https://tools.ietf.org/html/rfc6901#section-5) or [URI fragment identifier representation](https://tools.ietf.org/html/rfc6901#section-6)
 
 _returns:_
 
-* a new [`JsonPointer` instance](#user-content-jsonpointer-class)
+-   a new [`JsonPointer` instance](#user-content-jsonpointer-class)
 
 _example:_
 
@@ -84,18 +85,18 @@ const pointer = JsonPointer.create('/legumes/0');
 // fragmentId: #/legumes/0
 ```
 
-#### .has&lt;T>(target: T, pointer: string | string[] | JsonPointer): boolean
+#### .has(target: unknown, pointer: string | string\[] | JsonPointer): boolean
 
-Determins whether the specified `target` has a value at the `pointer`'s path.
+Determines whether the specified `target` has a value at the `pointer`'s path.
 
 _arguments:_
 
-* `target` : _object, required_ &ndash; the target object
-* `pointer` : _string, required_ &ndash; a JSON pointer in [JSON string representation](https://tools.ietf.org/html/rfc6901#section-5) or [URI fragment identifier representation](https://tools.ietf.org/html/rfc6901#section-6)
+-   `target` : _object, required_ – the target object
+-   `pointer` : _string, required_ – a JSON pointer in [JSON string representation](https://tools.ietf.org/html/rfc6901#section-5) or [URI fragment identifier representation](https://tools.ietf.org/html/rfc6901#section-6)
 
 _returns:_
 
-* the dereferenced value or _undefined_ if nonexistent
+-   the dereferenced value or _undefined_ if nonexistent
 
 #### .get(target,pointer)
 
@@ -103,12 +104,12 @@ Gets a value from the specified `target` object at the `pointer`'s path
 
 _arguments:_
 
-* `target` : _object, required_ &ndash; the target object
-* `pointer` : _string, required_ &ndash; a JSON pointer in [JSON string representation](https://tools.ietf.org/html/rfc6901#section-5) or [URI fragment identifier representation](https://tools.ietf.org/html/rfc6901#section-6)
+-   `target` : _object, required_ – the target object
+-   `pointer` : _string, required_ – a JSON pointer in [JSON string representation](https://tools.ietf.org/html/rfc6901#section-5) or [URI fragment identifier representation](https://tools.ietf.org/html/rfc6901#section-6)
 
 _returns:_
 
-* the dereferenced value or _undefined_ if nonexistent
+-   the dereferenced value or _undefined_ if nonexistent
 
 _example:_
 
@@ -123,14 +124,14 @@ Sets the `value` at the specified `pointer` on the `target`. The default behavio
 
 _arguments:_
 
-* `target` : _object, required_ &ndash; the target object
-* `pointer` : _string, required_ &ndash; a JSON pointer in [JSON string representation](https://tools.ietf.org/html/rfc6901#section-5) or [URI fragment identifier representation](https://tools.ietf.org/html/rfc6901#section-6)
-* `value` : _any_ &ndash; the value to be set at the specified `pointer`'s path
-* `force` : _boolean, optional_ &ndash; indicates [whether nonexistent paths are created during the call](https://tools.ietf.org/html/rfc6901#section-7)
+-   `target` : _object, required_ – the target object
+-   `pointer` : _string, required_ – a JSON pointer in [JSON string representation](https://tools.ietf.org/html/rfc6901#section-5) or [URI fragment identifier representation](https://tools.ietf.org/html/rfc6901#section-6)
+-   `value` : _any_ – the value to be set at the specified `pointer`'s path
+-   `force` : _boolean, optional_ – indicates [whether nonexistent paths are created during the call](https://tools.ietf.org/html/rfc6901#section-7)
 
 _returns:_
 
-* The prior value at the pointer's path &mdash; therefore, _undefined_ means the pointer's path was nonexistent.
+-   The prior value at the pointer's path — therefore, _undefined_ means the pointer's path was nonexistent.
 
 _example:_
 
@@ -166,12 +167,12 @@ Unsets the `value` at the specified `pointer` on the `target` and returns the va
 
 _arguments:_
 
-* `target` : _object, required_ &ndash; the target object
-* `pointer` : _string, required_ &ndash; a JSON pointer in [JSON string representation](https://tools.ietf.org/html/rfc6901#section-5) or [URI fragment identifier representation](https://tools.ietf.org/html/rfc6901#section-6)
+-   `target` : _object, required_ – the target object
+-   `pointer` : _string, required_ – a JSON pointer in [JSON string representation](https://tools.ietf.org/html/rfc6901#section-5) or [URI fragment identifier representation](https://tools.ietf.org/html/rfc6901#section-6)
 
 _returns:_
 
-* The dereferenced value or _undefined_ if nonexistent
+-   The dereferenced value or _undefined_ if nonexistent
 
 _example:_
 
@@ -206,12 +207,12 @@ Lists all of the pointers available on the specified `target`.
 
 _arguments:_
 
-* `target` : _object, required_ &ndash; the target object
-* `fragmentId` : _boolean, optional_ &ndash; indicates whether fragment identifiers should be listed instead of pointers
+-   `target` : _object, required_ – the target object
+-   `fragmentId` : _boolean, optional_ – indicates whether fragment identifiers should be listed instead of pointers
 
 _returns:_
 
-* an array of `pointer-value` pairs
+-   an array of `pointer-value` pairs
 
 _example:_
 
@@ -281,12 +282,12 @@ Flattens an object graph (the `target`) into a single-level object of `pointer-v
 
 _arguments:_
 
-* `target` : _object, required_ &ndash; the target object
-* `fragmentId` : _boolean, optional_ &ndash; indicates whether fragment identifiers should be listed instead of pointers
+-   `target` : _object, required_ – the target object
+-   `fragmentId` : _boolean, optional_ – indicates whether fragment identifiers should be listed instead of pointers
 
 _returns:_
 
-* a flattened object of `property-value` pairs as properties.
+-   a flattened object of `property-value` pairs as properties.
 
 _example:_
 
@@ -314,12 +315,12 @@ Flattens an object graph (the `target`) into a [Map object](https://developer.mo
 
 _arguments:_
 
-* `target` : _object, required_ &ndash; the target object
-* `fragmentId` : _boolean, optional_ &ndash; indicates whether fragment identifiers should be listed instead of pointers
+-   `target` : _object, required_ – the target object
+-   `fragmentId` : _boolean, optional_ – indicates whether fragment identifiers should be listed instead of pointers
 
 _returns:_
 
-* a Map object containing key-value pairs where keys are pointers.
+-   a Map object containing key-value pairs where keys are pointers.
 
 _example:_
 
@@ -353,11 +354,11 @@ Decodes the specified `pointer`.
 
 _arguments:_
 
-* `pointer` : _string, required_ &ndash; a JSON pointer in [JSON string representation](https://tools.ietf.org/html/rfc6901#section-5) or [URI fragment identifier representation](https://tools.ietf.org/html/rfc6901#section-6).
+-   `pointer` : _string, required_ – a JSON pointer in [JSON string representation](https://tools.ietf.org/html/rfc6901#section-5) or [URI fragment identifier representation](https://tools.ietf.org/html/rfc6901#section-6).
 
 _returns:_
 
-* An array of path segments used as indexers to descend from a root/`target` object to a referenced value.
+-   An array of path segments used as indexers to descend from a root/`target` object to a referenced value.
 
 _example:_
 
@@ -375,11 +376,11 @@ Decodes the specified `pointer`.
 
 _arguments:_
 
-* `pointer` : _string, required_ &ndash; a JSON pointer in [JSON string representation](https://tools.ietf.org/html/rfc6901#section-5).
+-   `pointer` : _string, required_ – a JSON pointer in [JSON string representation](https://tools.ietf.org/html/rfc6901#section-5).
 
 _returns:_
 
-* An array of path segments used as indexers to descend from a root/`target` object to a referenced value.
+-   An array of path segments used as indexers to descend from a root/`target` object to a referenced value.
 
 _example:_
 
@@ -397,11 +398,11 @@ Encodes the specified `path` as a JSON pointer in [JSON string representation](h
 
 _arguments:_
 
-* `path` : _Array, required_ &ndash; an array of path segments
+-   `path` : _Array, required_ – an array of path segments
 
 _returns:_
 
-* A JSON pointer in [JSON string representation](https://tools.ietf.org/html/rfc6901#section-5).
+-   A JSON pointer in [JSON string representation](https://tools.ietf.org/html/rfc6901#section-5).
 
 _example:_
 
@@ -419,11 +420,11 @@ Decodes the specified `pointer`.
 
 _arguments:_
 
-* `pointer` : _string, required_ &ndash; a JSON pointer in [URI fragment identifier representation](https://tools.ietf.org/html/rfc6901#section-6).
+-   `pointer` : _string, required_ – a JSON pointer in [URI fragment identifier representation](https://tools.ietf.org/html/rfc6901#section-6).
 
 _returns:_
 
-* An array of path segments used as indexers to descend from a root/`target` object to a referenced value.
+-   An array of path segments used as indexers to descend from a root/`target` object to a referenced value.
 
 _example:_
 
@@ -441,11 +442,11 @@ Encodes the specified `path` as a JSON pointer in [URI fragment identifier repre
 
 _arguments:_
 
-* `path` : _Array, required_ - an array of path segments
+-   `path` : _Array, required_ - an array of path segments
 
 _returns:_
 
-* A JSON pointer in [URI fragment identifier representation](https://tools.ietf.org/html/rfc6901#section-6).
+-   A JSON pointer in [URI fragment identifier representation](https://tools.ietf.org/html/rfc6901#section-6).
 
 _example:_
 
@@ -463,9 +464,9 @@ Encapsulates pointer related operations for a specified `pointer`.
 
 _properties:_
 
-* `.path` : _array_ &ndash; contains the pointer's path segements.
-* `.pointer` : _string_ &ndash; the pointer's [JSON string representation](https://tools.ietf.org/html/rfc6901#section-5)
-* `.uriFragmentIdentifier` : _string_ &ndash; the pointer's [URI fragment identifier representation](https://tools.ietf.org/html/rfc6901#section-6)
+-   `.path` : _array_ – contains the pointer's path segements.
+-   `.pointer` : _string_ – the pointer's [JSON string representation](https://tools.ietf.org/html/rfc6901#section-5)
+-   `.uriFragmentIdentifier` : _string_ – the pointer's [URI fragment identifier representation](https://tools.ietf.org/html/rfc6901#section-6)
 
 _methods:_
 
@@ -483,13 +484,13 @@ Sets the specified `target`'s value at the pointer's path, if such exists.If `fo
 
 _arguments:_
 
-* `target` : _object, required_ &ndash; the target object
-* `value` : _any_ &ndash; the value to be set at the specified `pointer`'s path
-* `force` : _boolean, optional_ &ndash; indicates [whether nonexistent paths are created during the call](https://tools.ietf.org/html/rfc6901#section-7)
+-   `target` : _object, required_ – the target object
+-   `value` : _any_ – the value to be set at the specified `pointer`'s path
+-   `force` : _boolean, optional_ – indicates [whether nonexistent paths are created during the call](https://tools.ietf.org/html/rfc6901#section-7)
 
 _result:_
 
-* The prior value at the pointer's path &mdash; therefore, _undefined_ means the pointer's path was nonexistent.
+-   The prior value at the pointer's path — therefore, _undefined_ means the pointer's path was nonexistent.
 
 #### .concat(target)
 
@@ -497,7 +498,7 @@ Creates new pointer appending target to the current pointer's path
 
 _arguments:_
 
-* `target` : _JsonPointer, array or string, required_ &ndash; the path to be appended to the current path
+-   `target` : _JsonPointer, array or string, required_ – the path to be appended to the current path
 
 ## Performance
 
@@ -621,28 +622,28 @@ mocha
 
 ## Releases
 
-* 2019-09-14 &mdash; __1.2.0__
-  * Merged new `.concat` function contributed by @vuwuv, updated dependencies.
+-   2019-09-14 — **1.2.0**
+    -   Merged new `.concat` function contributed by @vuwuv, updated dependencies.
 
-* 2019-03-10 &mdash; __1.1.2__
-  * Updated packages to remove critical security concern among dev dependencies'
+-   2019-03-10 — **1.1.2**
+    -   Updated packages to remove critical security concern among dev dependencies'
 
-* 2016-07-26 &mdash; __1.0.1__
-  * Fixed a problem with the Babel configuration
+-   2016-07-26 — **1.0.1**
+    -   Fixed a problem with the Babel configuration
 
-* 2016-01-12 &mdash; __1.0.0__
-  * Rolled major version to 1 to reflect breaking change in `.list(obj, fragmentId)`.
+-   2016-01-12 — **1.0.0**
+    -   Rolled major version to 1 to reflect breaking change in `.list(obj, fragmentId)`.
 
-* 2016-01-02 &mdash; __0.3.0__
-  * Retooled for node 4+
-  * Better compiled pointers
-  * Unrolled recursive `.list` function
-  * Added `.map` function
-  * Fully linted
-  * Lots more tests and examples.
-  * Documented many previously undocumented features.
+-   2016-01-02 — **0.3.0**
+    -   Retooled for node 4+
+    -   Better compiled pointers
+    -   Unrolled recursive `.list` function
+    -   Added `.map` function
+    -   Fully linted
+    -   Lots more tests and examples.
+    -   Documented many previously undocumented features.
 
-* 2014-10-21 &mdash; __0.2.0__  Added #list function to enumerate all properties in a graph, producing fragmentId/value pairs.
+-   2014-10-21 — **0.2.0**  Added #list function to enumerate all properties in a graph, producing fragmentId/value pairs.
 
 ## License
 

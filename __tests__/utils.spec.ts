@@ -1,3 +1,8 @@
+/**
+ * @hidden
+ * @packageDocumentation
+ */
+
 import { expect } from 'chai';
 
 import {
