@@ -26,24 +26,7 @@ commands:
           name: build & test
           command: npm run ci
           when: always
-      - run:
-          name: Setup Code Climate test-reporter
-          command: |
-            # download test reporter as a static binary
-            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-            chmod +x ./cc-test-reporter
-            ./cc-test-reporter before-build
-          when: always
-      - run:
-          name: code-coverage
-          command: |
-            rm -rf coverage
-            mkdir coverage
-            # nyc report requires that nyc has already been run,
-            # which creates the .nyc_output folder containing necessary data
-            ./node_modules/.bin/nyc report --reporter=text-lcov > coverage/lcov.info
-            ./cc-test-reporter after-build -t lcov
-          when: always
+      - run: ./node_modules/.bin/nyc report --report --reporter=text-lcov > coverage/lcov.info
       # Upload results
       - store_test_results:
           path: reports
