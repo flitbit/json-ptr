@@ -9,35 +9,79 @@
     "pointers",
     "fragmentid"
   ],
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "dist.browser"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/flitbit/json-ptr"
   },
   "scripts": {
-    "prerelease": "npm run clean && npm run test",
-    "release": "uglifyjs -c -m -o dist/json-ptr.min.js -r '$,require,exports,self,module,define' index.js",
-    "clean": "rimraf dist && mkdir dist",
-    "preversion": "npm run release",
-    "postversion": "git push && git push --tags",
+    "clean": "rimraf coverage dist dist.browser tmp docs",
+    "prebuild": "npm run lint",
+    "build:browser": "webpack",
+    "build:browser-tests": "webpack --config webpack.tests.config.js",
+    "buildall": "tsc -p tsconfig.release.json && npm run build:browser && npm run build:browser-tests && npm run docs",
+    "build": "npm run buildall",
+    "build:watch": "tsc -w -p tsconfig.release.json",
+    "lint": "eslint . --ext .ts,.tsx",
     "pretest": "npm run lint",
-    "test": "mocha test/**/*.js --reporter tap",
-    "test:watch": "nodemon --ext js,json --ignore dist/ --exec 'npm test'",
-    "preci": "npm run lint",
-    "ci": "mocha --reporter mocha-junit-reporter test/**/*.js",
-    "lint": "eslint index.js test"
+    "test": "nyc mocha __tests__/**/*.spec.ts",
+    "test:watch": "chokidar \"*.js\" \"*.json\" \"src/**/*.ts\" \"__tests__/**/*.ts\" --command \"npm run test\" --initial",
+    "cilint": "eslint . --ext .ts,.tsx --format junit --output-file ./reports/eslint/eslint.xml",
+    "precibuild": "npm run cilint",
+    "cibuild": "npm run buildall",
+    "preci": "npm run cibuild",
+    "ci": "nyc mocha __tests__/**/*.spec.ts --timeout=10000 --exit --reporter mocha-junit-reporter --reporter-options mochaFile=reports/mocha/test-results.xml",
+    "docs": "typedoc"
   },
   "devDependencies": {
-    "bluebird": "^3.5.5",
-    "eslint": "^6.4.0",
-    "eslint-plugin-mocha": "^6.1.1",
-    "expect.js": "^0.3.1",
-    "json": "^9.0.6",
-    "mocha": "^6.2.0",
-    "mocha-junit-reporter": "^1.23.1",
-    "nodemon": "^1.19.2",
-    "rimraf": "^3.0.0",
-    "uglify-js": "^3.6.0"
+    "@types/assert-plus": "^1.0.4",
+    "@types/bent": "^7.0.2",
+    "@types/chai": "^4.2.11",
+    "@types/debug": "^4.1.5",
+    "@types/mocha": "^7.0.2",
+    "@types/node": "~14.0.19",
+    "@typescript-eslint/eslint-plugin": "~3.6.0",
+    "@typescript-eslint/parser": "~3.6.0",
+    "bent": "^7.3.7",
+    "chai": "^4.2.0",
+    "chokidar-cli": "^2.1.0",
+    "eslint": "^7.4.0",
+    "eslint-config-prettier": "~6.11.0",
+    "eslint-plugin-mocha": "^7.0.1",
+    "mocha": "^8.0.1",
+    "mocha-junit-reporter": "^2.0.0",
+    "nyc": "^15.1.0",
+    "prettier": "~2.0.5",
+    "rimraf": "~3.0.2",
+    "ts-loader": "^7.0.5",
+    "ts-node": "^8.10.2",
+    "typedoc": "^0.17.8",
+    "typescript": "~3.9.6",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.12"
+  },
+  "nyc": {
+    "include": [
+      "src/**/*.ts"
+    ],
+    "extension": [
+      ".ts",
+      ".tsx"
+    ],
+    "require": [
+      "ts-node/register"
+    ],
+    "reporter": [
+      "text-summary",
+      "html"
+    ],
+    "sourceMap": true,
+    "instrument": true
   }
 }

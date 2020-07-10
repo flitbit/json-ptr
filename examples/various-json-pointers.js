@@ -1,5 +1,5 @@
 var assert = require('assert'),
-  ptr = require('..');
+  ptr = require('../dist');
 
 var obj = {
   a: 1,

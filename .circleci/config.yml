@@ -1,38 +1,12 @@
-version: 2
-jobs:
-  build:
-    working_directory: ~/repo
+version: 2.1
+executors:
+  node-12:
     docker:
-      - image: circleci/node:10
-    steps:
-      - checkout
-      - run:
-          name: authorize npm
-          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-      - restore_cache:
-          key: dependency-cache-{{ checksum "package.json" }}
-      - run:
-          name: run npm install
-          command: npm install
-      - save_cache:
-          key: dependency-cache-{{ checksum "package.json" }}
-          paths:
-            - ./node_modules
-      - run: mkdir ~/junit
-      - run:
-          name: build & test
-          command: npm run ci
-          when: always
-      - run: cp test-results.xml ~/junit/test-results.xml
-      - store_test_results:
-          path: ~/junit
-      - store_artifacts:
-          path: ~/junit
+      - image: circleci/node:12
 
-  build_deploy_npm:
-    working_directory: ~/repo
-    docker:
-      - image: circleci/node:10
+commands:
+  npm-ci:
+    description: "standard npm-based ci workflow"
     steps:
       - checkout
       - run:
@@ -47,27 +21,56 @@ jobs:
           key: dependency-cache-{{ checksum "package.json" }}
           paths:
             - ./node_modules
-      - run: mkdir ~/junit
+      - run: mkdir reports
       - run:
           name: build & test
           command: npm run ci
           when: always
-      - run: cp test-results.xml ~/junit/test-results.xml
+      - run: ./node_modules/.bin/nyc report --report --reporter=text-lcov > coverage/lcov.info
+      # Upload results
       - store_test_results:
-          path: ~/junit
+          path: reports
       - store_artifacts:
-          path: ~/junit
+          path: ./reports/mocha/test-results.xml
+      - store_artifacts:
+          path: ./reports/eslint/eslint.xml
+      - store_artifacts: # upload test coverage as artifact
+          path: ./coverage/lcov.info
+          prefix: tests
+
+jobs:
+  build-pre:
+    working_directory: ~/repo
+    executor: node-12
+    steps:
+      - npm-ci
       - run:
-          name: publish package to npm
-          command: npm publish
+          name: write pre-release npm package
+          command: |
+            sudo npm i -g json semver
+            PACKAGE_VERSION="$(cat package.json | json version)"
+            BRANCH_NAME="${CIRCLE_BRANCH//[^a-z0-9\-]/-}"
+            VERSION_PRE="$(semver -i prepatch --preid ${BRANCH_NAME}.$(git rev-parse --short HEAD) ${PACKAGE_VERSION})"
+            npm --no-git-tag-version version ${VERSION_PRE%.0}
+            npm publish --tag=${BRANCH_NAME}
+
+  build-release:
+    working_directory: ~/repo
+    executor: node-12
+    steps:
+      - npm-ci
+      - run:
+          name: publish npm package
+          command: |
+            npm publish
 
 workflows:
   version: 2
   build_deploy:
     jobs:
-      - build:
+      - build-pre:
           context: secrets
-      - build_deploy_npm:
+      - build-release:
           context: secrets
           filters:
             tags:

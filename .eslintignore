@@ -1,3 +1,2 @@
-releases/
-coverage/
+/**/*.js
 dist/
