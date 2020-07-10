@@ -30,7 +30,8 @@
     "lint": "eslint . --ext .ts,.tsx",
     "pretest": "npm run lint",
     "test": "nyc mocha __tests__/**/*.spec.ts",
-    "test:watch": "chokidar \"*.js\" \"*.json\" \"src/**/*.ts\" \"__tests__/**/*.ts\" --command \"npm run test\" --initial"
+    "test:watch": "chokidar \"*.js\" \"*.json\" \"src/**/*.ts\" \"__tests__/**/*.ts\" --command \"npm run test\" --initial",
+    "ci": "npm run test && npm run test"
   },
   "devDependencies": {
     "@types/assert-plus": "^1.0.4",
