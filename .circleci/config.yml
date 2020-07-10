@@ -39,7 +39,7 @@ jobs:
             PACKAGE_VERSION="$(cat package.json | json version)"
             BRANCH_NAME="${CIRCLE_BRANCH//[^a-z0-9\-]/-}"
             VERSION_PRE="$(semver -i prepatch --preid ${BRANCH_NAME}.$(git rev-parse --short HEAD) ${PACKAGE_VERSION})"
-            npm --no-git-tag-version version ${VERSION_PRE}
+            npm --no-git-tag-version version ${VERSION_PRE%.0}
             npm publish --tag=${BRANCH_NAME}
 
   build-release:
