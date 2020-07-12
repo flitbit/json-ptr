@@ -37,7 +37,7 @@
     "cibuild": "npm run buildall",
     "preci": "npm run cibuild",
     "ci": "nyc mocha __tests__/**/*.spec.ts --timeout=10000 --exit --reporter mocha-junit-reporter --reporter-options mochaFile=reports/mocha/test-results.xml",
-    "docs": "typedoc"
+    "docs": "typedoc --theme minimal && cp _config.yml docs/"
   },
   "devDependencies": {
     "@types/assert-plus": "^1.0.4",

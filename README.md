@@ -1,6 +1,6 @@
 # json-ptr
 
-[![CircleCI](https://circleci.com/gh/flitbit/json-ptr/tree/master.svg?style=svg)](https://circleci.com/gh/flitbit/json-ptr/tree/master)
+[![CircleCI](https://circleci.com/gh/flitbit/json-ptr/tree/master.svg?style=svg)](https://circleci.com/gh/flitbit/json-ptr/tree/master) [![codecov](https://codecov.io/gh/flitbit/json-ptr/branch/master/graph/badge.svg)](https://codecov.io/gh/flitbit/json-ptr)
 
 A complete implementation of JSON Pointer ([RFC 6901](https://tools.ietf.org/html/rfc6901)) for nodejs and modern browsers.
 
