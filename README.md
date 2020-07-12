@@ -22,6 +22,12 @@ npm install json-ptr
 import { JsonPointer, create } from 'json-ptr';
 ```
 
+## API Documentation
+
+The API documentation is generated from code by typedoc and [hosted on github](http://flitbit.github.io/json-ptr/classes/_src_pointer_.jsonpointer.html). Read the docs.
+
+Documentation is always a work in progress, let us know by creating an issue if you need a scenario documented.
+
 ### Example
 
 There are many uses for JSON Pointers, here's one we encountered when we updated a public API and suddenly had clients sending two different message bodies to our APIs. This example is contrived to illustrate how we supported both new and old incoming messages:
@@ -123,12 +129,6 @@ console.log(primaryGuestName(reservationV1));
 console.log(primaryGuestName(reservationV1_1));
 
 ```
-
-## API Documentation
-
-The API documentation is generated from code comments by typedoc and [hosted on github](http://flitbit.github.io/json-ptr/). Read the docs.
-
-We welcome new issues if you have questions or need additional documentation.
 
 ## Tests
 
