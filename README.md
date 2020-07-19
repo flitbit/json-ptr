@@ -8,6 +8,10 @@ A complete implementation of JSON Pointer ([RFC 6901](https://tools.ietf.org/htm
 
 I wrote this a few years back when I was unable to find a _complete implementation_ of [RFC 6901](https://tools.ietf.org/html/rfc6901). It turns out that I now use the hell out of it.
 
+## Breaking Changes at v1.3.0
+
+As was rightly pointed out in [this issue](https://github.com/flitbit/json-ptr/issues/24), I should have rolled the major version at `v1.3.0` instead of the minor version due to [breaking changes to the API](#user-content-where-did-the-global-functions-go). Not the worst blunder I've made, but my apologies all the same. Since the ship has sailed, I'm boosting the visibility of these breaking changes.
+
 ## Install
 
 ```bash
@@ -132,7 +136,7 @@ console.log(primaryGuestName(reservationV1_1));
 
 ### Where did the Global Functions Go?
 
-In version `v1.3.0` of the library, global functions were moved to the `JsonPointer` class.
+In version `v1.3.0` of the library, global functions were moved to static functions of the `JsonPointer` class. There should be no difference in arguments or behavior. If you were previously importing the global functions it is a small change to destructure them and have compatible code.
 
 | Global Fn           | Static Fn                       | Documentation                                                                                                                                                                                                                           |
 | ------------------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
