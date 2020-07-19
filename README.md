@@ -233,7 +233,7 @@ It is important to recognize in the performance results that _compiled_ options 
 ## Releases
 
 -   2020-07-10 — **1.3.0** **BREAKING CHANGES**
-    -   **BREAKING CHANGE:** Global functions are now static functions on the `JsonPointer` type. See [_Where did the Global Functions Go?_](#user-content-where-dit-the-global-functions-go)
+    -   **BREAKING CHANGE:** Global functions are now static functions on the `JsonPointer` type. See [_Where did the Global Functions Go?_](#user-content-where-did-the-global-functions-go)
     -   Merged new `.unset()` function contributed by @chrishalbert, updated dependencies.
     -   Migrated to typescript and retooled build/test/deploy pipeline. Definitely typed.
     -   100% test coverage which illuminated some idiosyncrasies; maybe we killed unobserved bugs, nobody knows.
