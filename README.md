@@ -130,6 +130,24 @@ console.log(primaryGuestName(reservationV1_1));
 
 ```
 
+### Where did the Global Functions Go?
+
+In version `v1.3.0` of the library, global functions were moved to the `JsonPointer` class.
+
+| Global Fn           | Static Fn                       | Documentation                                                                                                                                                                                                                           |
+| ------------------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `create()`          | `JsonPointer.create()`          | [Factory function that creates a `JsonPointer`](http://flitbit.github.io/json-ptr/classes/_src_pointer_.jsonpointer.html#create)                                                                                                        |
+| `decode()`          | `JsonPointer.decode()`          | [Decodes the specified pointer into path segments.](http://flitbit.github.io/json-ptr/classes/_src_pointer_.jsonpointer.html#decode)                                                                                                    |
+| `flatten()`         | `JsonPointer.flatten()`         | [DEvaluates the target's object graph, returning a Record&lt;Pointer, unknown> populated with pointers and the corresponding values from the graph..](http://flitbit.github.io/json-ptr/classes/_src_pointer_.jsonpointer.html#flatten) |
+| `get()`             | `JsonPointer.get()`             | [Gets the target object's value at the pointer's location.](http://flitbit.github.io/json-ptr/classes/_src_pointer_.jsonpointer.html#get)                                                                                               |
+| `has()`             | `JsonPointer.has()`             | [Determines if the specified target's object graph has a value at the pointer's location.](http://flitbit.github.io/json-ptr/classes/_src_pointer_.jsonpointer.html#has)                                                                |
+| `listFragmentIds()` | `JsonPointer.listFragmentIds()` | [Evaluates the target's object graph, returning a UriFragmentIdentifierPointerListItem for each location in the graph.](http://flitbit.github.io/json-ptr/classes/_src_pointer_.jsonpointer.html#listFragmentIds)                       |
+| `listPointers()`    | `JsonPointer.listPointers()`    | [Evaluates the target's object graph, returning a JsonStringPointerListItem for each location in the graph.](http://flitbit.github.io/json-ptr/classes/_src_pointer_.jsonpointer.html#listPointers)                                     |
+| `map()`             | `JsonPointer.map()`             | [Evaluates the target's object graph, returning a Map&lt;Pointer,unknown> populated with pointers and the corresponding values form the graph.](http://flitbit.github.io/json-ptr/classes/_src_pointer_.jsonpointer.html#map)           |
+| `set()`             | `JsonPointer.set()`             | [Sets the target object's value, as specified, at the pointer's location.](http://flitbit.github.io/json-ptr/classes/_src_pointer_.jsonpointer.html#set)                                                                                |
+|                     | `JsonPointer.unset()`           | [Removes the target object's value at the pointer's location.](http://flitbit.github.io/json-ptr/classes/_src_pointer_.jsonpointer.html#unset)                                                                                          |
+| `visit()`           | `JsonPointer.visit()`           | [Evaluates the target's object graph, calling the specified visitor for every unique pointer location discovered while walking the graph.](http://flitbit.github.io/json-ptr/classes/_src_pointer_.jsonpointer.html#visit)              |
+
 ## Tests
 
 We're maintaining near 100% test coverage. Visit our [circleci build page](https://app.circleci.com/pipelines/github/flitbit/json-ptr) and drill down on a recent build's _build and test_ step to see where we're at. It should look something like:
@@ -210,7 +228,8 @@ It is important to recognize in the performance results that _compiled_ options 
 
 ## Releases
 
--   2020-07-10 — **1.3.0**
+-   2020-07-10 — **1.3.0** **BREAKING CHANGES**
+    -   **BREAKING CHANGE:** Global functions are now static functions on the `JsonPointer` type. See [_Where did the Global Functions Go?_](#user-content-where-dit-the-global-functions-go)
     -   Merged new `.unset()` function contributed by @chrishalbert, updated dependencies.
     -   Migrated to typescript and retooled build/test/deploy pipeline. Definitely typed.
     -   100% test coverage which illuminated some idiosyncrasies; maybe we killed unobserved bugs, nobody knows.

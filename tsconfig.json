@@ -15,11 +15,11 @@
     "noUnusedParameters": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
-    "strictNullChecks": false,
+    "strictNullChecks": false
   },
   "include": [
     "src/**/*",
     "__tests__/**/*",
-    "examples/**/*.ts",
+    "examples/**/*.ts"
   ]
 }
