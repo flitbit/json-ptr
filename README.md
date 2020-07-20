@@ -145,6 +145,7 @@ In version `v1.3.0` of the library, global functions were moved to static functi
 | `flatten()`         | `JsonPointer.flatten()`         | [DEvaluates the target's object graph, returning a Record&lt;Pointer, unknown> populated with pointers and the corresponding values from the graph..](http://flitbit.github.io/json-ptr/classes/_src_pointer_.jsonpointer.html#flatten) |
 | `get()`             | `JsonPointer.get()`             | [Gets the target object's value at the pointer's location.](http://flitbit.github.io/json-ptr/classes/_src_pointer_.jsonpointer.html#get)                                                                                               |
 | `has()`             | `JsonPointer.has()`             | [Determines if the specified target's object graph has a value at the pointer's location.](http://flitbit.github.io/json-ptr/classes/_src_pointer_.jsonpointer.html#has)                                                                |
+| `list()`            |                                 | Replaced by `JsonPointer.listFragmentIds()` and `JsonPointer.listPointers()`.                                                                                                                                                           |
 | `listFragmentIds()` | `JsonPointer.listFragmentIds()` | [Evaluates the target's object graph, returning a UriFragmentIdentifierPointerListItem for each location in the graph.](http://flitbit.github.io/json-ptr/classes/_src_pointer_.jsonpointer.html#listFragmentIds)                       |
 | `listPointers()`    | `JsonPointer.listPointers()`    | [Evaluates the target's object graph, returning a JsonStringPointerListItem for each location in the graph.](http://flitbit.github.io/json-ptr/classes/_src_pointer_.jsonpointer.html#listPointers)                                     |
 | `map()`             | `JsonPointer.map()`             | [Evaluates the target's object graph, returning a Map&lt;Pointer,unknown> populated with pointers and the corresponding values form the graph.](http://flitbit.github.io/json-ptr/classes/_src_pointer_.jsonpointer.html#map)           |
@@ -231,6 +232,13 @@ json-pointer | get    |          | 1000000 | 2619 | 346.17%
 It is important to recognize in the performance results that _compiled_ options are faster. As a general rule, you should _compile_ any pointers you'll be using repeatedly.
 
 ## Releases
+
+> BEWARE of [Breaking Changes at v1.3.0!](#user-content-where-did-the-global-functions-go)
+
+-   2020-07-20 — **1.3.2**
+    -   Added missing `tslib` dependency.
+    -   Documented [where the global functions are now located; moving them broke compatibility at v1.3.0](#user-content-where-did-the-global-functions-go).
+
 
 -   2020-07-10 — **1.3.0** **BREAKING CHANGES**
     -   **BREAKING CHANGE:** Global functions are now static functions on the `JsonPointer` type. See [_Where did the Global Functions Go?_](#user-content-where-did-the-global-functions-go)

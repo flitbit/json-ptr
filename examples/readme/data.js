@@ -4,7 +4,7 @@
  */
 
 
-export const data = {
+module.exports.data = {
   legumes: [
     {
       name: 'pinto beans',

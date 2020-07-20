@@ -1,18 +1,18 @@
 'use strict';
 
-var assert = require('assert');
-var ptr = require('../../'); // json-ptr
+const assert = require('assert');
+const { JsonPointer: ptr, encodePointer, encodeUriFragmentIdentifier } = require('../../dist'); // json-ptr
 
-var pointer = '/people/wilbur dongleworth/age';
-var fragmentId = '#/people/wilbur%20dongleworth/age';
+const pointer = '/people/wilbur dongleworth/age';
+const fragmentId = '#/people/wilbur%20dongleworth/age';
 
 // round-trip encode pointer
-var path = ptr.decode(pointer);
-var decodedPointer = ptr.encodePointer(path);
+const path = ptr.decode(pointer);
+const decodedPointer = encodePointer(path);
 
 // round-trip encode fragmentId
-var fragmentPath = ptr.decode(fragmentId);
-var decodedFragmentId = ptr.encodeUriFragmentIdentifier(fragmentPath);
+const fragmentPath = ptr.decode(fragmentId);
+const decodedFragmentId = encodeUriFragmentIdentifier(fragmentPath);
 
 // pointers and fragments decode to equal paths and round-trip encode equal
 assert.equal(pointer, decodedPointer);

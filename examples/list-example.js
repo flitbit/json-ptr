@@ -1,5 +1,5 @@
-var util = require('util'),
-  JsonPointer = require('..');
+const util = require('util');
+const { JsonPointer } = require('../dist');
 var data = {
   a: 1,
   b: {
@@ -17,12 +17,12 @@ var data = {
   f: null
 };
 
-var items = JsonPointer.list(data);
+var items = JsonPointer.listPointers(data);
 
 console.log(util.inspect(items, false, 99));
 
 items = [];
-JsonPointer.list(data, function(item) {
+JsonPointer.listFragmentIds(data, function(item) {
   var type = typeof item.value;
   if (type === 'object') {
     if (Array.isArray(item.value)) {

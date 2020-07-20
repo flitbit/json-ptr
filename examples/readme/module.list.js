@@ -1,9 +1,9 @@
 'use strict';
 
-var ptr = require('../../'); // json-ptr
-var data = require('./data');
+const { JsonPointer: ptr } = require('../../'); // json-ptr
+const { data } = require('./data');
 
-// var list = ptr.list(data);
-var list = ptr.list(data, true);
+const list = ptr.listPointers(data, true);
+// or: const list = ptr.listFragmentIds(data);
 
 console.log(JSON.stringify(list, null, '  '));

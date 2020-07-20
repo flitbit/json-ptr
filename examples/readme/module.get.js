@@ -1,10 +1,10 @@
 'use strict';
 
-var ptr = require('../../'); // json-ptr
-var data = require('./data');
-var format = require('util').format;
+const { JsonPointer: ptr } = require('../../dist'); // json-ptr
+const { data } = require('./data');
+const { format } = require('util');
 
-var value = ptr.get(data, '/legumes/1');
+const value = ptr.get(data, '/legumes/1');
 // fragmentId: #/legumes/1
 
 console.log(

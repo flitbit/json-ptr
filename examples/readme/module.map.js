@@ -1,10 +1,10 @@
 
-var ptr = require('../../'); // json-ptr
-var data = require('./data');
+const { JsonPointer: ptr } = require('../../'); // json-ptr
+const { data } = require('./data');
 
-// var map = ptr.map(data);
-var map = ptr.map(data, true);
+// const map = ptr.map(data);
+const map = ptr.map(data, true);
 
-for (var it of map) {
+for (const it of map) {
   console.log(JSON.stringify(it, null, '  '));
 }

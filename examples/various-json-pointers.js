@@ -1,5 +1,5 @@
-var assert = require('assert'),
-  ptr = require('../dist');
+const assert = require('assert');
+const { JsonPointer: ptr } = require('../dist');
 
 var obj = {
   a: 1,
