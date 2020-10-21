@@ -183,6 +183,13 @@ describe('JsonPointer', () => {
       });
 
     }
+
+    it('throws on attempted prototype pollution', () => {
+      const subject = { my: 'subject' };
+      expect(() => JsonPointer.set(subject, new JsonPointer('/__proto__/polluted'), 'Yes! It\'s polluted'))
+        .to.throw('Attempted prototype pollution disallowed.');
+    })
+
   });
 
   describe('static .unset()', () => {
