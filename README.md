@@ -138,9 +138,9 @@ console.log(primaryGuestName(reservationV1_1));
 
 In version `v1.3.0` of the library, global functions were moved to static functions of the `JsonPointer` class. There should be no difference in arguments or behavior. If you were previously importing the global functions it is a small change to destructure them and have compatible code.
 
-| Global Fn           | Static Fn                       | Documentation                                                                                                                                                                                                                           |
-| ------------------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `create()`          | `JsonPointer.create()`          | [Factory function that creates a `JsonPointer`](http://flitbit.github.io/json-ptr/classes/_src_pointer_.jsonpointer.html#create)                                                                                                        |
+| Global Fn | Static Fn | Documentation |
+|---|---|---|
+| `create()`| `JsonPointer.create()`          | [Factory function that creates a `JsonPointer`](http://flitbit.github.io/json-ptr/classes/_src_pointer_.jsonpointer.html#create)                                                                                                        |
 | `decode()`          | `JsonPointer.decode()`          | [Decodes the specified pointer into path segments.](http://flitbit.github.io/json-ptr/classes/_src_pointer_.jsonpointer.html#decode)                                                                                                    |
 | `flatten()`         | `JsonPointer.flatten()`         | [DEvaluates the target's object graph, returning a Record&lt;Pointer, unknown> populated with pointers and the corresponding values from the graph..](http://flitbit.github.io/json-ptr/classes/_src_pointer_.jsonpointer.html#flatten) |
 | `get()`             | `JsonPointer.get()`             | [Gets the target object's value at the pointer's location.](http://flitbit.github.io/json-ptr/classes/_src_pointer_.jsonpointer.html#get)                                                                                               |
@@ -232,6 +232,10 @@ json-pointer | get    |          | 1000000 | 2619 | 346.17%
 It is important to recognize in the performance results that _compiled_ options are faster. As a general rule, you should _compile_ any pointers you'll be using repeatedly.
 
 ## Releases
+
+- 2020-10-21 — **2.0.0** _*Breaking Change*_
+  - Prototype pollution using this library is now disallowed and will throw an error. I've been looking into the origin of this issue and it seems to have been disclosed by mohan on [huntr.dev](https://www.huntr.dev/bounties/1-npm-json-ptr/). I received [a PR from](https://github.com/flitbit/json-ptr/pull/26) [@luci-m-666](https://github.com/luci-m-666), but found [another PR](https://github.com/418sec/json-ptr/pull/1) by [@alromh87](https://github.com/alromh87) that looks like the origin of the solution. Don't know who to thank, but thanks all -- somebody is due a bounty.
+  - Just in case somebody was relying on `json-ptr` to support pointers across the prototype, I'm rolling the major version number because you're now broken.
 
 > BEWARE of [Breaking Changes at v1.3.0!](#user-content-where-did-the-global-functions-go)
 
