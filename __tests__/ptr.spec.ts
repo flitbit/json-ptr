@@ -3,7 +3,6 @@
  * @packageDocumentation
  */
 
-
 import {
   JsonPointer,
   encodePointer,
@@ -963,7 +962,8 @@ describe('JsonPointer', function () {
       });
     });
     describe('listFragmentIds(target)', function () {
-      const items: UriFragmentIdentifierPointerListItem[] = JsonPointer.listFragmentIds(data);
+      const items: UriFragmentIdentifierPointerListItem[] =
+        JsonPointer.listFragmentIds(data);
       fragmentList.forEach(function (tt, n) {
         it(`item ${n} has fragmentId ${tt[0]}`, () => {
           expect(items[n].fragmentId).to.eql(tt[0]);
@@ -992,19 +992,33 @@ describe('concat pointers', function () {
   const ptr2 = create('/c/d');
   const result = '/a/b/c/d';
 
-  it('#concat JsonPointer("/a/b") with array ["a", "b"] should produce ' + result, function () {
-    expect(ptr1.concat(Array.from(ptr2.path)).pointer).to.eql(result);
-  });
+  it(
+    '#concat JsonPointer("/a/b") with array ["a", "b"] should produce ' +
+      result,
+    function () {
+      expect(ptr1.concat(Array.from(ptr2.path)).pointer).to.eql(result);
+    },
+  );
 
-  it('#concat JsonPointer("/a/b") with JsonPointer("/b/c") should produce ' + result, function () {
-    expect(ptr1.concat(ptr2).pointer).to.eql(result);
-  });
+  it(
+    '#concat JsonPointer("/a/b") with JsonPointer("/b/c") should produce ' +
+      result,
+    function () {
+      expect(ptr1.concat(ptr2).pointer).to.eql(result);
+    },
+  );
 
-  it('#concat JsonPointer("/a/b") with string "/b/c" should produce ' + result, function () {
-    expect(ptr1.concat(ptr2.pointer).pointer).to.eql(result);
-  });
+  it(
+    '#concat JsonPointer("/a/b") with string "/b/c" should produce ' + result,
+    function () {
+      expect(ptr1.concat(ptr2.pointer).pointer).to.eql(result);
+    },
+  );
 
-  it('#concat JsonPointer("/a/b") with string "#/b/c" should produce ' + result, function () {
-    expect(ptr1.concat(ptr2.uriFragmentIdentifier).toString()).to.eql(result);
-  });
+  it(
+    '#concat JsonPointer("/a/b") with string "#/b/c" should produce ' + result,
+    function () {
+      expect(ptr1.concat(ptr2.uriFragmentIdentifier).toString()).to.eql(result);
+    },
+  );
 });

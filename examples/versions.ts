@@ -21,7 +21,7 @@ const versions: Record<SupportedVersion, PrimaryGuestNamePointers> = {
     name: JsonPointer.create('/primary/primaryGuest/name'),
     surname: JsonPointer.create('/primary/primaryGuest/surname'),
     honorific: JsonPointer.create('/primary/primaryGuest/honorific'),
-  }
+  },
 };
 
 interface Reservation extends Record<string, unknown> {
@@ -50,21 +50,25 @@ function primaryGuestName(reservation: Reservation): string {
 
 // The original layout of a reservation (only the parts relevant to our example)
 const reservationV1: Reservation = {
-  guests: [{
-    name: 'Wilbur',
-    surname: 'Finkle',
-    honorific: 'Mr.'
-  }, {
-    name: 'Wanda',
-    surname: 'Finkle',
-    honorific: 'Mrs.'
-  }, {
-    name: 'Wilma',
-    surname: 'Finkle',
-    honorific: 'Miss',
-    child: true,
-    age: 12
-  }]
+  guests: [
+    {
+      name: 'Wilbur',
+      surname: 'Finkle',
+      honorific: 'Mr.',
+    },
+    {
+      name: 'Wanda',
+      surname: 'Finkle',
+      honorific: 'Mrs.',
+    },
+    {
+      name: 'Wilma',
+      surname: 'Finkle',
+      honorific: 'Miss',
+      child: true,
+      age: 12,
+    },
+  ],
   // ...
 };
 
@@ -75,21 +79,24 @@ const reservationV1_1: Reservation = {
     primaryGuest: {
       name: 'Wilbur',
       surname: 'Finkle',
-      honorific: 'Mr.'
+      honorific: 'Mr.',
     },
-    additionalGuests: [{
-      name: 'Wanda',
-      surname: 'Finkle',
-      honorific: 'Mrs.'
-    }, {
-      name: 'Wilma',
-      surname: 'Finkle',
-      honorific: 'Miss',
-      child: true,
-      age: 12
-    }]
+    additionalGuests: [
+      {
+        name: 'Wanda',
+        surname: 'Finkle',
+        honorific: 'Mrs.',
+      },
+      {
+        name: 'Wilma',
+        surname: 'Finkle',
+        honorific: 'Miss',
+        child: true,
+        age: 12,
+      },
+    ],
     // ...
-  }
+  },
   // ...
 };
 

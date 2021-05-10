@@ -21,12 +21,11 @@ import {
 } from '../src';
 
 describe('Utils', () => {
-
   type Tests = [PathSegments, PathSegments, string];
   const fragments: Tests[] = [
     [[], [], '#'],
     [[''], [''], '#/'],
-    [['foo bar'], ['foo%20bar'], "#/foo%20bar"],
+    [['foo bar'], ['foo%20bar'], '#/foo%20bar'],
     [['foo bar', 0], ['foo%20bar', 0], '#/foo%20bar/0'],
   ];
   const pointers: Tests[] = [
@@ -36,10 +35,11 @@ describe('Utils', () => {
     [['foo bar', 0], ['foo bar', 0], '/foo bar/0'],
   ];
 
-
   describe('encodeFragmentSegments()', () => {
     for (const [decoded, encoded] of fragments) {
-      it(`${JSON.stringify(decoded)} encodes to ${JSON.stringify(encoded)}`, () => {
+      it(`${JSON.stringify(decoded)} encodes to ${JSON.stringify(
+        encoded,
+      )}`, () => {
         expect(encodeFragmentSegments(decoded)).to.eql(encoded);
       });
     }
@@ -47,7 +47,9 @@ describe('Utils', () => {
 
   describe('decodeFragmentSegments()', () => {
     for (const [decoded, encoded] of fragments) {
-      it(`${JSON.stringify(encoded)} encodes to ${JSON.stringify(decoded)}`, () => {
+      it(`${JSON.stringify(encoded)} encodes to ${JSON.stringify(
+        decoded,
+      )}`, () => {
         expect(decodeFragmentSegments(encoded)).to.eql(decoded);
       });
     }
@@ -55,7 +57,9 @@ describe('Utils', () => {
 
   describe('encodePointerSegments()', () => {
     for (const [decoded, encoded] of pointers) {
-      it(`${JSON.stringify(decoded)} encodes to ${JSON.stringify(encoded)}`, () => {
+      it(`${JSON.stringify(decoded)} encodes to ${JSON.stringify(
+        encoded,
+      )}`, () => {
         expect(encodePointerSegments(decoded)).to.eql(encoded);
       });
     }
@@ -63,7 +67,9 @@ describe('Utils', () => {
 
   describe('decodePointerSegments()', () => {
     for (const [decoded, encoded] of pointers) {
-      it(`${JSON.stringify(encoded)} encodes to ${JSON.stringify(decoded)}`, () => {
+      it(`${JSON.stringify(encoded)} encodes to ${JSON.stringify(
+        decoded,
+      )}`, () => {
         expect(decodePointerSegments(encoded)).to.eql(decoded);
       });
     }
@@ -71,10 +77,14 @@ describe('Utils', () => {
 
   describe('encodePointer()', () => {
     it('throws when segments unspecified', () => {
-      expect(() => encodePointer(undefined)).to.throw('Invalid type: path must be an array of segments.');
+      expect(() => encodePointer(undefined)).to.throw(
+        'Invalid type: path must be an array of segments.',
+      );
     });
     it('throws when segments specified wrong type', () => {
-      expect(() => encodePointer({} as unknown as PathSegments)).to.throw('Invalid type: path must be an array of segments.');
+      expect(() => encodePointer({} as unknown as PathSegments)).to.throw(
+        'Invalid type: path must be an array of segments.',
+      );
     });
     for (const [, encoded, p] of pointers) {
       it(`${JSON.stringify(encoded)} = '${p}'`, () => {
@@ -85,10 +95,14 @@ describe('Utils', () => {
 
   describe('encodeUriFragmentIdentifier()', () => {
     it('throws when segments unspecified', () => {
-      expect(() => encodeUriFragmentIdentifier(undefined)).to.throw('Invalid type: path must be an array of segments.');
+      expect(() => encodeUriFragmentIdentifier(undefined)).to.throw(
+        'Invalid type: path must be an array of segments.',
+      );
     });
     it('throws when segments specified wrong type', () => {
-      expect(() => encodeUriFragmentIdentifier({} as unknown as PathSegments)).to.throw('Invalid type: path must be an array of segments.');
+      expect(() =>
+        encodeUriFragmentIdentifier({} as unknown as PathSegments),
+      ).to.throw('Invalid type: path must be an array of segments.');
     });
     for (const [decoded, , p] of fragments) {
       it(`${JSON.stringify(decoded)} = '${p}'`, () => {
@@ -97,34 +111,38 @@ describe('Utils', () => {
     }
   });
 
-
   describe('decodeUriFragmentIdentifier()', () => {
     it('throws when ptr unspecified', () => {
-      expect(() => decodeUriFragmentIdentifier(undefined)).to.throw('Invalid type: JSON Pointers are represented as strings.');
+      expect(() => decodeUriFragmentIdentifier(undefined)).to.throw(
+        'Invalid type: JSON Pointers are represented as strings.',
+      );
     });
     it('throws when ptr specified wrong type', () => {
-      expect(() => decodeUriFragmentIdentifier({} as unknown as string)).to.throw('Invalid type: JSON Pointers are represented as strings.');
+      expect(() =>
+        decodeUriFragmentIdentifier({} as unknown as string),
+      ).to.throw('Invalid type: JSON Pointers are represented as strings.');
     });
     it('throws when invalid ptr specified', () => {
-      expect(() => decodeUriFragmentIdentifier('')).to.throw('Invalid JSON Pointer syntax; URI fragment identifiers must begin with a hash.');
+      expect(() => decodeUriFragmentIdentifier('')).to.throw(
+        'Invalid JSON Pointer syntax; URI fragment identifiers must begin with a hash.',
+      );
     });
     for (const [decoded, , p] of fragments) {
-      const d = decoded.map(v => v + '');
+      const d = decoded.map((v) => v + '');
       it(`'${p}' === ${JSON.stringify(d)}`, () => {
         expect(decodeUriFragmentIdentifier(p)).to.eql(d);
       });
     }
   });
 
-
   describe('toArrayIndexReference()', () => {
     it('returns idx when specified as number', () => {
       expect(toArrayIndexReference([], 1000)).to.eql(1000);
     });
-    it('returns 0 when array falsy and idx === \'-\'', () => {
+    it("returns 0 when array falsy and idx === '-'", () => {
       expect(toArrayIndexReference(undefined, '-')).to.eql(0);
     });
-    it('returns length when idx === \'-\'', () => {
+    it("returns length when idx === '-'", () => {
       expect(toArrayIndexReference(['one'], '-')).to.eql(1);
     });
     it('returns -1 when idx NAN', () => {
@@ -138,10 +156,11 @@ describe('Utils', () => {
     });
   });
 
-
   describe('setValueAtPath()', () => {
     it('throws when target undefined', () => {
-      expect(() => setValueAtPath(undefined, 0, ['foo'])).to.throw('Cannot set values on undefined');
+      expect(() => setValueAtPath(undefined, 0, ['foo'])).to.throw(
+        'Cannot set values on undefined',
+      );
     });
     const data = { one: ['two', { three: 'four' }] };
     it('does not set at end of array if not forced', () => {
@@ -166,9 +185,13 @@ describe('Utils', () => {
 
   describe('unsetValueAtPath()', () => {
     it('throws when target undefined', () => {
-      expect(() => unsetValueAtPath(undefined, ['foo'])).to.throw('Cannot unset values on undefined');
+      expect(() => unsetValueAtPath(undefined, ['foo'])).to.throw(
+        'Cannot unset values on undefined',
+      );
     });
-    const data = { a: ['one', { two: 'three' }, 'four', { five: { six: 'seven' } }] };
+    const data = {
+      a: ['one', { two: 'three' }, 'four', { five: { six: 'seven' } }],
+    };
     it('can unset array elements', () => {
       const expected = data.a[0];
       expect(unsetValueAtPath(data, decodePointer('/a/0'))).to.eql(expected);
@@ -179,9 +202,9 @@ describe('Utils', () => {
     });
     it('succeeds when path through array', () => {
       const expected = (data.a[3] as Record<string, unknown>).six;
-      expect(unsetValueAtPath(data, decodePointer('/a/3/six'))).to.eql(expected);
+      expect(unsetValueAtPath(data, decodePointer('/a/3/six'))).to.eql(
+        expected,
+      );
     });
   });
-
 });
-
