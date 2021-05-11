@@ -29,6 +29,7 @@
     "build": "npm run buildall",
     "build:watch": "tsc -w --importHelpers -p tsconfig.release.json",
     "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "pretest": "npm run lint",
     "test": "nyc mocha __tests__/**/*.spec.ts",
     "test:watch": "chokidar \"*.js\" \"*.json\" \"src/**/*.ts\" \"__tests__/**/*.ts\" --command \"npm run test\" --initial",
@@ -37,34 +38,37 @@
     "cibuild": "npm run buildall",
     "preci": "npm run cibuild",
     "ci": "nyc mocha __tests__/**/*.spec.ts --timeout=10000 --exit --reporter mocha-junit-reporter --reporter-options mochaFile=reports/mocha/test-results.xml",
-    "docs": "typedoc --theme minimal && cp _config.yml docs/"
+    "docs": "typedoc --theme minimal --entryPoints src/index.ts && cp _config.yml docs/"
   },
   "devDependencies": {
     "@types/assert-plus": "^1.0.4",
-    "@types/bent": "^7.3.1",
-    "@types/chai": "^4.2.14",
+    "@types/bent": "^7.3.2",
+    "@types/chai": "^4.2.18",
     "@types/debug": "^4.1.5",
-    "@types/mocha": "^8.0.3",
-    "@types/node": "~14.14.1",
-    "@typescript-eslint/eslint-plugin": "~4.5.0",
-    "@typescript-eslint/parser": "~4.5.0",
+    "@types/mocha": "^8.2.2",
+    "@types/node": "~15.0.2",
+    "@typescript-eslint/eslint-plugin": "^4.23.0",
+    "@typescript-eslint/parser": "^4.23.0",
     "bent": "^7.3.12",
-    "chai": "^4.2.0",
+    "chai": "^4.3.4",
     "chokidar-cli": "^2.1.0",
-    "eslint": "^7.11.0",
-    "eslint-config-prettier": "~6.14.0",
-    "eslint-plugin-mocha": "^8.0.0",
-    "mocha": "^8.2.0",
+    "eslint": "^7.26.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-mocha": "^8.1.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "mocha": "^8.4.0",
     "mocha-junit-reporter": "^2.0.0",
     "nyc": "^15.1.0",
-    "prettier": "~2.1.2",
+    "prettier": "~2.3.0",
+    "process": "^0.11.10",
     "rimraf": "~3.0.2",
-    "ts-loader": "^8.0.6",
-    "ts-node": "^9.0.0",
-    "typedoc": "^0.19.2",
-    "typescript": "~4.0.3",
-    "webpack": "^4.44.2",
-    "webpack-cli": "^4.1.0"
+    "ts-loader": "^9.1.2",
+    "ts-node": "^9.1.1",
+    "typedoc": "^0.20.36",
+    "typescript": "~4.2.4",
+    "util": "^0.12.3",
+    "webpack": "^5.37.0",
+    "webpack-cli": "^4.7.0"
   },
   "nyc": {
     "include": [
@@ -85,6 +89,6 @@
     "instrument": true
   },
   "dependencies": {
-    "tslib": "^2.0.3"
+    "tslib": "^2.2.0"
   }
 }

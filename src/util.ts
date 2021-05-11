@@ -1,4 +1,11 @@
-import { JsonStringPointer, UriFragmentIdentifierPointer, Pointer, PathSegment, PathSegments, Decoder } from './types';
+import {
+  JsonStringPointer,
+  UriFragmentIdentifierPointer,
+  Pointer,
+  PathSegment,
+  PathSegments,
+  Decoder,
+} from './types';
 
 export function replace(source: string, find: string, repl: string): string {
   let res = '';
@@ -22,7 +29,11 @@ export function decodeFragmentSegments(segments: PathSegments): PathSegments {
   const res = new Array(len);
   while (++i < len) {
     if (typeof segments[i] === 'string') {
-      res[i] = replace(replace(decodeURIComponent(segments[i] as string), '~1', '/'), '~0', '~');
+      res[i] = replace(
+        replace(decodeURIComponent(segments[i] as string), '~1', '/'),
+        '~0',
+        '~',
+      );
     } else {
       res[i] = segments[i];
     }
@@ -36,7 +47,9 @@ export function encodeFragmentSegments(segments: PathSegments): PathSegments {
   const res = new Array(len);
   while (++i < len) {
     if (typeof segments[i] === 'string') {
-      res[i] = encodeURIComponent(replace(replace(segments[i] as string, '~', '~0'), '/', '~1'));
+      res[i] = encodeURIComponent(
+        replace(replace(segments[i] as string, '~', '~0'), '/', '~1'),
+      );
     } else {
       res[i] = segments[i];
     }
@@ -74,13 +87,17 @@ export function encodePointerSegments(segments: PathSegments): PathSegments {
 
 export function decodePointer(ptr: Pointer): PathSegments {
   if (typeof ptr !== 'string') {
-    throw new TypeError('Invalid type: JSON Pointers are represented as strings.');
+    throw new TypeError(
+      'Invalid type: JSON Pointers are represented as strings.',
+    );
   }
   if (ptr.length === 0) {
     return [];
   }
   if (ptr[0] !== '/') {
-    throw new ReferenceError('Invalid JSON Pointer syntax. Non-empty pointer must begin with a solidus `/`.');
+    throw new ReferenceError(
+      'Invalid JSON Pointer syntax. Non-empty pointer must begin with a solidus `/`.',
+    );
   }
   return decodePointerSegments(ptr.substring(1).split('/'));
 }
@@ -95,12 +112,18 @@ export function encodePointer(path: PathSegments): JsonStringPointer {
   return '/'.concat(encodePointerSegments(path).join('/'));
 }
 
-export function decodeUriFragmentIdentifier(ptr: UriFragmentIdentifierPointer): PathSegments {
+export function decodeUriFragmentIdentifier(
+  ptr: UriFragmentIdentifierPointer,
+): PathSegments {
   if (typeof ptr !== 'string') {
-    throw new TypeError('Invalid type: JSON Pointers are represented as strings.');
+    throw new TypeError(
+      'Invalid type: JSON Pointers are represented as strings.',
+    );
   }
   if (ptr.length === 0 || ptr[0] !== '#') {
-    throw new ReferenceError('Invalid JSON Pointer syntax; URI fragment identifiers must begin with a hash.');
+    throw new ReferenceError(
+      'Invalid JSON Pointer syntax; URI fragment identifiers must begin with a hash.',
+    );
   }
   if (ptr.length === 1) {
     return [];
@@ -111,7 +134,9 @@ export function decodeUriFragmentIdentifier(ptr: UriFragmentIdentifierPointer): 
   return decodeFragmentSegments(ptr.substring(2).split('/'));
 }
 
-export function encodeUriFragmentIdentifier(path: PathSegments): UriFragmentIdentifierPointer {
+export function encodeUriFragmentIdentifier(
+  path: PathSegments,
+): UriFragmentIdentifierPointer {
   if (!path || (path && !Array.isArray(path))) {
     throw new TypeError('Invalid type: path must be an array of segments.');
   }
@@ -121,7 +146,10 @@ export function encodeUriFragmentIdentifier(path: PathSegments): UriFragmentIden
   return '#/'.concat(encodeFragmentSegments(path).join('/'));
 }
 
-export function toArrayIndexReference(arr: readonly unknown[], idx: PathSegment): number {
+export function toArrayIndexReference(
+  arr: readonly unknown[],
+  idx: PathSegment,
+): number {
   if (typeof idx === 'number') return idx;
   const len = idx.length;
   if (!len) return -1;
@@ -148,14 +176,24 @@ export function compilePointerDereference(path: PathSegments): Dereference {
     return (it): unknown => it;
   }
   body = path.reduce((body, _, i) => {
-    return body + " && \n\ttypeof((it = it['" + replace(path[i] + '', '\\', '\\\\') + "'])) !== 'undefined'";
+    return (
+      body +
+      " && \n\ttypeof((it = it['" +
+      replace(path[i] + '', '\\', '\\\\') +
+      "'])) !== 'undefined'"
+    );
   }, "if (typeof(it) !== 'undefined'") as string;
   body = body + ') {\n\treturn it;\n }';
   // eslint-disable-next-line no-new-func
   return new Function('it', body) as Dereference;
 }
 
-export function setValueAtPath(target: unknown, val: unknown, path: PathSegments, force = false): unknown {
+export function setValueAtPath(
+  target: unknown,
+  val: unknown,
+  path: PathSegments,
+  force = false,
+): unknown {
   if (path.length === 0) {
     throw new Error('Cannot set the root object; assign it directly.');
   }
@@ -172,7 +210,11 @@ export function setValueAtPath(target: unknown, val: unknown, path: PathSegments
   let p: number;
   while (++cursor < len) {
     step = path[cursor];
-    if (step === '__proto__' || step === 'constructor' || step === 'prototype') {
+    if (
+      step === '__proto__' ||
+      step === 'constructor' ||
+      step === 'prototype'
+    ) {
       throw new Error('Attempted prototype pollution disallowed.');
     }
     if (Array.isArray(it)) {
@@ -274,5 +316,7 @@ export function pickDecoder(ptr: Pointer): Decoder {
 }
 
 export function decodePtrInit(ptr: Pointer | PathSegments): PathSegments {
-  return Array.isArray(ptr) ? ptr.slice(0) : pickDecoder(ptr as Pointer)(ptr as Pointer);
+  return Array.isArray(ptr)
+    ? ptr.slice(0)
+    : pickDecoder(ptr as Pointer)(ptr as Pointer);
 }
