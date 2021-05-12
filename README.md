@@ -239,7 +239,9 @@ It is important to recognize in the performance results that _compiled_ options 
 
 ## Releases
 
-- 2021-05-12 — **2.1.0** _Bug fixes for #28 and #30; **Security Vulnerability Patched**_
+- 2021-05-12 — **2.1.1** _Bug fix for [#36](https://github.com/flitbit/json-ptr/issues/36)_
+  - @CarolynWebster reported an unintentional behavior change starting at v1.3.0. An operation involving a pointer/path that crossed a null value in the object graph resulted in an exception. In versions prior to v1.3.0 it returned `undefined` as intended. The original behavior has been restored.
+- 2021-05-12 — **2.1.0** _Bug fixes for [#28](https://github.com/flitbit/json-ptr/issues/28) and [#30](https://github.com/flitbit/json-ptr/issues/30); **Security Vulnerability Patched**_
   - When compiling the accessors for quickly points in an object graph, the `.get()` method was not properly delimiting single quotes. This error caused the get operation to throw an exception in during normal usage. Worse, in cases where malicious user input was sent directly to `json-ptr`, the failure to delimit single quotes allowed the execution of arbitrary code (an injection attack). The first of these issues was reported in #28 by @mprast, the second (vulnerability) by @zpbrent. Thanks also to @elimumford for the actual code used for the fix.
 
   - If your code sent un-sanitized user input to the `.get()` method of `json-ptr`, your project was susceptible to this security vulnerability!
