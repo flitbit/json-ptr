@@ -8,6 +8,12 @@ A complete implementation of JSON Pointer ([RFC 6901](https://tools.ietf.org/htm
 
 I wrote this a few years back when I was unable to find a _complete implementation_ of [RFC 6901](https://tools.ietf.org/html/rfc6901). It turns out that I now use the hell out of it.
 
+## Security Vulnerability prior to v2.1.0
+
+There is a security vulnerability in versions prior to v2.1.0 in which an unscrupulous actor may execute arbitrary code. If your code sends un-sanitized user input to `json-ptr`'s `.get()` method, your project is vulnerable to this injection-style vulnerability.
+
+If your code is vulnerable, you should upgrade immediately, and also, stop sending un-sanitized user input to `json-ptr`.
+
 ## Breaking Changes at v1.3.0
 
 As was rightly pointed out in [this issue](https://github.com/flitbit/json-ptr/issues/24), I should have rolled the major version at `v1.3.0` instead of the minor version due to [breaking changes to the API](#user-content-where-did-the-global-functions-go). Not the worst blunder I've made, but my apologies all the same. Since the ship has sailed, I'm boosting the visibility of these breaking changes.
@@ -233,6 +239,11 @@ It is important to recognize in the performance results that _compiled_ options 
 
 ## Releases
 
+- 2021-05-12 — **2.1.0** _Bug fixes for #28 and #30; **Security Vulnerability Patched**_
+  - When compiling the accessors for quickly points in an object graph, the `.get()` method was not properly delimiting single quotes. This error caused the get operation to throw an exception in during normal usage. Worse, in cases where malicious user input was sent directly to `json-ptr`, the failure to delimit single quotes allowed the execution of arbitrary code (an injection attack). The first of these issues was reported in #28 by @mprast, the second (vulnerability) by @zpbrent. Thanks also to @elimumford for the actual code used for the fix.
+
+  - If your code sent un-sanitized user input to the `.get()` method of `json-ptr`, your project was susceptible to this security vulnerability!
+ 
 - 2020-10-21 — **2.0.0** _*Breaking Change*_
   - Prototype pollution using this library is now disallowed and will throw an error. I've been looking into the origin of this issue and it seems to have been disclosed by mohan on [huntr.dev](https://www.huntr.dev/bounties/1-npm-json-ptr/). I received [a PR from](https://github.com/flitbit/json-ptr/pull/26) [@luci-m-666](https://github.com/luci-m-666), but found [another PR](https://github.com/418sec/json-ptr/pull/1) by [@alromh87](https://github.com/alromh87) that looks like the origin of the solution. Don't know who to thank, but thanks all -- somebody is due a bounty.
   - Just in case somebody was relying on `json-ptr` to support pointers across the prototype, I'm rolling the major version number because you're now broken.
