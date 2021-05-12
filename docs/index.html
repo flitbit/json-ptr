@@ -2718,6 +2718,11 @@ img {
 				<h2>Background</h2>
 			</a>
 			<p>I wrote this a few years back when I was unable to find a <em>complete implementation</em> of <a href="https://tools.ietf.org/html/rfc6901">RFC 6901</a>. It turns out that I now use the hell out of it.</p>
+			<a href="#security-vulnerability-prior-to-v210" id="security-vulnerability-prior-to-v210" style="color: inherit; text-decoration: none;">
+				<h2>Security Vulnerability prior to v2.1.0</h2>
+			</a>
+			<p>There is a security vulnerability in versions prior to v2.1.0 in which an unscrupulous actor may execute arbitrary code. If your code sends un-sanitized user input to <code>json-ptr</code>&#39;s <code>.get()</code> method, your project is vulnerable to this injection-style vulnerability.</p>
+			<p>If your code is vulnerable, you should upgrade immediately, and also, stop sending un-sanitized user input to <code>json-ptr</code>.</p>
 			<a href="#breaking-changes-at-v130" id="breaking-changes-at-v130" style="color: inherit; text-decoration: none;">
 				<h2>Breaking Changes at v1.3.0</h2>
 			</a>
@@ -2986,7 +2991,16 @@ json-pointer | get    |          | 1000000 | 2619 | 346.17%
 				<h2>Releases</h2>
 			</a>
 			<ul>
-				<li>2020-10-21 — <strong>2.0.0</strong> <em><em>Breaking Change</em></em><ul>
+				<li><p>2021-05-12 — <strong>2.1.0</strong> <em>Bug fixes for #28 and #30; <strong>Security Vulnerability Patched</strong></em></p>
+					<ul>
+						<li><p>When compiling the accessors for quickly points in an object graph, the <code>.get()</code> method was not properly delimiting single quotes. This error caused the get operation to throw an exception in during normal usage. Worse, in cases where malicious user input was sent directly to <code>json-ptr</code>, the failure to delimit single quotes allowed the execution of arbitrary code (an injection attack). The first of these issues was reported in #28 by @mprast, the second (vulnerability) by @zpbrent. Thanks also to @elimumford for the actual code used for the fix.</p>
+						</li>
+						<li><p>If your code sent un-sanitized user input to the <code>.get()</code> method of <code>json-ptr</code>, your project was susceptible to this security vulnerability!</p>
+						</li>
+					</ul>
+				</li>
+				<li><p>2020-10-21 — <strong>2.0.0</strong> <em><em>Breaking Change</em></em></p>
+					<ul>
 						<li>Prototype pollution using this library is now disallowed and will throw an error. I&#39;ve been looking into the origin of this issue and it seems to have been disclosed by mohan on <a href="https://www.huntr.dev/bounties/1-npm-json-ptr/">huntr.dev</a>. I received <a href="https://github.com/flitbit/json-ptr/pull/26">a PR from</a> <a href="https://github.com/luci-m-666">@luci-m-666</a>, but found <a href="https://github.com/418sec/json-ptr/pull/1">another PR</a> by <a href="https://github.com/alromh87">@alromh87</a> that looks like the origin of the solution. Don&#39;t know who to thank, but thanks all -- somebody is due a bounty.</li>
 						<li>Just in case somebody was relying on <code>json-ptr</code> to support pointers across the prototype, I&#39;m rolling the major version number because you&#39;re now broken.</li>
 					</ul>
