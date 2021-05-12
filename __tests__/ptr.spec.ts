@@ -1041,3 +1041,19 @@ describe('path segments containing single quote', function () {
     expect(result.hacked).to.eql(undefined);
   });
 });
+
+describe('unreachable path across a null object in the graph', function () {
+  it('issue 36 proof of fix', function () {
+    interface MyData {
+      id: number;
+      employee: Record<string, unknown>;
+      created_on: string;
+    }
+    const o: MyData = {
+      id: 1234,
+      employee: null,
+      created_on: '2021-05-11',
+    };
+    expect(JsonPointer.get(o, '/employee/st_price')).to.eql(undefined);
+  });
+});

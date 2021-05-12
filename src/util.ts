@@ -178,13 +178,14 @@ export function compilePointerDereference(path: PathSegments): Dereference {
   body = path.reduce((body, _, i) => {
     return (
       body +
-      " && \n\ttypeof((it = it['" +
+      "\n\t&& it !== null && typeof((it = it['" +
       replace(replace(path[i] + '', '\\', '\\\\'), "'", "\\'") +
       "'])) !== 'undefined'"
     );
   }, "if (typeof(it) !== 'undefined'") as string;
   body = body + ') {\n\treturn it;\n }';
   // eslint-disable-next-line no-new-func
+  console.log(body);
   return new Function('it', body) as Dereference;
 }
 
