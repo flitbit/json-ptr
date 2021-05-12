@@ -975,6 +975,7 @@ describe('JsonPointer', function () {
     });
   });
 });
+
 describe('when data contains an array early in the path', function () {
   const data = {
     foo: [] as number[],
@@ -1021,4 +1022,22 @@ describe('concat pointers', function () {
       expect(ptr1.concat(ptr2.uriFragmentIdentifier).toString()).to.eql(result);
     },
   );
+});
+
+interface Hacked {
+  hacked: boolean;
+}
+
+describe('path segments containing single quote', function () {
+  it('issue 28 proof of fix', function () {
+    expect(JsonPointer.get({}, "/it's bad")).to.eql(undefined);
+  });
+  it('issue 30 proof of fix', function () {
+    JsonPointer.get(
+      {},
+      "/aaa'])) !== 'undefined') {return it;}; Number.hacked = true; if(((['a",
+    );
+    const result = Number as unknown as Hacked;
+    expect(result.hacked).to.eql(undefined);
+  });
 });

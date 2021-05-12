@@ -179,7 +179,7 @@ export function compilePointerDereference(path: PathSegments): Dereference {
     return (
       body +
       " && \n\ttypeof((it = it['" +
-      replace(path[i] + '', '\\', '\\\\') +
+      replace(replace(path[i] + '', '\\', '\\\\'), "'", "\\'") +
       "'])) !== 'undefined'"
     );
   }, "if (typeof(it) !== 'undefined'") as string;
