@@ -7,6 +7,7 @@ import {
   encodeUriFragmentIdentifier,
   pickDecoder,
   unsetValueAtPath,
+  decodeRelativePointer,
 } from './util';
 import {
   JsonStringPointer,
@@ -533,6 +534,38 @@ export class JsonPointer {
    */
   has(target: unknown): boolean {
     return typeof this.get(target) !== 'undefined';
+  }
+
+  /**
+   * Gets the value in the object graph that is the parent of the pointer location.
+   * @param target the target of the operation
+   */
+  parent(target: unknown): unknown {
+    const p = this.path;
+    if (p.length == 1) return undefined;
+    const parent = new JsonPointer(p.slice(0, p.length - 1));
+    return parent.get(target);
+  }
+
+  /**
+   * Resolves the specified relative pointer path against the specified target object, and gets the target object's value at the relative pointer's location.
+   * @param target the target of the operation
+   * @param rel the relative pointer (relative to this)
+   * @returns the value at the relative pointer's resolved path; otherwise undefined.
+   */
+  relative(target: unknown, rel: JsonStringPointer): unknown {
+    const p = this.path;
+    const decoded = decodeRelativePointer(rel) as string[];
+    const n = parseInt(decoded[0]);
+    const r = p.slice(0, p.length - n).concat(decoded.slice(1));
+    const other = new JsonPointer(r);
+    if (decoded[0][decoded[0].length - 1] == '#') {
+      // It references the path segment/name, not the value
+      const name = r[r.length - 1] as string;
+      const parent = other.parent(target);
+      return Array.isArray(parent) ? parseInt(name, 10) : name;
+    }
+    return other.get(target);
   }
 
   /**

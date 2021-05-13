@@ -30,7 +30,7 @@
     "build:watch": "tsc -w --importHelpers -p tsconfig.release.json",
     "lint": "eslint . --ext .ts,.tsx",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
-    "pretest": "npm run lint",
+    "pretest": "npm run lint:fix",
     "test": "nyc mocha __tests__/**/*.spec.ts",
     "test:watch": "chokidar \"*.js\" \"*.json\" \"src/**/*.ts\" \"__tests__/**/*.ts\" --command \"npm run test\" --initial",
     "cilint": "eslint . --ext .ts,.tsx --format junit --output-file ./reports/eslint/eslint.xml",

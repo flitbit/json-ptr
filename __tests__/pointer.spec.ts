@@ -474,4 +474,56 @@ describe('JsonPointer', () => {
       expect(p.uriFragmentIdentifier).to.eql('#/foo');
     });
   });
+
+  describe('.relative method', () => {
+    const doc = {
+      foo: ['bar', 'baz'],
+      highly: {
+        nested: {
+          objects: true,
+        },
+      },
+    };
+
+    it('throws when relative pointer unspecified', () => {
+      const p = new JsonPointer('/highly/nested/objects');
+      expect(() => p.relative(doc, undefined)).to.throw(
+        'Invalid type: Relative JSON Pointers are represented as strings.',
+      );
+    });
+    it('throws when relative pointer empty', () => {
+      const p = new JsonPointer('/highly/nested/objects');
+      expect(() => p.relative(doc, '')).to.throw(
+        'Invalid Relative JSON Pointer syntax. Relative pointer must begin with a non-negative integer, followed by either the number sign (#), or a JSON Pointer.',
+      );
+    });
+    it('throws when relative pointer invalid [0](NaN)', () => {
+      const p = new JsonPointer('/highly/nested/objects');
+      expect(() => p.relative(doc, 'b/z')).to.throw(
+        'Invalid Relative JSON Pointer syntax. Relative pointer must begin with a non-negative integer, followed by either the number sign (#), or a JSON Pointer.',
+      );
+    });
+    it('throws when relative pointer invalid 1#/z', () => {
+      const p = new JsonPointer('/highly/nested/objects');
+      expect(() => p.relative(doc, '1#/z')).to.throw(
+        'Invalid Relative JSON Pointer syntax. Relative pointer must begin with a non-negative integer, followed by either the number sign (#), or a JSON Pointer.',
+      );
+    });
+    it('Spec examples 1', () => {
+      const p = new JsonPointer('/foo/1');
+      expect(p.relative(doc, '0')).to.eql('baz');
+      expect(p.relative(doc, '1/0')).to.eql('bar');
+      expect(p.relative(doc, '2/highly/nested/objects')).to.eql(true);
+      expect(p.relative(doc, '0#')).to.eql(1);
+      expect(p.relative(doc, '1#')).to.eql('foo');
+    });
+    it('Spec examples 2', () => {
+      const p = new JsonPointer('/highly/nested');
+      expect(p.relative(doc, '0/objects')).to.eql(true);
+      expect(p.relative(doc, '1/nested/objects')).to.eql(true);
+      expect(p.relative(doc, '2/foo/0')).to.eql('bar');
+      expect(p.relative(doc, '0#')).to.eql('nested');
+      expect(p.relative(doc, '1#')).to.eql('highly');
+    });
+  });
 });
