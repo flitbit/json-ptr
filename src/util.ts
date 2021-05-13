@@ -185,7 +185,6 @@ export function compilePointerDereference(path: PathSegments): Dereference {
   }, "if (typeof(it) !== 'undefined'") as string;
   body = body + ') {\n\treturn it;\n }';
   // eslint-disable-next-line no-new-func
-  console.log(body);
   return new Function('it', body) as Dereference;
 }
 
