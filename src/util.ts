@@ -2,6 +2,7 @@ import {
   JsonStringPointer,
   UriFragmentIdentifierPointer,
   Pointer,
+  RelativeJsonPointer,
   PathSegment,
   PathSegments,
   Decoder,
@@ -149,7 +150,7 @@ export function encodeUriFragmentIdentifier(
 const InvalidRelativePointerError =
   'Invalid Relative JSON Pointer syntax. Relative pointer must begin with a non-negative integer, followed by either the number sign (#), or a JSON Pointer.';
 
-export function decodeRelativePointer(ptr: JsonStringPointer): PathSegments {
+export function decodeRelativePointer(ptr: RelativeJsonPointer): PathSegments {
   if (typeof ptr !== 'string') {
     throw new TypeError(
       'Invalid type: Relative JSON Pointers are represented as strings.',

@@ -13,6 +13,7 @@ import {
   JsonStringPointer,
   UriFragmentIdentifierPointer,
   Pointer,
+  RelativeJsonPointer,
   PathSegments,
   Encoder,
   JsonStringPointerListItem,
@@ -548,15 +549,40 @@ export class JsonPointer {
   }
 
   /**
+   * Creates a new JsonPointer instance to the specified relative location, based on this pointer's location in the object graph.
+   * @param ptr the relative pointer (relative to this)
+   * @returns A new instance that points to the relative location.
+   */
+  rel(ptr: RelativeJsonPointer): JsonPointer {
+    const p = this.path;
+    const decoded = decodeRelativePointer(ptr) as string[];
+    const n = parseInt(decoded[0]);
+    if (n > p.length) throw new Error('Relative location does not exist.');
+    const r = p.slice(0, p.length - n).concat(decoded.slice(1));
+    if (decoded[0][decoded[0].length - 1] == '#') {
+      // It references the path segment/name, not the value
+      const name = r[r.length - 1] as string;
+      throw new Error(
+        `We won't compile a pointer that will always return '${name}'. Use JsonPointer.relative(target, ptr) instead.`,
+      );
+    }
+    return new JsonPointer(r);
+  }
+
+  /**
    * Resolves the specified relative pointer path against the specified target object, and gets the target object's value at the relative pointer's location.
    * @param target the target of the operation
-   * @param rel the relative pointer (relative to this)
+   * @param ptr the relative pointer (relative to this)
    * @returns the value at the relative pointer's resolved path; otherwise undefined.
    */
-  relative(target: unknown, rel: JsonStringPointer): unknown {
+  relative(target: unknown, ptr: RelativeJsonPointer): unknown {
     const p = this.path;
-    const decoded = decodeRelativePointer(rel) as string[];
+    const decoded = decodeRelativePointer(ptr) as string[];
     const n = parseInt(decoded[0]);
+    if (n > p.length) {
+      // out of bounds
+      return undefined;
+    }
     const r = p.slice(0, p.length - n).concat(decoded.slice(1));
     const other = new JsonPointer(r);
     if (decoded[0][decoded[0].length - 1] == '#') {

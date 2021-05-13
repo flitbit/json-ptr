@@ -4,6 +4,7 @@ export type PathSegments = PathSegment[];
 export type JsonStringPointer = string;
 export type UriFragmentIdentifierPointer = string;
 export type Pointer = JsonStringPointer | UriFragmentIdentifierPointer;
+export type RelativeJsonPointer = string;
 
 /**
  * List item used when listing pointers and their values in an object graph.
