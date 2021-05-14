@@ -4,6 +4,8 @@
 
 A complete implementation of JSON Pointer ([RFC 6901](https://tools.ietf.org/html/rfc6901)) for nodejs and modern browsers.
 
+Supports [Relative JSON Pointers](https://tools.ietf.org/id/draft-handrews-relative-json-pointer-00.html). ([Example](https://github.com/flitbit/json-ptr/blob/487182100a08f4ddc7713e42ec063bbd5ce2c34c/examples/relative.js))
+
 ## Background
 
 I wrote this a few years back when I was unable to find a _complete implementation_ of [RFC 6901](https://tools.ietf.org/html/rfc6901). It turns out that I now use the hell out of it.
