@@ -2,6 +2,7 @@ import {
   JsonStringPointer,
   UriFragmentIdentifierPointer,
   Pointer,
+  RelativeJsonPointer,
   PathSegment,
   PathSegments,
   Decoder,
@@ -144,6 +145,40 @@ export function encodeUriFragmentIdentifier(
     return '#';
   }
   return '#/'.concat(encodeFragmentSegments(path).join('/'));
+}
+
+const InvalidRelativePointerError =
+  'Invalid Relative JSON Pointer syntax. Relative pointer must begin with a non-negative integer, followed by either the number sign (#), or a JSON Pointer.';
+
+export function decodeRelativePointer(ptr: RelativeJsonPointer): PathSegments {
+  if (typeof ptr !== 'string') {
+    throw new TypeError(
+      'Invalid type: Relative JSON Pointers are represented as strings.',
+    );
+  }
+  if (ptr.length === 0) {
+    // https://tools.ietf.org/id/draft-handrews-relative-json-pointer-00.html#rfc.section.3
+    throw new ReferenceError(InvalidRelativePointerError);
+  }
+  const segments = ptr.split('/');
+  let first = segments[0];
+  // It is a name reference; strip the hash.
+  if (first[first.length - 1] == '#') {
+    if (segments.length > 1) {
+      throw new ReferenceError(InvalidRelativePointerError);
+    }
+    first = first.substr(0, first.length - 1);
+  }
+  let i = -1;
+  const len = first.length;
+  while (++i < len) {
+    if (first[i] < '0' || first[i] > '9') {
+      throw new ReferenceError(InvalidRelativePointerError);
+    }
+  }
+  const path: unknown[] = decodePointerSegments(segments.slice(1));
+  path.unshift(segments[0]);
+  return path as PathSegments;
 }
 
 export function toArrayIndexReference(

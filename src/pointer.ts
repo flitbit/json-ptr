@@ -7,11 +7,13 @@ import {
   encodeUriFragmentIdentifier,
   pickDecoder,
   unsetValueAtPath,
+  decodeRelativePointer,
 } from './util';
 import {
   JsonStringPointer,
   UriFragmentIdentifierPointer,
   Pointer,
+  RelativeJsonPointer,
   PathSegments,
   Encoder,
   JsonStringPointerListItem,
@@ -533,6 +535,63 @@ export class JsonPointer {
    */
   has(target: unknown): boolean {
     return typeof this.get(target) !== 'undefined';
+  }
+
+  /**
+   * Gets the value in the object graph that is the parent of the pointer location.
+   * @param target the target of the operation
+   */
+  parent(target: unknown): unknown {
+    const p = this.path;
+    if (p.length == 1) return undefined;
+    const parent = new JsonPointer(p.slice(0, p.length - 1));
+    return parent.get(target);
+  }
+
+  /**
+   * Creates a new JsonPointer instance, pointing to the specified relative location in the object graph.
+   * @param ptr the relative pointer (relative to this)
+   * @returns A new instance that points to the relative location.
+   */
+  relative(ptr: RelativeJsonPointer): JsonPointer {
+    const p = this.path;
+    const decoded = decodeRelativePointer(ptr) as string[];
+    const n = parseInt(decoded[0]);
+    if (n > p.length) throw new Error('Relative location does not exist.');
+    const r = p.slice(0, p.length - n).concat(decoded.slice(1));
+    if (decoded[0][decoded[0].length - 1] == '#') {
+      // It references the path segment/name, not the value
+      const name = r[r.length - 1] as string;
+      throw new Error(
+        `We won't compile a pointer that will always return '${name}'. Use JsonPointer.rel(target, ptr) instead.`,
+      );
+    }
+    return new JsonPointer(r);
+  }
+
+  /**
+   * Resolves the specified relative pointer path against the specified target object, and gets the target object's value at the relative pointer's location.
+   * @param target the target of the operation
+   * @param ptr the relative pointer (relative to this)
+   * @returns the value at the relative pointer's resolved path; otherwise undefined.
+   */
+  rel(target: unknown, ptr: RelativeJsonPointer): unknown {
+    const p = this.path;
+    const decoded = decodeRelativePointer(ptr) as string[];
+    const n = parseInt(decoded[0]);
+    if (n > p.length) {
+      // out of bounds
+      return undefined;
+    }
+    const r = p.slice(0, p.length - n).concat(decoded.slice(1));
+    const other = new JsonPointer(r);
+    if (decoded[0][decoded[0].length - 1] == '#') {
+      // It references the path segment/name, not the value
+      const name = r[r.length - 1] as string;
+      const parent = other.parent(target);
+      return Array.isArray(parent) ? parseInt(name, 10) : name;
+    }
+    return other.get(target);
   }
 
   /**

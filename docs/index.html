@@ -2738,7 +2738,7 @@ img {
 			<a href="#nodejs" id="nodejs" style="color: inherit; text-decoration: none;">
 				<h3><a href="https://nodejs.org/en/">nodejs</a></h3>
 			</a>
-			<pre><code class="language-javascript"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">JsonPointer</span><span style="color: #000000">, </span><span style="color: #001080">create</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;json-ptr&#039;</span><span style="color: #000000">;</span>
+			<pre><code class="language-javascript"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">JsonPointer</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;json-ptr&#039;</span><span style="color: #000000">;</span>
 </code></pre>
 			<a href="#api-documentation" id="api-documentation" style="color: inherit; text-decoration: none;">
 				<h2>API Documentation</h2>
@@ -2991,7 +2991,17 @@ json-pointer | get    |          | 1000000 | 2619 | 346.17%
 				<h2>Releases</h2>
 			</a>
 			<ul>
-				<li><p>2021-05-12 — <strong>2.1.0</strong> <em>Bug fixes for #28 and #30; <strong>Security Vulnerability Patched</strong></em></p>
+				<li><p>2021-05-14 — <strong>2.2.0</strong> <em>Added Handling for Relative JSON Pointers</em></p>
+					<ul>
+						<li><a href="https://github.com/flitbit/json-ptr/blob/master/examples/relative.ts">Example usage</a></li>
+					</ul>
+				</li>
+				<li><p>2021-05-12 — <strong>2.1.1</strong> <em>Bug fix for <a href="https://github.com/flitbit/json-ptr/issues/36">#36</a></em></p>
+					<ul>
+						<li>@CarolynWebster reported an unintentional behavior change starting at v1.3.0. An operation involving a pointer/path that crossed a null value in the object graph resulted in an exception. In versions prior to v1.3.0 it returned <code>undefined</code> as intended. The original behavior has been restored.</li>
+					</ul>
+				</li>
+				<li><p>2021-05-12 — <strong>2.1.0</strong> <em>Bug fixes for <a href="https://github.com/flitbit/json-ptr/issues/28">#28</a> and <a href="https://github.com/flitbit/json-ptr/issues/30">#30</a>; <strong>Security Vulnerability Patched</strong></em></p>
 					<ul>
 						<li><p>When compiling the accessors for quickly points in an object graph, the <code>.get()</code> method was not properly delimiting single quotes. This error caused the get operation to throw an exception in during normal usage. Worse, in cases where malicious user input was sent directly to <code>json-ptr</code>, the failure to delimit single quotes allowed the execution of arbitrary code (an injection attack). The first of these issues was reported in #28 by @mprast, the second (vulnerability) by @zpbrent. Thanks also to @elimumford for the actual code used for the fix.</p>
 						</li>
