@@ -525,5 +525,68 @@ describe('JsonPointer', () => {
       expect(p.relative(doc, '0#')).to.eql('nested');
       expect(p.relative(doc, '1#')).to.eql('highly');
     });
+    it('returns undefined when relative location cannot exist', () => {
+      const p = new JsonPointer('/highly/nested/objects');
+      expect(p.relative(doc, '5/not-here')).to.be.undefined;
+    });
+  });
+
+  describe('.rel method', () => {
+    const doc = {
+      foo: ['bar', 'baz'],
+      highly: {
+        nested: {
+          objects: true,
+        },
+      },
+    };
+
+    it('throws when relative pointer unspecified', () => {
+      const p = new JsonPointer('/highly/nested/objects');
+      expect(() => p.rel(undefined)).to.throw(
+        'Invalid type: Relative JSON Pointers are represented as strings.',
+      );
+    });
+    it('throws when relative pointer empty', () => {
+      const p = new JsonPointer('/highly/nested/objects');
+      expect(() => p.rel('')).to.throw(
+        'Invalid Relative JSON Pointer syntax. Relative pointer must begin with a non-negative integer, followed by either the number sign (#), or a JSON Pointer.',
+      );
+    });
+    it('throws when relative pointer invalid [0](NaN)', () => {
+      const p = new JsonPointer('/highly/nested/objects');
+      expect(() => p.rel('b/z')).to.throw(
+        'Invalid Relative JSON Pointer syntax. Relative pointer must begin with a non-negative integer, followed by either the number sign (#), or a JSON Pointer.',
+      );
+    });
+    it('throws when relative pointer invalid 1#/z', () => {
+      const p = new JsonPointer('/highly/nested/objects');
+      expect(() => p.rel('1#/z')).to.throw(
+        'Invalid Relative JSON Pointer syntax. Relative pointer must begin with a non-negative integer, followed by either the number sign (#), or a JSON Pointer.',
+      );
+    });
+    it('throws when relative pointer to name (#)', () => {
+      const p = new JsonPointer('/highly/nested/objects');
+      expect(() => p.rel('1#')).to.throw(
+        "We won't compile a pointer that will always return 'nested'. Use JsonPointer.relative(target, ptr) instead.",
+      );
+    });
+    it('throws when relative location cannot exist', () => {
+      const p = new JsonPointer('/highly/nested/objects');
+      expect(() => p.rel('5/not-here')).to.throw(
+        'Relative location does not exist.',
+      );
+    });
+
+    it('Spec example from 1', () => {
+      const p = new JsonPointer('/foo/1');
+      const q = p.rel('2/highly/nested/objects');
+      expect(q.get(doc)).to.eql(true);
+    });
+    it('Spec example from 2', () => {
+      const p = new JsonPointer('/highly/nested');
+      const q = p.rel('2/foo/0');
+      expect(q.get(doc)).to.eql('bar');
+    });
   });
 });
