@@ -549,11 +549,11 @@ export class JsonPointer {
   }
 
   /**
-   * Creates a new JsonPointer instance to the specified relative location, based on this pointer's location in the object graph.
+   * Creates a new JsonPointer instance, pointing to the specified relative location in the object graph.
    * @param ptr the relative pointer (relative to this)
    * @returns A new instance that points to the relative location.
    */
-  rel(ptr: RelativeJsonPointer): JsonPointer {
+  relative(ptr: RelativeJsonPointer): JsonPointer {
     const p = this.path;
     const decoded = decodeRelativePointer(ptr) as string[];
     const n = parseInt(decoded[0]);
@@ -563,7 +563,7 @@ export class JsonPointer {
       // It references the path segment/name, not the value
       const name = r[r.length - 1] as string;
       throw new Error(
-        `We won't compile a pointer that will always return '${name}'. Use JsonPointer.relative(target, ptr) instead.`,
+        `We won't compile a pointer that will always return '${name}'. Use JsonPointer.rel(target, ptr) instead.`,
       );
     }
     return new JsonPointer(r);
@@ -575,7 +575,7 @@ export class JsonPointer {
    * @param ptr the relative pointer (relative to this)
    * @returns the value at the relative pointer's resolved path; otherwise undefined.
    */
-  relative(target: unknown, ptr: RelativeJsonPointer): unknown {
+  rel(target: unknown, ptr: RelativeJsonPointer): unknown {
     const p = this.path;
     const decoded = decodeRelativePointer(ptr) as string[];
     const n = parseInt(decoded[0]);
