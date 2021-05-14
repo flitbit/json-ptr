@@ -240,7 +240,7 @@ It is important to recognize in the performance results that _compiled_ options 
 ## Releases
 
 - 2021-05-14 — **2.2.0** _Added Handling for Relative JSON Pointers_
-  - [Example usage](https://github.com/flitbit/json-ptr/blob/master/examples/relative.ts)
+  - [Example usage](https://github.com/flitbit/json-ptr/blob/487182100a08f4ddc7713e42ec063bbd5ce2c34c/examples/relative.js)
 - 2021-05-12 — **2.1.1** _Bug fix for [#36](https://github.com/flitbit/json-ptr/issues/36)_
   - @CarolynWebster reported an unintentional behavior change starting at v1.3.0. An operation involving a pointer/path that crossed a null value in the object graph resulted in an exception. In versions prior to v1.3.0 it returned `undefined` as intended. The original behavior has been restored.
 - 2021-05-12 — **2.1.0** _Bug fixes for [#28](https://github.com/flitbit/json-ptr/issues/28) and [#30](https://github.com/flitbit/json-ptr/issues/30); **Security Vulnerability Patched**_
