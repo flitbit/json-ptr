@@ -21,5 +21,11 @@
     "src/**/*",
     "__tests__/**/*",
     "examples/**/*.ts"
-  ]
+  ],
+  "typedocOptions": {
+    "entryPoints": [
+      "src/index.ts"
+    ],
+    "out": "docs"
+  }
 }

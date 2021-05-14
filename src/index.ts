@@ -1,5 +1,4 @@
 /**
- * @hidden
  * @packageDocumentation
  */
 export * from './types';

@@ -36,7 +36,7 @@ import { JsonPointer } from 'json-ptr';
 
 ## API Documentation
 
-The [API documentation is generated from code by typedoc and hosted here](http://flitbit.github.io/json-ptr/classes/_src_pointer_.jsonpointer.html). Read the docs.
+The [API documentation is generated from code by typedoc and hosted here](http://flitbit.github.io/json-ptr/). Read the docs.
 
 Documentation is always a work in progress, let us know by creating an issue if you need a scenario documented.
 
