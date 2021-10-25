@@ -57,7 +57,7 @@ function descendingVisit(
   const distinctObjects = new Map<unknown, JsonPointer>();
   const q: Item[] = [{ obj: target, path: [] }];
   while (q.length) {
-    const { obj, path } = q.shift();
+    const { obj, path } = q.shift() as Item;
     visitor(encoder(path), obj);
     if (shouldDescend(obj)) {
       distinctObjects.set(
@@ -65,14 +65,14 @@ function descendingVisit(
         new JsonPointer(encodeUriFragmentIdentifier(path)),
       );
       if (!Array.isArray(obj)) {
-        const keys = Object.keys(obj);
+        const keys = Object.keys(obj as Record<string, unknown>);
         const len = keys.length;
         let i = -1;
         while (++i < len) {
           const it = (obj as Record<string, unknown>)[keys[i]];
           if (isObject(it) && distinctObjects.has(it)) {
             q.push({
-              obj: new JsonReference(distinctObjects.get(it)),
+              obj: new JsonReference(distinctObjects.get(it) as JsonPointer),
               path: path.concat(keys[i]),
             });
           } else {
@@ -90,7 +90,7 @@ function descendingVisit(
           const it = obj[j];
           if (isObject(it) && distinctObjects.has(it)) {
             q.push({
-              obj: new JsonReference(distinctObjects.get(it)),
+              obj: new JsonReference(distinctObjects.get(it) as JsonPointer),
               path: path.concat([j + '']),
             });
           } else {

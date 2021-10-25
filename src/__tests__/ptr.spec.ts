@@ -9,7 +9,7 @@ import {
   encodeUriFragmentIdentifier,
   JsonStringPointerListItem,
   UriFragmentIdentifierPointerListItem,
-} from '../src';
+} from '..';
 import { expect } from 'chai';
 
 const create = JsonPointer.create;
@@ -864,7 +864,7 @@ describe('JsonPointer', function () {
           },
         ],
       },
-      f: null as string,
+      f: null as unknown as string,
       'http://schema.org/name': 'Phillip',
     };
 
@@ -918,7 +918,7 @@ describe('JsonPointer', function () {
       a: 1,
       b: { c: 2 },
       d: { e: [{ a: 3 }, { b: 4 }, { c: 5 }] },
-      f: null as string,
+      f: null as unknown as string,
     };
     const pointerList = [
       ['', data],
@@ -1051,7 +1051,7 @@ describe('unreachable path across a null object in the graph', function () {
     }
     const o: MyData = {
       id: 1234,
-      employee: null,
+      employee: null as unknown as Record<string, unknown>,
       created_on: '2021-05-11',
     };
     expect(JsonPointer.get(o, '/employee/st_price')).to.eql(undefined);

@@ -5,12 +5,12 @@
 
 import { expect } from 'chai';
 
-import { JsonReference, JsonPointer } from '../src';
+import { JsonReference, JsonPointer } from '..';
 
 describe('JsonReference', () => {
   describe('.ctor()', () => {
     it('throws when pointer unspecified', () => {
-      expect(() => new JsonReference(undefined)).to.throw(
+      expect(() => new JsonReference(undefined as unknown as string)).to.throw(
         'Invalid type: JSON Pointers are represented as strings.',
       );
     });

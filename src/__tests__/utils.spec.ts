@@ -18,7 +18,7 @@ import {
   setValueAtPath,
   unsetValueAtPath,
   decodePointer,
-} from '../src';
+} from '..';
 
 describe('Utils', () => {
   type Tests = [PathSegments, PathSegments, string];
@@ -77,9 +77,9 @@ describe('Utils', () => {
 
   describe('encodePointer()', () => {
     it('throws when segments unspecified', () => {
-      expect(() => encodePointer(undefined)).to.throw(
-        'Invalid type: path must be an array of segments.',
-      );
+      expect(() =>
+        encodePointer(undefined as unknown as PathSegments),
+      ).to.throw('Invalid type: path must be an array of segments.');
     });
     it('throws when segments specified wrong type', () => {
       expect(() => encodePointer({} as unknown as PathSegments)).to.throw(
@@ -95,9 +95,9 @@ describe('Utils', () => {
 
   describe('encodeUriFragmentIdentifier()', () => {
     it('throws when segments unspecified', () => {
-      expect(() => encodeUriFragmentIdentifier(undefined)).to.throw(
-        'Invalid type: path must be an array of segments.',
-      );
+      expect(() =>
+        encodeUriFragmentIdentifier(undefined as unknown as PathSegments),
+      ).to.throw('Invalid type: path must be an array of segments.');
     });
     it('throws when segments specified wrong type', () => {
       expect(() =>
@@ -113,9 +113,9 @@ describe('Utils', () => {
 
   describe('decodeUriFragmentIdentifier()', () => {
     it('throws when ptr unspecified', () => {
-      expect(() => decodeUriFragmentIdentifier(undefined)).to.throw(
-        'Invalid type: JSON Pointers are represented as strings.',
-      );
+      expect(() =>
+        decodeUriFragmentIdentifier(undefined as unknown as string),
+      ).to.throw('Invalid type: JSON Pointers are represented as strings.');
     });
     it('throws when ptr specified wrong type', () => {
       expect(() =>
@@ -140,7 +140,7 @@ describe('Utils', () => {
       expect(toArrayIndexReference([], 1000)).to.eql(1000);
     });
     it("returns 0 when array falsy and idx === '-'", () => {
-      expect(toArrayIndexReference(undefined, '-')).to.eql(0);
+      expect(toArrayIndexReference(undefined as unknown as [], '-')).to.eql(0);
     });
     it("returns length when idx === '-'", () => {
       expect(toArrayIndexReference(['one'], '-')).to.eql(1);

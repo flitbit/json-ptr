@@ -6,7 +6,7 @@
 import { expect } from 'chai';
 import { inspect } from 'util';
 
-import { JsonPointer, PathSegment } from '../src';
+import { JsonPointer, PathSegment } from '..';
 
 const rand = (min: number, max: number): number =>
   Math.random() * (max - min) + min;
@@ -95,7 +95,7 @@ describe('JsonPointer', () => {
 
   describe('static .create()', () => {
     it('throws on undefined', () => {
-      expect(() => JsonPointer.create(undefined)).to.throw(
+      expect(() => JsonPointer.create(undefined as unknown as string)).to.throw(
         'Invalid type: JSON Pointers are represented as strings.',
       );
     });
@@ -111,7 +111,7 @@ describe('JsonPointer', () => {
 
   describe('.ctor()', () => {
     it('throws on undefined', () => {
-      expect(() => new JsonPointer(undefined)).to.throw(
+      expect(() => new JsonPointer(undefined as unknown as string)).to.throw(
         'Invalid type: JSON Pointers are represented as strings.',
       );
     });
@@ -487,7 +487,7 @@ describe('JsonPointer', () => {
 
     it('throws when relative pointer unspecified', () => {
       const p = new JsonPointer('/highly/nested/objects');
-      expect(() => p.rel(doc, undefined)).to.throw(
+      expect(() => p.rel(doc, undefined as unknown as string)).to.throw(
         'Invalid type: Relative JSON Pointers are represented as strings.',
       );
     });
@@ -543,7 +543,7 @@ describe('JsonPointer', () => {
 
     it('throws when relative pointer unspecified', () => {
       const p = new JsonPointer('/highly/nested/objects');
-      expect(() => p.relative(undefined)).to.throw(
+      expect(() => p.relative(undefined as unknown as string)).to.throw(
         'Invalid type: Relative JSON Pointers are represented as strings.',
       );
     });
