@@ -2,12 +2,12 @@ const path = require('path');
 const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = {
-  mode: "production",
+  mode: 'production',
   entry: {
     'json-ptr.min': './src/index.ts',
   },
   output: {
-    path: path.resolve(__dirname, 'dist.browser'),
+    path: path.resolve(__dirname, 'dist'),
     filename: '[name].js',
     libraryTarget: 'umd',
     library: 'JsonPointer',
@@ -17,7 +17,14 @@ module.exports = {
     rules: [
       {
         test: /\.tsx?$/,
-        use: 'ts-loader',
+        use: [
+          {
+            loader: 'ts-loader',
+            options: {
+              configFile: 'tsconfig.webpack.json',
+            },
+          },
+        ],
         include: path.resolve(__dirname, 'src'),
       },
     ],

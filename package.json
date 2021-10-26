@@ -11,13 +11,14 @@
   ],
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
+  "umd": "dist/json-ptr.min.js",
   "exports": {
     ".": {
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.js"
     }
   },
-  "types": "dist/cjs/index.d.ts",
+  "types": "dist/types/index.d.ts",
   "files": [
     "dist"
   ],
@@ -27,29 +28,31 @@
     "url": "https://github.com/flitbit/json-ptr"
   },
   "scripts": {
-    "clean": "shx rm -fr coverage lib lib-esm _bundles tmp .nyc_output",
+    "clean": "shx rm -fr coverage dist dist.browser docs tmp .nyc_output",
     "prebuild": "npm run lint",
+    "prebuild:browser": "shx rm -fr dist.browser",
     "build:browser": "webpack",
     "build:browser-tests": "webpack --config webpack.tests.config.js",
     "buildall": "npm run build-lib && npm run build:browser && npm run build:browser-tests && npm run docs",
-    "build-lib": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json",
+    "build-lib": "rollup -c",
     "build": "npm run buildall",
     "prebuild-lib": "shx rm -fr dist",
     "postbuild-lib": "shx cp package-cjs.json dist/cjs/package.json && shx cp package-esm.json dist/esm/package.json",
     "lint": "eslint . --ext .ts,.tsx",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
-    "pretest": "npm run build",
-    "test": "nyc mocha dist/cjs/__tests__/**/*.spec.js",
-    "test:only": "cross-env TS_NODE_COMPILER_OPTIONS='{ \"module\": \"commonjs\" }' nyc mocha src/**/*.spec.ts",
-    "test:watch": "nodemon --exec 'npm run test' --watch *.js --watch *.json --watch src/**/*.ts --watch __tests__/**/*.ts",
+    "test": "cross-env TS_NODE_COMPILER_OPTIONS='{ \"module\": \"commonjs\", \"noEmit\": false }' nyc mocha src/**/*.spec.ts",
+    "test:watch": "onchange --initial \"*.js\" \"*.json\" \"src/**/*.ts\" -- npm run test",
     "cilint": "eslint . --ext .ts,.tsx --format junit --output-file ./reports/eslint/eslint.xml",
     "precibuild": "npm run cilint",
     "cibuild": "npm run buildall",
     "preci": "npm run cibuild",
-    "ci": "nyc mocha __tests__/**/*.spec.ts --timeout=10000 --exit --reporter mocha-junit-reporter --reporter-options mochaFile=reports/mocha/test-results.xml",
-    "docs": "rimraf docs && typedoc --theme minimal && cp _config.yml docs/"
+    "ci": "cross-env TS_NODE_COMPILER_OPTIONS='{ \"module\": \"commonjs\", \"noEmit\": false }' nyc mocha __tests__/**/*.spec.ts --timeout=10000 --exit --reporter mocha-junit-reporter --reporter-options mochaFile=reports/mocha/test-results.xml",
+    "predocs": "shx rm -fr docs",
+    "docs": "typedoc && cp _config.yml docs/"
   },
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^21.0.1",
+    "@rollup/plugin-node-resolve": "^13.0.6",
     "@types/assert-plus": "^1.0.4",
     "@types/bent": "^7.3.2",
     "@types/chai": "^4.2.18",
@@ -67,11 +70,15 @@
     "eslint-plugin-prettier": "^4.0.0",
     "mocha": "^9.1.3",
     "mocha-junit-reporter": "^2.0.0",
-    "nodemon": "^2.0.14",
     "nyc": "^15.1.0",
+    "onchange": "^7.1.0",
     "prettier": "^2.4.1",
     "process": "^0.11.10",
     "rimraf": "~3.0.2",
+    "rollup": "^2.58.3",
+    "rollup-plugin-peer-deps-external": "^2.2.4",
+    "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-typescript2": "^0.30.0",
     "shx": "^0.3.3",
     "terser-webpack-plugin": "^5.1.2",
     "ts-loader": "^9.1.2",
@@ -99,8 +106,5 @@
     ],
     "sourceMap": true,
     "instrument": true
-  },
-  "dependencies": {
-    "tslib": "^2.2.0"
   }
 }

@@ -6,14 +6,21 @@ module.exports = {
     'json-ptr.tests': './src/__tests__/index.ts',
   },
   output: {
-    path: path.resolve(__dirname, 'dist.browser'),
+    path: path.resolve(__dirname, 'dist'),
     filename: '[name].js',
   },
   module: {
     rules: [
       {
         test: /\.tsx?$/,
-        use: 'ts-loader',
+        use: [
+          {
+            loader: 'ts-loader',
+            options: {
+              configFile: 'tsconfig.webpack.json',
+            },
+          },
+        ],
         include: [path.resolve(__dirname, 'src')],
       },
     ],
