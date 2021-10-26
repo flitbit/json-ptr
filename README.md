@@ -18,7 +18,7 @@ npm install json-ptr
 
 ## Release Bundles
 
-As of v3.0.0, we provide CJS, ESM, and UMD builds under the `dist/` folder, and appropriate references in our `package.json` file, so your code should just work. If you reference `json-ptr` on a CDN, try [UNPKG](https://unpkg.com/), which picks up our releases automatically.
+As of v3.0.0, we provide CJS, ESM, and UMD builds under the `dist/` folder when you install the package from NPM, we also have all appropriate references in our `package.json` file, so your code should just work. If you need a CDN reference to `json-ptr`, try [UNPKG](https://unpkg.com/), which picks up our releases automatically.
 
 ## Use
 
