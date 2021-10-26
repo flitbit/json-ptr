@@ -245,6 +245,9 @@ export function setValueAtPath(
   let p: number;
   while (++cursor < len) {
     step = path[cursor];
+    if (typeof step !== 'string' && typeof step !== 'number') {
+      throw new TypeError('PathSegments must be a string or a number.');
+    }
     if (
       step === '__proto__' ||
       step === 'constructor' ||
@@ -318,6 +321,16 @@ export function unsetValueAtPath(target: unknown, path: PathSegments): unknown {
   let p: number;
   while (++cursor < len) {
     step = path[cursor];
+    if (typeof step !== 'string' && typeof step !== 'number') {
+      throw new TypeError('PathSegments must be a string or a number.');
+    }
+    if (
+      step === '__proto__' ||
+      step === 'constructor' ||
+      step === 'prototype'
+    ) {
+      throw new Error('Attempted prototype pollution disallowed.');
+    }
     if (Array.isArray(it)) {
       p = toArrayIndexReference(it, step);
       if (p >= it.length) return undefined;

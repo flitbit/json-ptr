@@ -18,7 +18,7 @@ import {
   setValueAtPath,
   unsetValueAtPath,
   decodePointer,
-} from '../src';
+} from '..';
 
 describe('Utils', () => {
   type Tests = [PathSegments, PathSegments, string];
@@ -77,9 +77,9 @@ describe('Utils', () => {
 
   describe('encodePointer()', () => {
     it('throws when segments unspecified', () => {
-      expect(() => encodePointer(undefined)).to.throw(
-        'Invalid type: path must be an array of segments.',
-      );
+      expect(() =>
+        encodePointer(undefined as unknown as PathSegments),
+      ).to.throw('Invalid type: path must be an array of segments.');
     });
     it('throws when segments specified wrong type', () => {
       expect(() => encodePointer({} as unknown as PathSegments)).to.throw(
@@ -95,9 +95,9 @@ describe('Utils', () => {
 
   describe('encodeUriFragmentIdentifier()', () => {
     it('throws when segments unspecified', () => {
-      expect(() => encodeUriFragmentIdentifier(undefined)).to.throw(
-        'Invalid type: path must be an array of segments.',
-      );
+      expect(() =>
+        encodeUriFragmentIdentifier(undefined as unknown as PathSegments),
+      ).to.throw('Invalid type: path must be an array of segments.');
     });
     it('throws when segments specified wrong type', () => {
       expect(() =>
@@ -113,9 +113,9 @@ describe('Utils', () => {
 
   describe('decodeUriFragmentIdentifier()', () => {
     it('throws when ptr unspecified', () => {
-      expect(() => decodeUriFragmentIdentifier(undefined)).to.throw(
-        'Invalid type: JSON Pointers are represented as strings.',
-      );
+      expect(() =>
+        decodeUriFragmentIdentifier(undefined as unknown as string),
+      ).to.throw('Invalid type: JSON Pointers are represented as strings.');
     });
     it('throws when ptr specified wrong type', () => {
       expect(() =>
@@ -140,7 +140,7 @@ describe('Utils', () => {
       expect(toArrayIndexReference([], 1000)).to.eql(1000);
     });
     it("returns 0 when array falsy and idx === '-'", () => {
-      expect(toArrayIndexReference(undefined, '-')).to.eql(0);
+      expect(toArrayIndexReference(undefined as unknown as [], '-')).to.eql(0);
     });
     it("returns length when idx === '-'", () => {
       expect(toArrayIndexReference(['one'], '-')).to.eql(1);
@@ -155,6 +155,12 @@ describe('Utils', () => {
       expect(toArrayIndexReference([], '999s9')).to.eql(-1);
     });
   });
+
+  interface Prototyped {
+    __proto__?: { polluted: string };
+    constructor?: { polluted: string };
+    prototype?: { polluted: string };
+  }
 
   describe('setValueAtPath()', () => {
     it('throws when target undefined', () => {
@@ -181,6 +187,42 @@ describe('Utils', () => {
       expect(setValueAtPath(data, 'VV', ['one', 5], true)).to.be.undefined;
       expect(data.one[5]).to.eql('VV');
     });
+
+    it('will prevent __proto__ from being polluted', () => {
+      expect(() => {
+        setValueAtPath({}, 'yes', ['__proto__', 'polluted'], true);
+      }).to.throw('Attempted prototype pollution disallowed.');
+      const prototyped = {} as unknown as Prototyped;
+      expect(prototyped.__proto__?.polluted).to.not.eql('yes');
+    });
+    it('will prevent .constructor from being polluted', () => {
+      expect(() => {
+        setValueAtPath({}, 'yes', ['constructor', 'polluted'], true);
+      }).to.throw('Attempted prototype pollution disallowed.');
+      const prototyped = {} as unknown as Prototyped;
+      expect(prototyped.constructor?.polluted).to.not.eql('yes');
+    });
+    it('will prevent .prototype from being polluted', () => {
+      expect(() => {
+        setValueAtPath({}, 'yes', ['prototype', 'polluted'], true);
+      }).to.throw('Attempted prototype pollution disallowed.');
+      const prototyped = {} as unknown as Prototyped;
+      expect(prototyped.prototype?.polluted).to.not.eql('yes');
+    });
+    it('will prevent __proto__ from being polluted by javascript', () => {
+      expect(() => {
+        setValueAtPath(
+          {},
+          'yes',
+          // not allowed in TS depending on tsconfig, but hackable in JS:
+          [['__proto__'], 'polluted'] as unknown as string[],
+          true,
+        );
+        const prototyped = {} as unknown as Prototyped;
+        expect(prototyped.__proto__?.polluted).to.not.eql('yes');
+        expect(prototyped.__proto__).to.be.undefined;
+      }).to.throw('PathSegments must be a string or a number.');
+    });
   });
 
   describe('unsetValueAtPath()', () => {
@@ -205,6 +247,30 @@ describe('Utils', () => {
       expect(unsetValueAtPath(data, decodePointer('/a/3/six'))).to.eql(
         expected,
       );
+    });
+    it('will prevent __proto__ from being polluted', () => {
+      expect(() => {
+        unsetValueAtPath({}, ['__proto__', 'polluted']);
+      }).to.throw('Attempted prototype pollution disallowed.');
+    });
+    it('will prevent .constructor from being polluted', () => {
+      expect(() => {
+        unsetValueAtPath({}, ['constructor', 'polluted']);
+      }).to.throw('Attempted prototype pollution disallowed.');
+    });
+    it('will prevent .prototype from being polluted', () => {
+      expect(() => {
+        unsetValueAtPath({}, ['prototype', 'polluted']);
+      }).to.throw('Attempted prototype pollution disallowed.');
+    });
+    it('will prevent __proto__ from being polluted by javascript', () => {
+      expect(() => {
+        unsetValueAtPath(
+          {},
+          // not allowed in TS depending on tsconfig, but hackable in JS:
+          [['__proto__'], 'polluted'] as unknown as string[],
+        );
+      }).to.throw('PathSegments must be a string or a number.');
     });
   });
 });

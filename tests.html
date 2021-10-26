@@ -1,33 +1,33 @@
 <html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Mocha Tests</title>
+    <link href="node_modules/mocha/mocha.css" rel="stylesheet" />
+  </head>
 
-<head>
-  <meta charset="utf-8">
-  <title>Mocha Tests</title>
-  <link href="node_modules/mocha/mocha.css" rel="stylesheet" />
-</head>
-
-<body>
-  <!-- You should open this file directly in a browser from your file system, not from a server... -->
-  <div id="mocha"></div>
-  <script>
-    globalConflict = "This is a conflict";
-    JsonPointer = globalConflict;
-  </script>
-  <script src="https://cdn.rawgit.com/jquery/jquery/3.2.1/dist/jquery.min.js"></script>
-  <script src="node_modules/mocha/mocha.js"></script>
-  <script src="node_modules/chai/chai.js"></script>
-  <script>
-    mocha.setup('bdd')
-  </script>
-  <!-- <script src="dist.browser/json-ptr.js"></script> -->
-  <script src="dist.browser/json-ptr-with-browser-tests.js"></script>
-  <script>
-    window.onload = function () {
-      mocha.checkLeaks();
-      mocha.globals(['jQuery']);
-      mocha.run();
-    };
-  </script>
-</body>
-
+  <body>
+    <!-- You should open this file directly in a browser from your file system, not from a server... -->
+    <div id="mocha"></div>
+    <script>
+      globalConflict = 'This is a conflict';
+      JsonPointer = globalConflict;
+    </script>
+    <script src="https://cdn.rawgit.com/jquery/jquery/3.2.1/dist/jquery.min.js"></script>
+    <script src="node_modules/mocha/mocha.js"></script>
+    <script src="node_modules/chai/chai.js"></script>
+    <script>
+      // Define process.env since mocha expects it.
+      process = { env: {} };
+      mocha.setup('bdd');
+    </script>
+    <!-- <script src="dist/json-ptr.js"></script> -->
+    <script src="dist/json-ptr.tests.js"></script>
+    <script>
+      window.onload = function () {
+        mocha.checkLeaks();
+        mocha.globals(['jQuery']);
+        mocha.run();
+      };
+    </script>
+  </body>
 </html>

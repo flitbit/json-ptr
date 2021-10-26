@@ -1,12 +1,12 @@
 version: 2.1
 executors:
-  node-12:
+  node-14:
     docker:
-      - image: circleci/node:12
+      - image: circleci/node:14
 
 commands:
   npm-ci:
-    description: "standard npm-based ci workflow"
+    description: 'standard npm-based ci workflow'
     steps:
       - checkout
       - run:
@@ -42,7 +42,7 @@ commands:
 jobs:
   build-pre:
     working_directory: ~/repo
-    executor: node-12
+    executor: node-14
     steps:
       - npm-ci
       - run:
@@ -57,7 +57,7 @@ jobs:
 
   build-release:
     working_directory: ~/repo
-    executor: node-12
+    executor: node-14
     steps:
       - npm-ci
       - run:
