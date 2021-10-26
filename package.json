@@ -46,7 +46,7 @@
     "precibuild": "npm run cilint",
     "cibuild": "npm run buildall",
     "preci": "npm run cibuild",
-    "ci": "cross-env TS_NODE_COMPILER_OPTIONS='{ \"module\": \"commonjs\", \"noEmit\": false }' nyc mocha __tests__/**/*.spec.ts --timeout=10000 --exit --reporter mocha-junit-reporter --reporter-options mochaFile=reports/mocha/test-results.xml",
+    "ci": "cross-env TS_NODE_COMPILER_OPTIONS='{ \"module\": \"commonjs\", \"noEmit\": false }' nyc mocha src/**/*.spec.ts --timeout=10000 --exit --reporter mocha-junit-reporter --reporter-options mochaFile=reports/mocha/test-results.xml",
     "predocs": "shx rm -fr docs",
     "docs": "typedoc && cp _config.yml docs/"
   },
