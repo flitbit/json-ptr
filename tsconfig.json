@@ -15,7 +15,7 @@
     "rootDir": "./src",
     "sourceMap": true,
     "strict": true,
-    "target": "esnext",
+    "target": "ES2019",
     "types": ["node", "mocha"]
   },
   "include": ["src/**/*"],
