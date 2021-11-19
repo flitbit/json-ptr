@@ -193,21 +193,24 @@ describe('Utils', () => {
         setValueAtPath({}, 'yes', ['__proto__', 'polluted'], true);
       }).to.throw('Attempted prototype pollution disallowed.');
       const prototyped = {} as unknown as Prototyped;
-      expect(prototyped.__proto__?.polluted).to.not.eql('yes');
+      if (!prototyped.__proto__) return;
+      expect(prototyped.__proto__.polluted).to.not.eql('yes');
     });
     it('will prevent .constructor from being polluted', () => {
       expect(() => {
         setValueAtPath({}, 'yes', ['constructor', 'polluted'], true);
       }).to.throw('Attempted prototype pollution disallowed.');
       const prototyped = {} as unknown as Prototyped;
-      expect(prototyped.constructor?.polluted).to.not.eql('yes');
+      if (!prototyped.constructor) return;
+      expect(prototyped.constructor.polluted).to.not.eql('yes');
     });
     it('will prevent .prototype from being polluted', () => {
       expect(() => {
         setValueAtPath({}, 'yes', ['prototype', 'polluted'], true);
       }).to.throw('Attempted prototype pollution disallowed.');
       const prototyped = {} as unknown as Prototyped;
-      expect(prototyped.prototype?.polluted).to.not.eql('yes');
+      if (!prototyped.prototype) return;
+      expect(prototyped.prototype.polluted).to.not.eql('yes');
     });
     it('will prevent __proto__ from being polluted by javascript', () => {
       expect(() => {
@@ -219,7 +222,6 @@ describe('Utils', () => {
           true,
         );
         const prototyped = {} as unknown as Prototyped;
-        expect(prototyped.__proto__?.polluted).to.not.eql('yes');
         expect(prototyped.__proto__).to.be.undefined;
       }).to.throw('PathSegments must be a string or a number.');
     });
