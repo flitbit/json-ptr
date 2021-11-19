@@ -48,7 +48,7 @@
     "preci": "npm run cibuild",
     "ci": "cross-env TS_NODE_COMPILER_OPTIONS='{ \"module\": \"commonjs\", \"noEmit\": false }' nyc mocha src/**/*.spec.ts --timeout=10000 --exit --reporter mocha-junit-reporter --reporter-options mochaFile=reports/mocha/test-results.xml",
     "predocs": "shx rm -fr docs",
-    "docs": "typedoc && shx cp _config.yml docs/"
+    "docs": "typedoc && shx cp docs-overlay/* docs/"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^21.0.1",
