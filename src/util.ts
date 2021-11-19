@@ -356,7 +356,7 @@ export function unsetValueAtPath(target: unknown, path: PathSegments): unknown {
 }
 
 export function looksLikeFragment(ptr: Pointer): boolean {
-  return ptr?.length > 0 && ptr[0] === '#';
+  return typeof ptr === 'string' && ptr.length > 0 && ptr[0] === '#';
 }
 
 export function pickDecoder(ptr: Pointer): Decoder {
