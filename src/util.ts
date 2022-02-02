@@ -249,6 +249,9 @@ export function setValueAtPath(
       throw new TypeError('PathSegments must be a string or a number.');
     }
     if (
+      // Reconsider this strategy. It disallows legitimate structures on
+      // non - objects, or more precisely, on objects not derived from a class
+      // or constructor function.
       step === '__proto__' ||
       step === 'constructor' ||
       step === 'prototype'
@@ -284,7 +287,11 @@ export function setValueAtPath(
             return undefined;
           }
           // if the next step is an array index, this step should be an array.
-          if (toArrayIndexReference(it[step], path[cursor + 1]) !== -1) {
+          const n = Number(path[cursor + 1]);
+          if (
+            Number.isInteger(n) &&
+            toArrayIndexReference(it[step], n) !== -1
+          ) {
             it = it[step] = [];
             continue;
           }
