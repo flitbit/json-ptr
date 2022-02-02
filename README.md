@@ -20,7 +20,7 @@ npm install json-ptr
 
 As of v3.0.0, we provide CJS, ESM, and UMD builds under the `dist/` folder when you install the package from NPM, we also have all appropriate references in our `package.json` file, so your code should just work. If you need a CDN reference for a website or the like, try [UNPKG](https://unpkg.com/), which picks up our releases automatically.
 
-CDN: https://unpkg.com/browse/json-ptr@3.0.2/dist/json-ptr.min.js.
+CDN: https://unpkg.com/browse/json-ptr@3.1.0/dist/json-ptr.min.js.
 
 ## Use
 
@@ -256,6 +256,11 @@ json-pointer | get    |          | 1000000 | 2619 | 346.17%
 It is important to recognize in the performance results that _compiled_ options are faster. As a general rule, you should _compile_ any pointers you'll be using repeatedly.
 
 ## Releases
+
+- 2022-02-02 — **3.1.0**
+
+  - [fixed issue #48](https://github.com/flitbit/json-ptr/issues/48) wherein, when calling any of the `.set()` methods, which in turn rely on [`setValueAtPath()`](https://flitbit.github.io/json-ptr/modules.html#setValueAtPath), _and_ using the `force` argument to enable creating an object graph, one character path segments were interpreted as numbers, which resulted in unintended object graphs being created when the character was not an integer.
+  - fixed borked documentation as reported in [issue #44](https://github.com/flitbit/json-ptr/issues/44)
 
 - 2021-10-26 — **3.0.0** **Potential Security Vulnerability Patched**
   - When setting a value on an object graph, a developer could purposely use `json-ptr` to pollute an object's prototype by passing invalid path segments to the set/unset operations. This behavior has been disallowed.
