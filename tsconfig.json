@@ -22,7 +22,6 @@
   "exclude": ["**/node_modules", "**/dist", "**/*.md", "**/rollup.*"],
   "typedocOptions": {
     "entryPoints": ["src/index.ts"],
-    "githubPages": false,
     "includeVersion": true,
     "out": "docs"
   }

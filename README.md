@@ -1,6 +1,6 @@
 # json-ptr
 
-[![CircleCI](https://circleci.com/gh/flitbit/json-ptr/tree/master.svg?style=svg)](https://circleci.com/gh/flitbit/json-ptr/tree/master) [![codecov](https://codecov.io/gh/flitbit/json-ptr/branch/master/graph/badge.svg)](https://codecov.io/gh/flitbit/json-ptr)
+[![CircleCI](https://circleci.com/gh/flitbit/json-ptr/tree/main.svg?style=svg)](https://circleci.com/gh/flitbit/json-ptr/tree/main) [![codecov](https://codecov.io/gh/flitbit/json-ptr/branch/main/graph/badge.svg)](https://codecov.io/gh/flitbit/json-ptr)
 
 A complete implementation of JSON Pointer ([RFC 6901](https://tools.ietf.org/html/rfc6901)) for nodejs and modern browsers.
 
@@ -20,7 +20,7 @@ npm install json-ptr
 
 As of v3.0.0, we provide CJS, ESM, and UMD builds under the `dist/` folder when you install the package from NPM, we also have all appropriate references in our `package.json` file, so your code should just work. If you need a CDN reference for a website or the like, try [UNPKG](https://unpkg.com/), which picks up our releases automatically.
 
-CDN: https://unpkg.com/browse/json-ptr@3.0.0/dist/json-ptr.min.js.
+CDN: https://unpkg.com/browse/json-ptr@3.0.2/dist/json-ptr.min.js.
 
 ## Use
 
@@ -36,7 +36,7 @@ import { JsonPointer } from 'json-ptr';
 
 ## API Documentation
 
-The [API documentation is generated from code by typedoc and hosted here](http://flitbit.github.io/json-ptr/). Read the docs.
+The [API documentation is generated from code by typedoc and hosted here](https://flitbit.github.io/json-ptr/). Read the docs.
 
 Documentation is always a work in progress, let us know by creating an issue if you need a scenario documented.
 
