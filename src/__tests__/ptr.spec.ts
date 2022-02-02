@@ -1057,3 +1057,39 @@ describe('unreachable path across a null object in the graph', function () {
     expect(JsonPointer.get(o, '/employee/st_price')).to.eql(undefined);
   });
 });
+
+describe('.set() ops, single char segment interpreted as number', function () {
+  it('issue 48 proof of fix', function () {
+    interface Data {
+      hi?: { e: string };
+    }
+    const obj: Data = {};
+    const ptr = JsonPointer.create('/hi/e');
+    ptr.set(obj, 'hello', true);
+    expect(obj.hi?.e).to.eql('hello');
+  });
+  it('issue 48 does not apply when path is an integer', function () {
+    // We intentionally support creating arrays, or, more accurately, allowing
+    // path specifications to suggest a segment is an array. When an object
+    // graph is being constructed, based solely on a path, if a segment is
+    // followed by another segment that is an integer, we infer that the segment
+    // is intended to be an array. This is a subtlety, but provides added
+    // utility to the .set() methods. Try to keep this subtlety in mind.
+    //
+    //
+    // This test is a duplicate of tests above, but here for clarification as
+    // it relates to issue 48
+    //
+    interface Data {
+      arr?: string[];
+    }
+    const obj: Data = {};
+    const ptr = JsonPointer.create('/arr/0');
+    ptr.set(obj, 'hello', true);
+    if (obj.arr) {
+      expect(obj.arr[0]).to.eql('hello');
+    } else {
+      expect.fail('well hell, the array should have been created.');
+    }
+  });
+});
