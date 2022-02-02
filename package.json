@@ -1,6 +1,6 @@
 {
   "name": "json-ptr",
-  "version": "3.0.1",
+  "version": "3.1.0",
   "author": "Phillip Clark <phillip@flitbit.com>",
   "description": "A complete implementation of JSON Pointer (RFC 6901) for nodejs and modern browsers.",
   "keywords": [
