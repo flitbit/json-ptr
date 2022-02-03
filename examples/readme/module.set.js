@@ -1,7 +1,7 @@
 'use strict';
 
 const assert = require('assert');
-const { JsonPointer: ptr } = require('../../dist'); // json-ptr
+const { JsonPointer: ptr } = require('../../'); // json-ptr
 const { data } = require('./data');
 
 const before = ptr.get(data, '/legumes/1/instock');
