@@ -1,6 +1,6 @@
 'use strict';
 
-const { JsonPointer: ptr } = require('../../dist'); // json-ptr
+const { JsonPointer: ptr } = require('../../'); // json-ptr
 const data = require('./data');
 
 // var obj = ptr.flatten(data);

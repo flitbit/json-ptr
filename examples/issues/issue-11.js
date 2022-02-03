@@ -1,4 +1,4 @@
-var ptr = require('../../dist');
+var ptr = require('../../');
 var util = require('util');
 
 var a = {

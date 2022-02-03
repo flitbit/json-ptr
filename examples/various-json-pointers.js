@@ -1,20 +1,24 @@
 const assert = require('assert');
-const { JsonPointer: ptr } = require('../dist');
+const { JsonPointer: ptr } = require('../');
 
 var obj = {
   a: 1,
   b: {
-    c: 2
+    c: 2,
   },
   d: {
-    e: [{
-      a: 3
-    }, {
-      b: 4
-    }, {
-      c: 5
-    }]
-  }
+    e: [
+      {
+        a: 3,
+      },
+      {
+        b: 4,
+      },
+      {
+        c: 5,
+      },
+    ],
+  },
 };
 
 // JSON Pointers (as strings)
@@ -22,9 +26,7 @@ var obj = {
 var n = -1,
   ub = 10000;
 
-
 while (++n < ub) {
-
   assert.equal(ptr.get(obj, '/a'), n + 1);
   assert.equal(ptr.get(obj, '/b/c'), n + 2);
   assert.equal(ptr.get(obj, '/d/e/0/a'), n + 3);
@@ -46,13 +48,13 @@ while (++n < ub) {
   assert.equal(ptr.get(obj, ''), obj);
 }
 
-assert.throws(function() {
+assert.throws(function () {
   ptr.get(obj, 'a');
 });
 
-assert.throws(function() {
+assert.throws(function () {
   ptr.set(obj, 'a', {
-    a: 'value'
+    a: 'value',
   });
 });
 
@@ -60,7 +62,6 @@ assert.throws(function() {
 ub = ub * 2;
 n--;
 while (++n < ub) {
-
   assert.equal(ptr.get(obj, '#/a'), n + 1);
   assert.equal(ptr.get(obj, '#/b/c'), n + 2);
   assert.equal(ptr.get(obj, '#/d/e/0/a'), n + 3);
@@ -82,33 +83,33 @@ while (++n < ub) {
   assert.equal(ptr.get(obj, ''), obj);
 }
 
-assert.throws(function() {
+assert.throws(function () {
   // Cannot assign the root object:
   ptr.set(obj, '#', {});
 });
 
-assert.throws(function() {
+assert.throws(function () {
   ptr.get(obj, '#a');
 });
-assert.throws(function() {
+assert.throws(function () {
   ptr.set(obj, '#a', {
-    a: 'value'
+    a: 'value',
   });
 });
 
-assert.throws(function() {
+assert.throws(function () {
   ptr.get(obj, 'a/');
 });
 
 var complexKeys = {
   'a/b': {
-    c: 1
+    c: 1,
   },
   d: {
-    'e/f': 2
+    'e/f': 2,
   },
   '~1': 3,
-  '01': 4
+  '01': 4,
 };
 
 assert.equal(ptr.get(complexKeys, '/a~1b/c'), 1);
@@ -130,7 +131,7 @@ assert.equal(ary[4], 'four');
 
 // Examples from the draft:
 var example = {
-  'foo': ['bar', 'baz'],
+  foo: ['bar', 'baz'],
   '': 0,
   'a/b': 1,
   'c%d': 2,
@@ -139,7 +140,7 @@ var example = {
   'i\\j': 5,
   'k"l': 6,
   ' ': 7,
-  'm~n': 8
+  'm~n': 8,
 };
 
 assert.equal(ptr.get(example, ''), example);

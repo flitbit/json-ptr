@@ -1,5 +1,5 @@
 const assert = require('assert');
-const { JsonPointer } = require('../dist');
+const { JsonPointer } = require('../');
 
 // https://tools.ietf.org/id/draft-handrews-relative-json-pointer-00.html#rfc.section.5.1
 
@@ -26,11 +26,9 @@ assert(p2.rel(doc, '2/foo/0') == 'bar');
 assert(p2.rel(doc, '0#') == 'nested');
 assert(p2.rel(doc, '1#') == 'highly');
 
-// Pre-compile relative pointers to dramatically improve performance in 
+// Pre-compile relative pointers to dramatically improve performance in
 // scenarios such as loops or when a piece of code will be frequently using
 // the same relative location:
 const compiled = p2.relative('1/nested/objects');
 // ...once compiled, it is just another pointer...
 assert(compiled.get(doc, '1/nested/objects') == true);
-
-

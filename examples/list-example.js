@@ -1,20 +1,24 @@
 const util = require('util');
-const { JsonPointer } = require('../dist');
+const { JsonPointer } = require('../');
 var data = {
   a: 1,
   b: {
-    c: 2
+    c: 2,
   },
   d: {
-    e: [{
-      a: 3
-    }, {
-      b: 4
-    }, {
-      c: 5
-    }]
+    e: [
+      {
+        a: 3,
+      },
+      {
+        b: 4,
+      },
+      {
+        c: 5,
+      },
+    ],
   },
-  f: null
+  f: null,
 };
 
 var items = JsonPointer.listPointers(data);
@@ -22,7 +26,7 @@ var items = JsonPointer.listPointers(data);
 console.log(util.inspect(items, false, 99));
 
 items = [];
-JsonPointer.listFragmentIds(data, function(item) {
+JsonPointer.listFragmentIds(data, function (item) {
   var type = typeof item.value;
   if (type === 'object') {
     if (Array.isArray(item.value)) {

@@ -1,4 +1,4 @@
-const { JsonPointer } = require('../../dist');
+const { JsonPointer } = require('../../');
 const util = require('util');
 
 var p = new JsonPointer("/I'm/bad");

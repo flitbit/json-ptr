@@ -1,7 +1,11 @@
 'use strict';
 
 const assert = require('assert');
-const { JsonPointer: ptr, encodePointer, encodeUriFragmentIdentifier } = require('../../dist'); // json-ptr
+const {
+  JsonPointer: ptr,
+  encodePointer,
+  encodeUriFragmentIdentifier,
+} = require('../../'); // json-ptr
 
 const pointer = '/people/wilbur dongleworth/age';
 const fragmentId = '#/people/wilbur%20dongleworth/age';
@@ -22,6 +26,14 @@ path.forEach((segment, i) => {
   assert.equal(segment, fragmentPath[i]);
 });
 
-console.log(JSON.stringify({
-  path, pointer, fragmentId
-}, null, '  '));
+console.log(
+  JSON.stringify(
+    {
+      path,
+      pointer,
+      fragmentId,
+    },
+    null,
+    '  ',
+  ),
+);
