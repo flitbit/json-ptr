@@ -15,7 +15,6 @@ import {
   Pointer,
   RelativeJsonPointer,
   PathSegments,
-  Encoder,
   JsonStringPointerListItem,
   UriFragmentIdentifierPointerListItem,
 } from './types';
@@ -36,7 +35,7 @@ function isObject(value: unknown): boolean {
  *
  * Tree descent occurs in-order, breadth first.
  */
-export type Visitor = (ptr: JsonStringPointer, val: unknown) => void;
+export type Visitor = (ptr: JsonPointer, val: unknown) => void;
 
 /** @hidden */
 interface Item {
@@ -48,28 +47,29 @@ interface Item {
 function shouldDescend(obj: unknown): boolean {
   return isObject(obj) && !JsonReference.isReference(obj);
 }
+
 /** @hidden */
 function descendingVisit(
   target: unknown,
   visitor: Visitor,
-  encoder: Encoder,
+  includeSymbols = false,
 ): void {
   const distinctObjects = new Map<unknown, JsonPointer>();
   const q: Item[] = [{ obj: target, path: [] }];
   while (q.length) {
     const { obj, path } = q.shift() as Item;
-    visitor(encoder(path), obj);
+    visitor(new JsonPointer(path), obj);
     if (shouldDescend(obj)) {
-      distinctObjects.set(
-        obj,
-        new JsonPointer(encodeUriFragmentIdentifier(path)),
-      );
+      distinctObjects.set(obj, new JsonPointer(path));
       if (!Array.isArray(obj)) {
-        const keys = Object.keys(obj as Record<string, unknown>);
+        let keys: (string | symbol)[] = Object.keys(obj as object);
+        if (includeSymbols) {
+          keys = keys.concat(Object.getOwnPropertySymbols(obj));
+        }
         const len = keys.length;
         let i = -1;
         while (++i < len) {
-          const it = (obj as Record<string, unknown>)[keys[i]];
+          const it = (obj as Record<string | symbol, unknown>)[keys[i]];
           if (isObject(it) && distinctObjects.has(it)) {
             q.push({
               obj: new JsonReference(distinctObjects.get(it) as JsonPointer),
@@ -84,19 +84,19 @@ function descendingVisit(
         }
       } else {
         // handleArray
-        let j = -1;
+        let i = -1;
         const len = obj.length;
-        while (++j < len) {
-          const it = obj[j];
+        while (++i < len) {
+          const it = obj[i];
           if (isObject(it) && distinctObjects.has(it)) {
             q.push({
               obj: new JsonReference(distinctObjects.get(it) as JsonPointer),
-              path: path.concat([j + '']),
+              path: path.concat([i]),
             });
           } else {
             q.push({
               obj: it,
-              path: path.concat([j + '']),
+              path: path.concat([i]),
             });
           }
         }
@@ -106,11 +106,161 @@ function descendingVisit(
 }
 
 /** @hidden */
-const $ptr = Symbol('pointer');
+const $get = Symbol('$get');
 /** @hidden */
-const $frg = Symbol('fragmentId');
+const $frg = Symbol('$frg');
 /** @hidden */
-const $get = Symbol('getter');
+const $symbols = Symbol('$symbols');
+/**
+ * Symbol used to cache pre-compiled getters on target objects used with static
+ * pointer methods.
+ * @hidden
+ */
+const $cache = Symbol('$cache');
+
+interface Symbols {
+  [$symbols]: number[];
+}
+
+interface Caching {
+  [$cache]?: Map<string, [number[], PathSegments, Dereference][]>;
+}
+
+/**
+ * Enables pointer caching for the specified object. Pointer caching can save
+ * processing cycles when frequently executing pointer operations against an
+ * object, using transient JsonPointer instances, such as those used by static
+ * methods like [[JsonPointer.get]].
+ *
+ * The cache gets cleaned up with the target instance, when the target goes out
+ * of scope.
+ * @param target the object on which pointer caching will be enabled.
+ * @returns the target object
+ */
+export const enablePointerCaching = (target: unknown): unknown => {
+  const caching = target as Caching;
+  let cache = caching[$cache];
+  if (!cache) {
+    cache = new Map<string, [number[], PathSegments, Dereference][]>();
+    caching[$cache] = cache;
+  }
+  return target;
+};
+
+export const disablePointerCaching = (target: unknown): unknown => {
+  const caching = target as Caching;
+  if (caching[$cache]) {
+    delete caching[$cache];
+  }
+  return target;
+};
+
+function countSymbols(path: PathSegments | Symbols): number[] {
+  let symbols = (path as Symbols)[$symbols];
+  if (typeof symbols === 'undefined') {
+    symbols = [];
+    const certainlyPath = path as PathSegments;
+    let i = -1;
+    const len = certainlyPath.length;
+    while (++i < len) {
+      if (typeof certainlyPath[i] === 'symbol') {
+        symbols.push(i);
+      }
+    }
+    (path as Symbols)[$symbols] = symbols;
+  }
+  return symbols;
+}
+
+function resolveGetterOrCompile(
+  ptr: JsonPointer,
+  target: unknown,
+  getter?: Dereference,
+): Dereference {
+  const { pointer, path } = ptr;
+  const symbols = countSymbols(path);
+  const cache = (target as Caching)[$cache];
+  if (cache) {
+    // the object has a pointer cache.
+    let records = cache.get(pointer);
+    if (!records) {
+      // the object has not seen this pointer
+      getter = getter || compilePointerDereference(path);
+      records = [[symbols, path, getter]];
+      cache.set(pointer, records);
+      return getter;
+    }
+    // There should only be a few, because it requires symbols at the same path
+    // segment, with the same name, but different symbol scope. Possible but
+    // unlikely.
+    for (const [s, p, g] of records) {
+      if (s.length == symbols.length) {
+        // somewhat unroll the loops
+        switch (s.length) {
+          case 0:
+            return g;
+          case 1:
+            if (s[0] === symbols[0] && p[s[0]] === path[symbols[0]]) return g;
+            break;
+          case 2:
+            if (
+              s[0] === symbols[0] &&
+              p[s[0]] === path[symbols[0]] &&
+              s[1] === symbols[1] &&
+              p[s[1]] === path[symbols[1]]
+            )
+              return g;
+            break;
+          case 3:
+            if (
+              s[0] === symbols[0] &&
+              p[s[0]] === path[symbols[0]] &&
+              s[1] === symbols[1] &&
+              p[s[1]] === path[symbols[1]] &&
+              s[2] === symbols[2] &&
+              p[s[2]] === path[symbols[2]]
+            )
+              return g;
+            break;
+          default:
+            // ok, more than 3, so loop
+            if (
+              s[0] === symbols[0] &&
+              p[s[0]] === path[symbols[0]] &&
+              s[1] === symbols[1] &&
+              p[s[1]] === path[symbols[1]] &&
+              s[2] === symbols[2] &&
+              p[s[2]] === path[symbols[2]] &&
+              s[3] === symbols[3] &&
+              p[s[3]] === path[symbols[3]]
+            ) {
+              // loop over the remainder...
+              let seemsEqual = true;
+              let j = 3;
+              const len = s.length;
+              while (seemsEqual && ++j < len) {
+                seemsEqual =
+                  s[j] === symbols[j] && p[s[j]] === path[symbols[j]];
+              }
+              if (seemsEqual) return g;
+            }
+            break;
+        }
+      }
+    }
+    // We get here if there isn't a match in the cache.
+    getter = getter || compilePointerDereference(path);
+    records.push([symbols, path, getter]);
+    return getter;
+  }
+  return getter || compilePointerDereference(path);
+}
+
+/**
+ * Tuple representing a pointer:value pair.
+ */
+export type PointerPair = [JsonPointer, unknown];
+export type PointerLike = Pointer | PathSegments | JsonPointer;
 
 /**
  * Represents a JSON Pointer, capable of getting and setting the value on target
@@ -221,11 +371,14 @@ const $get = Symbol('getter');
  */
 export class JsonPointer {
   /** @hidden */
-  private [$ptr]: JsonStringPointer;
-  /** @hidden */
-  private [$frg]: UriFragmentIdentifierPointer;
-  /** @hidden */
   private [$get]: Dereference;
+  /** @hidden */
+  private [$frg]: JsonStringPointer;
+
+  /**
+   * This pointer's JSON Pointer encoded string representation.
+   */
+  readonly pointer: JsonStringPointer;
 
   /**
    * Factory function that creates a JsonPointer instance.
@@ -262,10 +415,7 @@ export class JsonPointer {
    * @param target the target of the operation
    * @param pointer the pointer or path
    */
-  static has(
-    target: unknown,
-    pointer: Pointer | PathSegments | JsonPointer,
-  ): boolean {
+  static has(target: unknown, pointer: PointerLike): boolean {
     if (typeof pointer === 'string' || Array.isArray(pointer)) {
       pointer = new JsonPointer(pointer);
     }
@@ -291,10 +441,7 @@ export class JsonPointer {
    * @param target the target of the operation
    * @param pointer the pointer or path.
    */
-  static get(
-    target: unknown,
-    pointer: Pointer | PathSegments | JsonPointer,
-  ): unknown {
+  static get(target: unknown, pointer: PointerLike): unknown {
     if (typeof pointer === 'string' || Array.isArray(pointer)) {
       pointer = new JsonPointer(pointer);
     }
@@ -339,7 +486,7 @@ export class JsonPointer {
    */
   static set(
     target: unknown,
-    pointer: Pointer | PathSegments | JsonPointer,
+    pointer: PointerLike,
     val: unknown,
     force = false,
   ): unknown {
@@ -379,10 +526,7 @@ export class JsonPointer {
    *
    * @returns the value that was removed from the object graph.
    */
-  static unset(
-    target: unknown,
-    pointer: Pointer | PathSegments | JsonPointer,
-  ): unknown {
+  static unset(target: unknown, pointer: PointerLike): unknown {
     if (typeof pointer === 'string' || Array.isArray(pointer)) {
       pointer = new JsonPointer(pointer);
     }
@@ -401,46 +545,69 @@ export class JsonPointer {
    * Evaluates the target's object graph, calling the specified visitor for every unique pointer location discovered while walking the graph.
    * @param target the target of the operation
    * @param visitor a callback function invoked for each unique pointer location in the object graph
-   * @param fragmentId indicates whether the visitor should receive fragment identifiers or regular pointers
+   * @param includeSymbols indicates whether the results should include paths across symbols (these don't round-trip to legitimate JSON Pointers)
    */
-  static visit(target: unknown, visitor: Visitor, fragmentId = false): void {
-    descendingVisit(
-      target,
-      visitor,
-      fragmentId ? encodeUriFragmentIdentifier : encodePointer,
-    );
+  static visit(
+    target: unknown,
+    visitor: Visitor,
+    includeSymbols = false,
+  ): void {
+    descendingVisit(target, visitor, includeSymbols);
   }
 
   /**
-   * Evaluates the target's object graph, returning a [[JsonStringPointerListItem]] for each location in the graph.
+   * Evaluates the target's object graph, returning a [[PointerPair]] for each location in the graph.
    * @param target the target of the operation
+   * @param includeSymbols indicates whether the results should include paths across symbols (these don't round-trip to legitimate JSON Pointers)
    */
-  static listPointers(target: unknown): JsonStringPointerListItem[] {
-    const res: JsonStringPointerListItem[] = [];
+  static listPairs(target: unknown, includeSymbols = false): PointerPair[] {
+    const res: PointerPair[] = [];
     descendingVisit(
       target,
       (pointer, value): void => {
-        res.push({ pointer, value });
+        res.push([pointer, value]);
       },
-      encodePointer,
+      includeSymbols,
     );
     return res;
   }
 
   /**
-   * Evaluates the target's object graph, returning a [[UriFragmentIdentifierPointerListItem]] for each location in the graph.
+   * Evaluates the target's object graph, returning a [[JsonStringPointerListItem]] for each location in the graph.
    * @param target the target of the operation
+   * @param includeSymbols indicates whether the results should include paths across symbols (these don't round-trip to legitimate JSON Pointers)
+   */
+  static listPointers(
+    target: unknown,
+    includeSymbols = false,
+  ): JsonStringPointerListItem[] {
+    const res: JsonStringPointerListItem[] = [];
+    descendingVisit(
+      target,
+      (pointer, value): void => {
+        res.push({ pointer: pointer.pointer, value });
+      },
+      includeSymbols,
+    );
+    return res;
+  }
+
+  /**
+   * Evaluates the target's object graph, returning a [[JsonStringPointerListItem]] for each location in the graph.
+   * @param target the target of the operation
+   * @param includeSymbols indicates whether the results should include paths across symbols (these don't round-trip to legitimate JSON Pointers)
    */
   static listFragmentIds(
     target: unknown,
+    includeSymbols = false,
   ): UriFragmentIdentifierPointerListItem[] {
     const res: UriFragmentIdentifierPointerListItem[] = [];
     descendingVisit(
       target,
-      (fragmentId, value): void => {
-        res.push({ fragmentId, value });
+      (pointer, value): void => {
+        res.push({ fragmentId: pointer.uriFragmentIdentifier, value });
       },
-      encodeUriFragmentIdentifier,
+      includeSymbols,
     );
     return res;
   }
@@ -448,19 +615,33 @@ export class JsonPointer {
   /**
    * Evaluates the target's object graph, returning a Record&lt;Pointer, unknown> populated with pointers and the corresponding values from the graph.
    * @param target the target of the operation
-   * @param fragmentId indicates whether the results are populated with fragment identifiers rather than regular pointers
+   * @param includeSymbols indicates whether the results should include paths across symbols (these don't round-trip to legitimate JSON Pointers)
    */
   static flatten(
     target: unknown,
-    fragmentId = false,
+    includeSymbols = false,
   ): Record<Pointer, unknown> {
     const res: Record<Pointer, unknown> = {};
     descendingVisit(
       target,
-      (p, v) => {
-        res[p] = v;
+      (pointer, value) => {
+        res[pointer.pointer] = value;
       },
-      fragmentId ? encodeUriFragmentIdentifier : encodePointer,
+      includeSymbols,
+    );
+    return res;
+  }
+
+  static pointersWithSymbol(target: unknown, sym: symbol): JsonPointer[] {
+    const res: JsonPointer[] = [];
+    descendingVisit(
+      target,
+      (pointer) => {
+        if (~pointer.path.indexOf(sym)) {
+          res.push(pointer);
+        }
+      },
+      true,
     );
     return res;
   }
@@ -469,13 +650,21 @@ export class JsonPointer {
    * Evaluates the target's object graph, returning a Map&lt;Pointer,unknown>  populated with pointers and the corresponding values form the graph.
    * @param target the target of the operation
    * @param fragmentId indicates whether the results are populated with fragment identifiers rather than regular pointers
+   * @param includeSymbols indicates whether the results should include paths across symbols (these don't round-trip to legitimate JSON Pointers)
    */
-  static map(target: unknown, fragmentId = false): Map<Pointer, unknown> {
+  static map(
+    target: unknown,
+    fragmentId = false,
+    includeSymbols = false,
+  ): Map<string, unknown> {
     const res = new Map<Pointer, unknown>();
+    const encoder = fragmentId ? encodeUriFragmentIdentifier : encodePointer;
     descendingVisit(
       target,
-      res.set.bind(res),
-      fragmentId ? encodeUriFragmentIdentifier : encodePointer,
+      (p, v) => {
+        res.set(encoder(p.path), v);
+      },
+      includeSymbols,
     );
     return res;
   }
@@ -487,10 +676,20 @@ export class JsonPointer {
 
   /**
    * Creates a new instance.
-   * @param ptr a string representation of a JSON Pointer, or a decoded array of path segments.
+   *
+   * If [[ptr]] is another [[JsonPointer]] then consider this a copy constructor.
+   * @param ptr a string representation of a JSON Pointer, a decoded array of path segments, or another JsonPointer.
    */
-  constructor(ptr: Pointer | PathSegments) {
-    this.path = decodePtrInit(ptr);
+  constructor(ptr: PointerLike) {
+    if (ptr instanceof JsonPointer) {
+      // copy construct...
+      this.path = ptr.path;
+      this.pointer = ptr.pointer;
+      this[$get] = ptr[$get];
+      return;
+    }
+    const path = (this.path = decodePtrInit(ptr));
+    this.pointer = encodePointer(path);
   }
 
   /**
@@ -499,9 +698,9 @@ export class JsonPointer {
    */
   get(target: unknown): unknown {
     if (!this[$get]) {
-      this[$get] = compilePointerDereference(this.path);
+      this[$get] = resolveGetterOrCompile(this, target);
     }
-    return this[$get](target);
+    return this[$get](this.path, target);
   }
 
   /**
@@ -598,22 +797,12 @@ export class JsonPointer {
    * Creates a new instance by concatenating the specified pointer's path onto this pointer's path.
    * @param ptr the string representation of a pointer, it's decoded path, or an instance of JsonPointer indicating the additional path to concatenate onto the pointer.
    */
-  concat(ptr: JsonPointer | Pointer | PathSegments): JsonPointer {
+  concat(ptr: PointerLike): JsonPointer {
     return new JsonPointer(
       this.path.concat(
         ptr instanceof JsonPointer ? ptr.path : decodePtrInit(ptr),
       ),
     );
-  }
-
-  /**
-   * This pointer's JSON Pointer encoded string representation.
-   */
-  get pointer(): JsonStringPointer {
-    if (this[$ptr] === undefined) {
-      this[$ptr] = encodePointer(this.path);
-    }
-    return this[$ptr];
   }
 
   /**
@@ -633,6 +822,47 @@ export class JsonPointer {
     return this.pointer;
   }
 }
+
+/**
+ * Re-export of [[JsonPointer.create]] to support classic API
+ */
+export const create = JsonPointer.create;
+/**
+ * Re-export of [[JsonPointer.get]] to support classic API
+ */
+export const get = JsonPointer.get;
+/**
+ * Re-export of [[JsonPointer.set]] to support classic API
+ */
+export const set = JsonPointer.set;
+/**
+ * Re-export of [[JsonPointer.unset]] to support classic API
+ */
+export const unset = JsonPointer.unset;
+/**
+ * Re-export of [[JsonPointer.decode]] to support classic API
+ */
+export const decode = JsonPointer.decode;
+/**
+ * Re-export of [[JsonPointer.visit]] to support classic API
+ */
+export const visit = JsonPointer.visit;
+/**
+ * Re-export of [[JsonPointer.listPointers]] to support classic API
+ */
+export const listPointers = JsonPointer.listPointers;
+/**
+ * Re-export of [[JsonPointer.listFragmentIds]] to support classic API
+ */
+export const listFragmentIds = JsonPointer.listFragmentIds;
+/**
+ * Re-export of [[JsonPointer.flatten]] to support classic API
+ */
+export const flatten = JsonPointer.flatten;
+/**
+ * Re-export of [[JsonPointer.map]] to support classic API
+ */
+export const map = JsonPointer.map;
 
 /** @hidden */
 const $pointer = Symbol('pointer');
@@ -666,7 +896,7 @@ export class JsonReference {
    * Creates a new instance.
    * @param pointer a JSON Pointer for the reference.
    */
-  constructor(pointer: JsonPointer | Pointer | PathSegments) {
+  constructor(pointer: PointerLike) {
     this[$pointer] =
       pointer instanceof JsonPointer ? pointer : new JsonPointer(pointer);
     this.$ref = this[$pointer].uriFragmentIdentifier;

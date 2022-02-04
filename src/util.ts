@@ -51,6 +51,8 @@ export function encodeFragmentSegments(segments: PathSegments): PathSegments {
       res[i] = encodeURIComponent(
         replace(replace(segments[i] as string, '~', '~0'), '/', '~1'),
       );
+    } else if (typeof segments[i] === 'symbol') {
+      res[i] = `Symbol(${(segments[i] as symbol).description})`;
     } else {
       res[i] = segments[i];
     }
@@ -79,6 +81,8 @@ export function encodePointerSegments(segments: PathSegments): PathSegments {
   while (++i < len) {
     if (typeof segments[i] === 'string') {
       res[i] = replace(replace(segments[i] as string, '~', '~0'), '/', '~1');
+    } else if (typeof segments[i] === 'symbol') {
+      res[i] = `Symbol(${(segments[i] as symbol).description})`;
     } else {
       res[i] = segments[i];
     }
@@ -167,7 +171,7 @@ export function decodeRelativePointer(ptr: RelativeJsonPointer): PathSegments {
     if (segments.length > 1) {
       throw new ReferenceError(InvalidRelativePointerError);
     }
-    first = first.substr(0, first.length - 1);
+    first = first.substring(0, first.length - 1);
   }
   let i = -1;
   const len = first.length;
@@ -184,8 +188,9 @@ export function decodeRelativePointer(ptr: RelativeJsonPointer): PathSegments {
 export function toArrayIndexReference(
   arr: readonly unknown[],
   idx: PathSegment,
-): number {
+): number | symbol {
   if (typeof idx === 'number') return idx;
+  if (typeof idx === 'symbol') return idx;
   const len = idx.length;
   if (!len) return -1;
   let cursor = 0;
@@ -203,24 +208,37 @@ export function toArrayIndexReference(
   return parseInt(idx, 10);
 }
 
-export type Dereference = (it: unknown) => unknown;
+export type Dereference = (path: PathSegments, it: unknown) => unknown;
 
 export function compilePointerDereference(path: PathSegments): Dereference {
   let body = "if (typeof(it) !== 'undefined'";
   if (path.length === 0) {
-    return (it): unknown => it;
+    return (_, it): unknown => it;
   }
-  body = path.reduce((body, _, i) => {
-    return (
-      body +
-      "\n\t&& it !== null && typeof((it = it['" +
-      replace(replace(path[i] + '', '\\', '\\\\'), "'", "\\'") +
-      "'])) !== 'undefined'"
-    );
-  }, "if (typeof(it) !== 'undefined'") as string;
+  let i = -1;
+  const len = path.length;
+  while (++i < len) {
+    if (typeof path[i] === 'symbol') {
+      body =
+        body +
+        '\n\t&& it !== null && typeof((it = it[path[' +
+        i +
+        "]])) !== 'undefined'";
+    } else {
+      const p = path[i] as string;
+      body =
+        body +
+        "\n\t&& it !== null && typeof((it = it['" +
+        replace(replace(p + '', '\\', '\\\\'), "'", "\\'") +
+        "'])) !== 'undefined'";
+    }
+  }
   body = body + ') {\n\treturn it;\n }';
   // eslint-disable-next-line no-new-func
-  return new Function('it', body) as Dereference;
+  const generated = new Function('path', 'it', body) as Dereference;
+  // sometimes, it's useful to visualize the generated getters.
+  // console.log(`${encodePointer(path)} = ${generated.toString()}`);
+  return generated;
 }
 
 export function setValueAtPath(
@@ -239,14 +257,16 @@ export function setValueAtPath(
   let it: any = target;
   const len = path.length;
   const end = path.length - 1;
-  let step: PathSegment;
   let cursor = -1;
   let rem: unknown;
-  let p: number;
   while (++cursor < len) {
-    step = path[cursor];
-    if (typeof step !== 'string' && typeof step !== 'number') {
-      throw new TypeError('PathSegments must be a string or a number.');
+    const step = path[cursor];
+    if (
+      typeof step !== 'string' &&
+      typeof step !== 'number' &&
+      typeof step !== 'symbol'
+    ) {
+      throw new TypeError('PathSegments must be a string, number, or symbol.');
     }
     if (
       // Reconsider this strategy. It disallows legitimate structures on
@@ -263,21 +283,30 @@ export function setValueAtPath(
         it.push(val);
         return undefined;
       }
-      p = toArrayIndexReference(it, step);
-      if (it.length > p) {
+      const p = toArrayIndexReference(it, step);
+      if (typeof p === 'symbol') {
         if (cursor === end) {
-          rem = it[p];
-          it[p] = val;
+          rem = (it as unknown as Record<symbol, unknown>)[p];
+          (it as unknown as Record<symbol, unknown>)[p] = val;
           break;
         }
-        it = it[p];
-      } else if (cursor === end && p === it.length) {
-        if (force) {
-          it.push(val);
-          return undefined;
+        it = (it as unknown as Record<symbol, unknown>)[p];
+      } else {
+        if (it.length > p) {
+          if (cursor === end) {
+            rem = it[p];
+            it[p] = val;
+            break;
+          }
+          it = it[p];
+        } else if (cursor === end && p === it.length) {
+          if (force) {
+            it.push(val);
+            return undefined;
+          }
+        } else if (force) {
+          it = it[p] = cursor === end ? val : {};
         }
-      } else if (force) {
-        it = it[p] = cursor === end ? val : {};
       }
     } else {
       if (typeof it[step] === 'undefined') {
@@ -322,12 +351,10 @@ export function unsetValueAtPath(target: unknown, path: PathSegments): unknown {
   let it: any = target;
   const len = path.length;
   const end = path.length - 1;
-  let step: PathSegment;
   let cursor = -1;
   let rem: unknown;
-  let p: number;
   while (++cursor < len) {
-    step = path[cursor];
+    const step = path[cursor];
     if (typeof step !== 'string' && typeof step !== 'number') {
       throw new TypeError('PathSegments must be a string or a number.');
     }
@@ -339,14 +366,23 @@ export function unsetValueAtPath(target: unknown, path: PathSegments): unknown {
       throw new Error('Attempted prototype pollution disallowed.');
     }
     if (Array.isArray(it)) {
-      p = toArrayIndexReference(it, step);
-      if (p >= it.length) return undefined;
-      if (cursor === end) {
-        rem = it[p];
-        delete it[p];
-        break;
+      const p = toArrayIndexReference(it, step);
+      if (typeof p === 'symbol') {
+        if (cursor === end) {
+          rem = (it as unknown as Record<symbol, unknown>)[p];
+          delete (it as unknown as Record<symbol, unknown>)[p];
+          break;
+        }
+        it = (it as unknown as Record<symbol, unknown>)[p];
+      } else {
+        if (p >= it.length) return undefined;
+        if (cursor === end) {
+          rem = it[p];
+          delete it[p];
+          break;
+        }
+        it = it[p];
       }
-      it = it[p];
     } else {
       if (typeof it[step] === 'undefined') {
         return undefined;

@@ -8,7 +8,7 @@
       "type": "node",
       "request": "launch",
       "name": "Launch Program",
-      "program": "${workspaceFolder}/examples/issues/issue-13.js"
+      "program": "${workspaceFolder}/examples/various-json-pointers.js"
     },
     {
       "name": "Run mocha",
@@ -16,10 +16,7 @@
       "request": "launch",
       "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
       "stopOnEntry": false,
-      "args": [
-        "__tests__/**/*.spec.ts",
-        "--no-timeouts"
-      ],
+      "args": ["src/__tests__/**/*.spec.ts", "--no-timeouts"],
       "cwd": "${workspaceRoot}",
       "runtimeExecutable": null,
       "env": {

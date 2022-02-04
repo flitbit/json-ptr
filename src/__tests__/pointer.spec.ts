@@ -295,11 +295,11 @@ describe('JsonPointer', () => {
     it(`static .visit(data)`, () => {
       const sequence: PathSegment[] = [];
       JsonPointer.visit(data1, (p, v) => {
-        const path = JsonPointer.decode(p);
+        const path = p.path;
         if (path.length) {
           sequence.push(path[path.length - 1]);
-          if (typeof v === 'string') {
-            sequence.push(v);
+          if (typeof v !== 'object') {
+            sequence.push(v as PathSegment);
           }
         }
       });
@@ -307,16 +307,16 @@ describe('JsonPointer', () => {
         'foo',
         'bar',
         'baz',
-        '0',
+        0,
         'qux',
-        '1',
+        1,
         'quux',
-        '2',
+        2,
         'garply',
         'waldo',
-        '0',
+        0,
         'fred',
-        '1',
+        1,
         'plugh',
       ]);
     });
@@ -326,11 +326,11 @@ describe('JsonPointer', () => {
       JsonPointer.visit(
         data1,
         (p, v) => {
-          const path = JsonPointer.decode(p);
+          const path = p.path;
           if (path.length) {
             sequence.push(path[path.length - 1]);
-            if (typeof v === 'string') {
-              sequence.push(v);
+            if (typeof v !== 'object') {
+              sequence.push(v as PathSegment);
             }
           }
         },
@@ -340,16 +340,16 @@ describe('JsonPointer', () => {
         'foo',
         'bar',
         'baz',
-        '0',
+        0,
         'qux',
-        '1',
+        1,
         'quux',
-        '2',
+        2,
         'garply',
         'waldo',
-        '0',
+        0,
         'fred',
-        '1',
+        1,
         'plugh',
       ]);
     });
@@ -366,7 +366,7 @@ describe('JsonPointer', () => {
     it('handles references', () => {
       const pointers: Record<string, unknown> = {};
       JsonPointer.visit(objWithReferences, (p, v) => {
-        pointers[p] = v;
+        pointers[p.pointer] = v;
       });
       console.log(inspect(pointers, false, 9));
     });
@@ -385,7 +385,6 @@ describe('JsonPointer', () => {
     };
 
     const obj = JsonPointer.flatten(data);
-    const objf = JsonPointer.flatten(data, true);
 
     it('obj to # of items', () => {
       expect(Object.keys(obj).length).to.eql(tests1.length);
@@ -394,11 +393,6 @@ describe('JsonPointer', () => {
     for (const [p, expected] of tests1) {
       it(`obj['${p}'] === ${JSON.stringify(expected)}`, () => {
         expect(obj[p]).to.eql(expected);
-      });
-    }
-    for (const [p, expected] of tests1f) {
-      it(`obj['${p}'] === ${JSON.stringify(expected)}`, () => {
-        expect(objf[p]).to.eql(expected);
       });
     }
   });

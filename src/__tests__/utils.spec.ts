@@ -128,7 +128,9 @@ describe('Utils', () => {
       );
     });
     for (const [decoded, , p] of fragments) {
-      const d = decoded.map((v) => v + '');
+      const d = decoded.map((v) =>
+        typeof v === 'symbol' ? `Symbol(${v.description})` : v + '',
+      );
       it(`'${p}' === ${JSON.stringify(d)}`, () => {
         expect(decodeUriFragmentIdentifier(p)).to.eql(d);
       });
@@ -223,7 +225,7 @@ describe('Utils', () => {
         );
         const prototyped = {} as unknown as Prototyped;
         expect(prototyped.__proto__).to.be.undefined;
-      }).to.throw('PathSegments must be a string or a number.');
+      }).to.throw('PathSegments must be a string, number, or symbol.');
     });
   });
 

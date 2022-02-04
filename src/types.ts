@@ -1,4 +1,5 @@
-export type PathSegment = string | number;
+export type SafePathSegment = string | number;
+export type PathSegment = SafePathSegment | symbol;
 export type PathSegments = PathSegment[];
 
 export type JsonStringPointer = string;

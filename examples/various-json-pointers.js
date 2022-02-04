@@ -1,5 +1,5 @@
 const assert = require('assert');
-const { JsonPointer: ptr } = require('../');
+const { JsonPointer: ptr, enablePointerCaching } = require('../');
 
 var obj = {
   a: 1,
@@ -20,6 +20,8 @@ var obj = {
     ],
   },
 };
+
+enablePointerCaching(obj);
 
 // JSON Pointers (as strings)
 

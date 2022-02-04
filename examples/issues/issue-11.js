@@ -2,7 +2,7 @@ var ptr = require('../../');
 var util = require('util');
 
 var a = {
-    Foo: []
+  Foo: [],
 };
 
 var p = ptr.create('/Foo/0/Bar/Baz');
@@ -21,12 +21,12 @@ p.set(a, 5, true);
 //   ]
 // }
 console.log(util.inspect(a, false, 9));
-console.log(util.inspect(ptr.list(a), false, 9));
+console.log(util.inspect(ptr.listPointers(a), false, 9));
 
 p = ptr.create('/Foo/Bar/Baz');
 
 var b = {
-    Foo: {}
+  Foo: {},
 };
 
 p.set(b, 5, true);
@@ -40,4 +40,4 @@ p.set(b, 5, true);
 //   }
 // }
 console.log(util.inspect(b, false, 9));
-console.log(util.inspect(ptr.list(a), false, 9));
+console.log(util.inspect(ptr.listPointers(a), false, 9));

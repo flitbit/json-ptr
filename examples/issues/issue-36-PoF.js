@@ -1,5 +1,4 @@
 const { JsonPointer } = require('../../');
-const util = require('util');
 
 const o = {
   id: 1234,
