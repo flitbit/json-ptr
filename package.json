@@ -14,14 +14,9 @@
   "umd": "dist/json-ptr.min.js",
   "exports": {
     ".": {
-      "import": {
-        "default": "./dist/esm/index.js",
-        "types": "./dist/types/index.d.ts"
-      },
-      "require": {
-        "default": "./dist/cjs/index.js",
-        "types": "./dist/types/index.d.ts"
-      }
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
     }
   },
   "types": "dist/types/index.d.ts",
