@@ -543,7 +543,7 @@ export class JsonPointer {
    */
   parent(target: unknown): unknown {
     const p = this.path;
-    if (p.length == 1) return undefined;
+    if (p.length == 1) return target;
     const parent = new JsonPointer(p.slice(0, p.length - 1));
     return parent.get(target);
   }
